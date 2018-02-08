@@ -1,28 +1,10 @@
-Kart3: 
+Kart-SV: 
 ===================
 
 Developers: Dr. Hsin-Nan Lin and Dr. Wen-Lian Hsu Institute of Information Science, Academia Sinica, Taiwan.
 
 # Introduction
 
-
-# Download
-
-Please use the command 
-  ```
-  $ git clone https://github.com/hsinnan75/Kart3.git
-  ```
-to download the package of Kart3.
-
-# Compiling
-
-# Changes
-
-# Get updates
-
-# Instructions
-
-# Usage
 
 # File formats
 

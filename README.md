@@ -77,7 +77,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
 - Output file
 
-    MapCaller can output SAM file and VCF file. 
+    MapCaller outputs a SAM file [optional] and a VCF file. 
 
 # Parameter setting
 

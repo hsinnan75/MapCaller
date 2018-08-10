@@ -15,7 +15,7 @@ Please use the command
 to download the package of MapCaller.
 
 # Compiling
-To compile MapCaller and the index tool, please change to kart's folder and just type 'make' to compile MapCaller and bwt_index. If the compilation or the program fails, please contact me (arith@iis.sinica.edu.tw), Thanks.
+To compile MapCaller and the index tool, please just type 'make' to compile MapCaller and bwt_index. If the compilation or the program fails, please contact me (arith@iis.sinica.edu.tw), Thanks.
 
 # Changes
 version 0.9.0: First version released.
@@ -59,7 +59,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
  case 2: multiple input 
   ```
- $ ./kart -i ecoli -f ReadFileA_1.fq ReadFileB_1.fq ReadFileC_1.fq -f2 ReadFileA_2.fq ReadFileB_2.fq ReadFileC_2.fq -vcf out.vcf
+ $ ./MapCaller -i ecoli -f ReadFileA_1.fq ReadFileB_1.fq ReadFileC_1.fq -f2 ReadFileA_2.fq ReadFileB_2.fq ReadFileC_2.fq -vcf out.vcf
   ```
 
 # File formats

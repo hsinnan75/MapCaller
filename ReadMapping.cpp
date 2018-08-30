@@ -71,7 +71,7 @@ void OutputSamHeaders()
 {
 	int i, len;
 	char buffer[1024];
-	len = sprintf(buffer, "@PG\tID:Kart-SV\tPN:Kart-SV\tVN:%s\n", VersionStr);
+	len = sprintf(buffer, "@PG\tID:MapCaller\tPN:MapCaller\tVN:%s\n", VersionStr);
 
 	fprintf(sam_output, "%s", buffer);
 	for (i = 0; i < iChromsomeNum; i++)

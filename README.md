@@ -104,5 +104,4 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
 -m output multiple alignments [default: false]
 
-
   ```

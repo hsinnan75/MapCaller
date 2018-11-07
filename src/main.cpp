@@ -14,7 +14,7 @@ bool bDebugMode, bPairEnd, bUnique, bSAMoutput, bVCFoutput, gzCompressed, FastQF
 
 void ShowProgramUsage(const char* program)
 {
-	fprintf(stderr, "sv_pred v%s\n\n", VersionStr);
+	fprintf(stderr, "MapCaller v%s\n\n", VersionStr);
 	fprintf(stderr, "Usage: %s -i Index_Prefix -f <ReadFile_A1 ReadFile_B1 ...> [-f2 <ReadFile_A2 ReadFile_B2 ...>]\n\n", program);
 	fprintf(stderr, "Options: -t INT        number of threads [%d]\n", iThreadNum);
 	fprintf(stderr, "         -f            files with #1 mates reads (format:fa, fq, fq.gz)\n");
@@ -25,6 +25,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -m            output multiple alignments\n");
 	fprintf(stderr, "         -no_vcf       No VCF output [false]\n");
 	fprintf(stderr, "         -p            paired-end reads are interlaced in the same file\n");
+	fprintf(stderr, "         -v            version\n");
 	fprintf(stderr, "\n");
 }
 
@@ -170,6 +171,11 @@ int main(int argc, char* argv[])
 			}
 			else if (parameter == "-m") bUnique = false;
 			else if (parameter == "-d" || parameter == "-debug") bDebugMode = true;
+			else if (parameter == "-v" || parameter == "--version")
+			{
+				fprintf(stderr, "MapCaller v%s\n\n", VersionStr);
+				exit(0);
+			}
 			else
 			{
 				fprintf(stderr, "Warning! Unknow parameter: %s\n", argv[i]);

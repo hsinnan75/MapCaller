@@ -505,7 +505,13 @@ void *ReadMapping(void *arg)
 			pthread_mutex_lock(&OutputLock);
 			iTotalReadNum += ReadNum; iTotalMappingNum += MappedNum; iTotalPairedNum += PairedNum; TotalPairedDistance += myTotalDistance, ReadLengthSum += myReadLengthSum;
 			if (iTotalPairedNum > 1000) avgDist = (int)(1.*TotalPairedDistance / iTotalPairedNum + .5);
-			if (bSAMoutput) for (vector<string>::iterator iter = SamStreamVec.begin(); iter != SamStreamVec.end(); iter++) fprintf(sam_output, "%s", iter->c_str());
+			if (bSAMoutput)
+			{
+				for (vector<string>::iterator iter = SamStreamVec.begin(); iter != SamStreamVec.end(); iter++)
+				{
+					fprintf(sam_output, "%s", iter->c_str()); fflush(sam_output);
+				}
+			}
 			pthread_mutex_unlock(&OutputLock);
 			// update the mapping status and the query genome profile
 			if (bVCFoutput) 
@@ -534,7 +540,13 @@ void *ReadMapping(void *arg)
 			if (bSAMoutput) for (SamStreamVec.clear(), i = 0; i != ReadNum; i++) GenerateSingleSamStream(ReadArr[i], SamStreamVec);
 			pthread_mutex_lock(&OutputLock);
 			iTotalReadNum += ReadNum; iTotalMappingNum += MappedNum;
-			if (bSAMoutput) for (vector<string>::iterator iter = SamStreamVec.begin(); iter != SamStreamVec.end(); iter++) fprintf(sam_output, "%s", iter->c_str());
+			if (bSAMoutput)
+			{
+				for (vector<string>::iterator iter = SamStreamVec.begin(); iter != SamStreamVec.end(); iter++)
+				{
+					fprintf(sam_output, "%s", iter->c_str()); fflush(sam_output);
+				}
+			}
 			pthread_mutex_unlock(&OutputLock);
 			// update the mapping status and the query genome profile
 			if (bVCFoutput)

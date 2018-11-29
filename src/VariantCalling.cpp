@@ -228,7 +228,6 @@ void ShowMetaInfo()
 	fprintf(outFile, "##reference=%s\n", IndexFileName);
 	fprintf(outFile, "##INFO=<ID=NS,Number=1,Type=Integer,Description=\"Number of samples with data\">\n");
 	fprintf(outFile, "##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total read depth at the locus\">\n");
-	fprintf(outFile, "##INFO=<ID=NS,Number=1,Type=Integer,Description=\"Number of samples with data\">\n");
 	for (int i = 0; i < iChromsomeNum; i++) fprintf(outFile, "##Contig=<ID=%s,length=%d>\n", ChromosomeVec[i].name, ChromosomeVec[i].len);
 	fprintf(outFile, "##INFO=<ID=TYPE,Type=String,Description=\"The type of allele, either SUBSTITUTE, INSERT, DELETE, DUPLICATION,or BND.\">\n");
 	fprintf(outFile, "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO\n");

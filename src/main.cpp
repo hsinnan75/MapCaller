@@ -25,6 +25,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -m            output multiple alignments\n");
 	fprintf(stderr, "         -no_vcf       No VCF output [false]\n");
 	fprintf(stderr, "         -p            paired-end reads are interlaced in the same file\n");
+	fprintf(stderr, "         -filter       Minimal quality score [%d]\n", MinVarConfScore);
 	fprintf(stderr, "         -v            version\n");
 	fprintf(stderr, "\n");
 }

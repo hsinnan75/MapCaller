@@ -185,8 +185,8 @@ typedef struct
 	int64_t gPos;
 	uint8_t qscore;
 	uint32_t gEnd;
-	uint16_t NS; // Number of samples with data
-	uint16_t DP; // read depth
+	uint16_t NS; // AD (allel depth)
+	uint16_t DP; // total depth
 } VarPos_t;
 
 // Global variables

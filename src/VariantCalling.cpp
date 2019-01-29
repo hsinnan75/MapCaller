@@ -160,7 +160,7 @@ void *IdentifyVariants(void *arg)
 			VarPos.type = var_INS; VarPos.gPos = gPos; VarPos.DP = cov; VarPos.NS = ins_freq;
 			//if (weight >= cov || (VarPos.qscore = -100 * log10((1.0 - (1.0*weight / cov)))) > MaxQscore) VarPos.qscore = MaxQscore;
 			VarPos.qscore = CalQualityScore(weight, cov);
-			if (VarPos.qscore >= MinVarConfScore) MyVarPosVec.push_back(VarPos);
+			if (VarPos.qscore >= 10) MyVarPosVec.push_back(VarPos);
 		}
 		//if (del_freq >= MinBaseDepth && (pre_cov + del_freq) >= minCov && (weight = del_freq * (int)ceil(del_len / 5.0)) >= (int)(pre_cov*0.3))
 		if (del_freq >= MinBaseDepth)
@@ -169,7 +169,7 @@ void *IdentifyVariants(void *arg)
 			VarPos.type = var_DEL; VarPos.gPos = gPos; VarPos.DP = cov; VarPos.NS = del_freq;
 			//if (weight >= pre_cov || (VarPos.qscore = -100 * log10((1.0 - (1.0*weight / pre_cov)))) > MaxQscore) VarPos.qscore = MaxQscore;
 			VarPos.qscore = CalQualityScore(weight, pre_cov);
-			if (VarPos.qscore >= MinVarConfScore) MyVarPosVec.push_back(VarPos);
+			if (VarPos.qscore >= 10) MyVarPosVec.push_back(VarPos);
 		}
 		if ((cov >= MinBaseDepth || cov >= minCov) && cov > ins_freq && cov > del_freq)
 		{
@@ -178,14 +178,14 @@ void *IdentifyVariants(void *arg)
 				VarPos.gPos = gPos; VarPos.type = var_SUB; VarPos.DP = cov; VarPos.NS = p.second;
 				//if (p.second >= (int)(cov*0.8) || ((VarPos.qscore = -100 * log10((1.0 - (1.0*p.second / cov))))) > MaxQscore) VarPos.qscore = MaxQscore;
 				VarPos.qscore = CalQualityScore(p.second, cov);
-				if (VarPos.qscore >= MinVarConfScore) MyVarPosVec.push_back(VarPos);
+				if (VarPos.qscore >= 10) MyVarPosVec.push_back(VarPos);
 			}
 			else if ((diploid_cov = CheckDiploid(cov, MappingRecordArr[gPos])) > p.second)
 			{
-				VarPos.gPos = gPos; VarPos.type = var_SUB; VarPos.DP = cov; VarPos.NS = diploid_cov;
+				VarPos.gPos = gPos; VarPos.type = var_SUB; VarPos.DP = cov; VarPos.NS = diploid_cov - p.second;
 				//if (diploid_cov >= (int)(cov*0.8) || (VarPos.qscore = -100 * log10((1.0 - (1.0*diploid_cov / cov)))) > MaxQscore) VarPos.qscore = MaxQscore;
 				VarPos.qscore = CalQualityScore(diploid_cov, cov);
-				if (VarPos.qscore >= MinVarConfScore) MyVarPosVec.push_back(VarPos);
+				if (VarPos.qscore >= 10) MyVarPosVec.push_back(VarPos);
 			}
 		}
 		pre_cov = cov;
@@ -226,10 +226,13 @@ void ShowMetaInfo()
 {
 	fprintf(outFile, "##fileformat=VCFv4.3\n");
 	fprintf(outFile, "##reference=%s\n", IndexFileName);
-	fprintf(outFile, "##INFO=<ID=NS,Number=1,Type=Integer,Description=\"Number of samples with data\">\n");
-	fprintf(outFile, "##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total read depth at the locus\">\n");
-	for (int i = 0; i < iChromsomeNum; i++) fprintf(outFile, "##Contig=<ID=%s,length=%d>\n", ChromosomeVec[i].name, ChromosomeVec[i].len);
+	fprintf(outFile, "##INFO=<ID=AD,Number=1,Type=Integer,Description=\"Allel depth\">\n");
+	fprintf(outFile, "##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total depth\">\n");
+	fprintf(outFile, "##INFO=<ID=AF,Number=.,Type=Float,Description=\"Allele frequency\">\n");
+	fprintf(outFile, "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n");
+	fprintf(outFile, "##FILTER=<ID=q%d,Description=\"Quality below %d\">\n", MinVarConfScore, MinVarConfScore);
 	fprintf(outFile, "##INFO=<ID=TYPE,Type=String,Description=\"The type of allele, either SUBSTITUTE, INSERT, DELETE, DUPLICATION,or BND.\">\n");
+	for (int i = 0; i < iChromsomeNum; i++) fprintf(outFile, "##Contig=<ID=%s,length=%d>\n", ChromosomeVec[i].name, ChromosomeVec[i].len);
 	fprintf(outFile, "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO\n");
 }
 
@@ -407,14 +410,17 @@ void GenVariantCallingFile()
 {
 	int64_t gPos;
 	string ALTstr;
+	char failstr[64];
+	bool bHomozygote;
 	pair<char, int> p;
 	Coordinate_t coor;
 	map<int, int> VarNumMap;
-	int i, len, num, thr, cov, dupN;
+	int i, n, len, num, thr, cov, dupN;
 	map<string, uint16_t>::iterator IndSeqMapIter;
 
 	outFile = fopen(VcfFileName, "w"); ShowMetaInfo();
 
+	sprintf(failstr, "q%d", MinVarConfScore);
 	for (num = (int)VarPosVec.size(), i = 0; i < num; i++)
 	{
 		gPos = VarPosVec[i].gPos; coor = DetermineCoordinate(gPos); ALTstr.clear();
@@ -424,12 +430,13 @@ void GenVariantCallingFile()
 			VarNumMap[var_SUB]++;
 			thr = GetProfileColumnSize(MappingRecordArr[gPos]) * FrequencyThr; p = GetMaxItemInProfileColumn(MappingRecordArr[gPos]);
 			
-			ALTstr.push_back(p.first);
-			if (MappingRecordArr[gPos].A > thr && p.first != 'A') ALTstr += ",A";
-			if (MappingRecordArr[gPos].C > thr && p.first != 'C') ALTstr += ",C";
-			if (MappingRecordArr[gPos].G > thr && p.first != 'G') ALTstr += ",G";
-			if (MappingRecordArr[gPos].T > thr && p.first != 'T') ALTstr += ",T";
-			fprintf(outFile, "%s	%d	.	%c	%s	%d	%s	DP=%d;NS=%d;TYPE=SUBSTITUTE\n", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos, RefSequence[VarPosVec[i].gPos], ALTstr.c_str(), VarPosVec[i].qscore, (VarPosVec[i].qscore >= 10 ? "PASS" : "q10"), VarPosVec[i].DP, VarPosVec[i].NS);
+			n = 1; if (p.first != RefSequence[gPos]) ALTstr = p.first;
+			if (MappingRecordArr[gPos].A > thr && p.first != 'A') { n++; if (RefSequence[gPos] != 'A') ALTstr += ",A"; }
+			if (MappingRecordArr[gPos].C > thr && p.first != 'C') { n++; if (RefSequence[gPos] != 'C') ALTstr += ",C"; }
+			if (MappingRecordArr[gPos].G > thr && p.first != 'G') { n++; if (RefSequence[gPos] != 'G') ALTstr += ",G"; }
+			if (MappingRecordArr[gPos].T > thr && p.first != 'T') { n++; if (RefSequence[gPos] != 'T') ALTstr += ",T"; }
+			bHomozygote = (n == 1 ? true : false); if (ALTstr[0] == ',') ALTstr = ALTstr.substr(1);
+			fprintf(outFile, "%s	%d	.	%c	%s	%d	%s	DP=%d;AD=%d;AF=%.3f;GT=%s;TYPE=SUBSTITUTE\n", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos, RefSequence[VarPosVec[i].gPos], ALTstr.c_str(), VarPosVec[i].qscore, (VarPosVec[i].qscore >= MinVarConfScore ? "PASS" : failstr), VarPosVec[i].DP, VarPosVec[i].NS, 1.0*VarPosVec[i].NS / VarPosVec[i].DP, (bHomozygote ? "1|1" : "0|1"));
 		}
 		else if (VarPosVec[i].type == var_INS)
 		{
@@ -442,7 +449,7 @@ void GenVariantCallingFile()
 			{
 				VarNumMap[var_INS]++;
 				ALTstr[len - 1] = '\0';
-				fprintf(outFile, "%s	%d	.	%c	%s	%d	%s	DP=%d;NS=%d;TYPE=INSERT\n", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos - 1, RefSequence[gPos - 1], ALTstr.c_str(), VarPosVec[i].qscore, (VarPosVec[i].qscore >= 10 ? "PASS" : "q10"), VarPosVec[i].DP, VarPosVec[i].NS);
+				fprintf(outFile, "%s	%d	.	%c	%s	%d	%s	DP=%d;AD=%d;AF=%.3f;TYPE=INSERT\n", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos - 1, RefSequence[gPos - 1], ALTstr.c_str(), VarPosVec[i].qscore, (VarPosVec[i].qscore >= MinVarConfScore ? "PASS" : failstr), VarPosVec[i].DP, VarPosVec[i].NS, 1.0*VarPosVec[i].NS / VarPosVec[i].DP);
 			}
 		}
 		else if (VarPosVec[i].type == var_DEL)
@@ -456,7 +463,7 @@ void GenVariantCallingFile()
 			{
 				VarNumMap[var_DEL]++;
 				ALTstr[len - 1] = '\0';
-				fprintf(outFile, "%s	%d	.	%s	%c	%d	%s	DP=%d;NS=%d;TYPE=DELETE\n", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos - 1, ALTstr.c_str(), RefSequence[gPos - 1], VarPosVec[i].qscore, (VarPosVec[i].qscore >= 10 ? "PASS" : "q10"), VarPosVec[i].DP, VarPosVec[i].NS);
+				fprintf(outFile, "%s	%d	.	%s	%c	%d	%s	DP=%d;AD=%d;AF=%.3f;TYPE=DELETE\n", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos - 1, ALTstr.c_str(), RefSequence[gPos - 1], VarPosVec[i].qscore, (VarPosVec[i].qscore >= MinVarConfScore ? "PASS" : failstr), VarPosVec[i].DP, VarPosVec[i].NS, VarPosVec[i].NS, 1.0*VarPosVec[i].NS / VarPosVec[i].DP);
 			}
 		}
 		else if (VarPosVec[i].type == var_CNV)

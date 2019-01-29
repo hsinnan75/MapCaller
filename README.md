@@ -98,10 +98,16 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
 -vcf STR VCF output [default: output.vcf]
 
+-filter INT Minimal quality score [default:10]
+
 -no_vcf No VCF output [false]
 
 -size Sequencing fragment size [default: 500, MapCaller can predict the fragment size automatically]
 
 -m output multiple alignments [default: false]
+
+-v version number
+
+-h help
 
   ```

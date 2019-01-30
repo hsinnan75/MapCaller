@@ -238,7 +238,7 @@ void RestoreReferenceInfo()
 	GenomeSize = RefIdx->bns->l_pac; TwoGenomeSize = (GenomeSize << 1);
 	iChromsomeNum = RefIdx->bns->n_seqs; ChromosomeVec.resize(iChromsomeNum);
 
-	fprintf(stderr, "Load the reference sequences (%d chromsomes total size = %lld)...\n", iChromsomeNum, GenomeSize);
+	fprintf(stderr, "Load the reference sequences (%d chromsome%s, total size = %lld bp)...\n", iChromsomeNum, (iChromsomeNum == 1? "":"s"), GenomeSize);
 	fseek(RefIdx->bns->fp_pac, 0, SEEK_SET);
 	size_t ret = fread(RefIdx->pac, 1, GenomeSize / 4 + 1, RefIdx->bns->fp_pac);
 

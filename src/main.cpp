@@ -215,6 +215,12 @@ int main(int argc, char* argv[])
 		{
 			Refbwt = RefIdx->bwt;
 			RestoreReferenceInfo();
+
+			if (GenomeSize <= 0)
+			{
+				fprintf(stderr, "Reference genome is empty\n");
+				exit(1);
+			}
 			if (bVCFoutput)
 			{
 				fprintf(stderr, "Initialize the alignment profile...\n");

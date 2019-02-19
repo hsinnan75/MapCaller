@@ -11,6 +11,7 @@
 #define var_CNV 4 // copy number variation
 #define var_INV 5 // inversion
 #define var_TNL 6 // translocation
+#define var_Som 7 // somatic mutation
 #define var_NIL 255
 
 typedef struct
@@ -131,6 +132,17 @@ uint8_t CalQualityScore(int a, int b)
 	return qs;
 }
 
+int CheckSomaticMutationFrequency(MappingRecord_t& Profile, int thr, char ref_base)
+{
+	int freq = 0;
+
+	if (ref_base != 'A' && Profile.A >= MinAlleleFreq && Profile.A >= thr) freq += Profile.A;
+	if (ref_base != 'C' && Profile.C >= MinAlleleFreq && Profile.C >= thr) freq += Profile.C;
+	if (ref_base != 'G' && Profile.G >= MinAlleleFreq && Profile.G >= thr) freq += Profile.G;
+	if (ref_base != 'T' && Profile.T >= MinAlleleFreq && Profile.T >= thr) freq += Profile.T;
+
+	return freq;
+}
 void *IdentifyVariants(void *arg)
 {
 	VarPos_t VarPos;
@@ -138,6 +150,7 @@ void *IdentifyVariants(void *arg)
 	int64_t gPos, end;
 	vector<int64_t> myDupVec;
 	vector<VarPos_t> MyVarPosVec;
+	vector<pair<char, int> > SomaticMutationVec;
 	map<int64_t, map<string, uint16_t> >::iterator IndMapIter;
 	int i, n, head_idx, num, cov, avg_cov, pre_cov, diploid_cov, ins_freq, ins_len, del_freq, del_len, dup_len, weight, tid = *((int*)arg);
 
@@ -186,6 +199,15 @@ void *IdentifyVariants(void *arg)
 				//if (diploid_cov >= (int)(cov*0.8) || (VarPos.qscore = -100 * log10((1.0 - (1.0*diploid_cov / cov)))) > MaxQscore) VarPos.qscore = MaxQscore;
 				VarPos.qscore = CalQualityScore(diploid_cov, cov);
 				if (VarPos.qscore >= 10) MyVarPosVec.push_back(VarPos);
+			}
+		}
+		else if (bSomatic && cov >= MinBaseDepth)
+		{
+			if ((VarPos.NS = CheckSomaticMutationFrequency(MappingRecordArr[gPos], (int)(cov*0.01), RefSequence[gPos])) > 0)
+			{
+				VarPos.gPos = gPos; VarPos.type = var_Som; VarPos.DP = cov;
+				VarPos.qscore = CalQualityScore(VarPos.NS, cov);
+				MyVarPosVec.push_back(VarPos);
 			}
 		}
 		pre_cov = cov;
@@ -435,6 +457,17 @@ void GenVariantCallingFile()
 			if (MappingRecordArr[gPos].C > thr && p.first != 'C') { n++; if (RefSequence[gPos] != 'C') ALTstr += ",C"; }
 			if (MappingRecordArr[gPos].G > thr && p.first != 'G') { n++; if (RefSequence[gPos] != 'G') ALTstr += ",G"; }
 			if (MappingRecordArr[gPos].T > thr && p.first != 'T') { n++; if (RefSequence[gPos] != 'T') ALTstr += ",T"; }
+			bHomozygote = (n == 1 ? true : false); if (ALTstr[0] == ',') ALTstr = ALTstr.substr(1);
+			fprintf(outFile, "%s	%d	.	%c	%s	%d	%s	DP=%d;AD=%d;AF=%.3f;GT=%s;TYPE=SUBSTITUTE\n", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos, RefSequence[VarPosVec[i].gPos], ALTstr.c_str(), VarPosVec[i].qscore, (VarPosVec[i].qscore >= MinVarConfScore ? "PASS" : failstr), VarPosVec[i].DP, VarPosVec[i].NS, 1.0*VarPosVec[i].NS / VarPosVec[i].DP, (bHomozygote ? "1|1" : "0|1"));
+		}
+		else if (VarPosVec[i].type == var_Som)
+		{
+			VarNumMap[var_SUB]++;
+			n = 0; thr = (int)(GetProfileColumnSize(MappingRecordArr[gPos])*0.01); ALTstr.clear();
+			if (RefSequence[gPos] != 'A' && MappingRecordArr[gPos].A >= MinAlleleFreq && MappingRecordArr[gPos].A >= thr) n++, ALTstr += ",A";;
+			if (RefSequence[gPos] != 'C' && MappingRecordArr[gPos].C >= MinAlleleFreq && MappingRecordArr[gPos].C >= thr) n++, ALTstr += ",C";;
+			if (RefSequence[gPos] != 'G' && MappingRecordArr[gPos].G >= MinAlleleFreq && MappingRecordArr[gPos].G >= thr) n++, ALTstr += ",G";;
+			if (RefSequence[gPos] != 'T' && MappingRecordArr[gPos].T >= MinAlleleFreq && MappingRecordArr[gPos].T >= thr) n++, ALTstr += ",T";;
 			bHomozygote = (n == 1 ? true : false); if (ALTstr[0] == ',') ALTstr = ALTstr.substr(1);
 			fprintf(outFile, "%s	%d	.	%c	%s	%d	%s	DP=%d;AD=%d;AF=%.3f;GT=%s;TYPE=SUBSTITUTE\n", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos, RefSequence[VarPosVec[i].gPos], ALTstr.c_str(), VarPosVec[i].qscore, (VarPosVec[i].qscore >= MinVarConfScore ? "PASS" : failstr), VarPosVec[i].DP, VarPosVec[i].NS, 1.0*VarPosVec[i].NS / VarPosVec[i].DP, (bHomozygote ? "1|1" : "0|1"));
 		}

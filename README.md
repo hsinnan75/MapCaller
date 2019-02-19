@@ -104,6 +104,12 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
 -size Sequencing fragment size [default: 500, MapCaller can predict the fragment size automatically]
 
+-dp INT Minimal read depth for variant calling [5]
+
+-ad INT Minimal ALT allele count [3]
+
+-somatic detect somatic mutations [false]
+
 -m output multiple alignments [default: false]
 
 -v version number

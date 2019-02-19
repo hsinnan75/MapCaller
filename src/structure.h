@@ -204,8 +204,8 @@ extern vector<CoordinatePair_t> DistantPairVec;
 extern vector<string> ReadFileNameVec1, ReadFileNameVec2;
 extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos;
 extern char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
-extern bool bDebugMode, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bVCFoutput;
-extern int iThreadNum, iChromsomeNum, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinBaseDepth, MinVarConfScore, ObserveBegPos, ObserveEndPos;
+extern bool bDebugMode, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bVCFoutput, bSomatic;
+extern int iThreadNum, iChromsomeNum, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinBaseDepth, MinAlleleFreq, MinVarConfScore, ObserveBegPos, ObserveEndPos;
 
 extern vector<DiscordPair_t> InversionSiteVec, TranslocationSiteVec;
 extern map<int64_t, map<string, uint16_t> > InsertSeqMap, DeleteSeqMap;

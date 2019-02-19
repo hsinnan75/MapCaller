@@ -9,8 +9,8 @@ int64_t ObservGenomicPos;
 MappingRecord_t* MappingRecordArr = NULL;
 vector<string> ReadFileNameVec1, ReadFileNameVec2;
 char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
-int iThreadNum, ObserveBegPos, ObserveEndPos, FragmentSize, MinBaseDepth, MinVarConfScore;
-bool bDebugMode, bPairEnd, bUnique, bSAMoutput, bVCFoutput, gzCompressed, FastQFormat;
+bool bDebugMode, bPairEnd, bUnique, bSAMoutput, bVCFoutput, bSomatic, gzCompressed, FastQFormat;
+int iThreadNum, ObserveBegPos, ObserveEndPos, FragmentSize, MinBaseDepth, MinAlleleFreq, MinVarConfScore;
 
 void ShowProgramUsage(const char* program)
 {
@@ -20,9 +20,12 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -f            files with #1 mates reads (format:fa, fq, fq.gz)\n");
 	fprintf(stderr, "         -f2           files with #2 mates reads (format:fa, fq, fq.gz)\n");
 	fprintf(stderr, "         -size         Sequncing fragment size [%d]\n", FragmentSize);
+	fprintf(stderr, "         -dp INT       Minimal read depth for variant calling [%d]\n", MinBaseDepth);
+	fprintf(stderr, "         -ad INT       Minimal ALT allele count [%d]\n", MinAlleleFreq);
 	fprintf(stderr, "         -sam          SAM output filename [NULL]\n");
 	fprintf(stderr, "         -vcf          VCF output filename [%s]\n", VcfFileName);
 	fprintf(stderr, "         -m            output multiple alignments\n");
+	fprintf(stderr, "         -somatic      detect somatic mutations [false]\n");
 	fprintf(stderr, "         -no_vcf       No VCF output [false]\n");
 	fprintf(stderr, "         -p            paired-end reads are interlaced in the same file\n");
 	fprintf(stderr, "         -filter       Minimal quality score [%d]\n", MinVarConfScore);
@@ -107,6 +110,7 @@ int main(int argc, char* argv[])
 	bUnique = true;
 	FastQFormat = true;
 	bSAMoutput = false;
+	bSomatic = false;
 	bVCFoutput = true;
 	gzCompressed = false;
 	FragmentSize = 500;
@@ -114,6 +118,7 @@ int main(int argc, char* argv[])
 	ObserveBegPos = -1;
 	ObserveEndPos = -1;
 	MinBaseDepth = 5;
+	MinAlleleFreq = 3;
 	MinVarConfScore = 10;
 	VcfFileName = (char*)"output.vcf";
 	RefSequence = IndexFileName = SamFileName = NULL;
@@ -155,7 +160,7 @@ int main(int argc, char* argv[])
 			}
 			else if (parameter == "-filter" && i + 1 < argc) MinVarConfScore = atoi(argv[++i]);
 			else if (parameter == "-size" && i + 1 < argc) FragmentSize = atoi(argv[++i]);
-			else if (parameter == "-min") MinBaseDepth = atoi(argv[++i]);
+			else if (parameter == "-dp") MinBaseDepth = atoi(argv[++i]);
 			else if ((parameter == "-sam" || parameter == "-out" || parameter == "-o") && i + 1 < argc)
 			{
 				bSAMoutput = true;
@@ -163,6 +168,7 @@ int main(int argc, char* argv[])
 			}
 			else if ((parameter == "-vcf") && i + 1 < argc) VcfFileName = argv[++i];
 			else if (parameter == "-no_vcf") bVCFoutput = false;
+			else if (parameter == "-somatic") bSomatic = true;
 			else if (parameter == "-pair" || parameter == "-p") bPairEnd = true;
 			else if (parameter == "-obs" && i + 1 < argc) ObservGenomicPos = atoi(argv[++i]);
 			else if (parameter == "-obr" && i + 2 < argc)

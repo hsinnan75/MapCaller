@@ -22,6 +22,7 @@ typedef struct
 } BreakPoint_t;
 
 FILE *outFile;
+char DebugMsg[1024];
 vector<VarPos_t> VarPosVec;
 static pthread_mutex_t Lock;
 vector<BreakPoint_t> BreakPointCanVec;
@@ -157,7 +158,8 @@ void *IdentifyVariants(void *arg)
 	int i, n, head_idx, num, cov, avg_cov, pre_cov, diploid_cov, ins_freq, ins_len, del_freq, del_len, dup_len, weight, tid = *((int*)arg);
 
 	myDupVec.push_back(0);
-	gPos = (tid == 0 ? 0 : (GenomeSize / iThreadNum)*tid); end = (tid == iThreadNum - 1 ? GenomeSize : (GenomeSize / iThreadNum)*(tid + 1));
+	gPos = (tid == 0 ? 0 : (GenomeSize / iThreadNum)*tid);
+	end  = (tid == iThreadNum - 1 ? GenomeSize : (GenomeSize / iThreadNum)*(tid + 1));
 	
 	for (pre_cov = 0; gPos < end; gPos++)
 	{
@@ -212,6 +214,11 @@ void *IdentifyVariants(void *arg)
 				VarPos.qscore = CalQualityScore(VarPos.NS, cov);
 				MyVarPosVec.push_back(VarPos);
 			}
+		}
+		if (gPos == ObservGenomicPos)
+		{
+			Coordinate_t coor = DetermineCoordinate(gPos);
+			sprintf(DebugMsg, "chr=%d, Pos=%d, ACGT=[%d %d %d %d], dp=%d/%d, mutation_freq=%d", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos, MappingRecordArr[gPos].A, MappingRecordArr[gPos].C, MappingRecordArr[gPos].G, MappingRecordArr[gPos].T, cov, MinBaseDepth, CheckSomaticMutationFrequency(MappingRecordArr[gPos], (int)(cov*0.01), RefSequence[gPos]));
 		}
 		pre_cov = cov;
 	}
@@ -552,5 +559,6 @@ void VariantCalling()
 		fprintf(stderr, "Write all the predicted sample variations to file [%s]...\n", VcfFileName); GenVariantCallingFile();
 	}
 	fprintf(stderr, "SV calling has be done in %lld seconds.\n", (long long)(time(NULL) - StartProcessTime));
+	if (bDebugMode) fprintf(stderr, "%s\n", DebugMsg);
 	delete[] ThrIDarr; delete[] ThreadArr;
 }

@@ -259,7 +259,7 @@ int CheckPairedAlignmentDistance(int64_t EstiDistance, vector<AlnCan_t>& AlnCanV
 			if (iter->p_score == max_score)
 			{
 				paired_num++;
-				if (bDebugMode) printf("PairedAlnCan = %d and %d\n", iter->idx1 + 1, iter->idx2 + 1);
+				//if (bDebugMode) printf("PairedAlnCan = %d and %d\n", iter->idx1 + 1, iter->idx2 + 1);
 				AlnCanVec1[iter->idx1].PairedAlnCanIdx = iter->idx2;
 				AlnCanVec2[iter->idx2].PairedAlnCanIdx = iter->idx1;
 			}
@@ -412,11 +412,11 @@ void *ReadMapping(void *arg)
 				n = CheckPairedAlignmentDistance((int)(avgDist*1.5), ReadArr[i].AlnCanVec, ReadArr[j].AlnCanVec);
 				//if (n > 1) printf("%s: %d\n", ReadArr[i].header, n);
 				if (n == 0) n = AlignmentRescue((int)(avgDist*1.5), ReadArr[i], ReadArr[j]); // perform alignment rescue
-				if (bDebugMode)
-				{
-					printf("read1:%s\n", ReadArr[i].header); ShowFragPairCluster(ReadArr[i].AlnCanVec);
-					printf("read2:%s\n", ReadArr[j].header); ShowFragPairCluster(ReadArr[j].AlnCanVec);
-				}
+				//if (bDebugMode)
+				//{
+				//	printf("read1:%s\n", ReadArr[i].header); ShowFragPairCluster(ReadArr[i].AlnCanVec);
+				//	printf("read2:%s\n", ReadArr[j].header); ShowFragPairCluster(ReadArr[j].AlnCanVec);
+				//}
 				if(n == 0)
 				{
 					RemoveRedundantAlnCan(ReadArr[i].AlnCanVec); 

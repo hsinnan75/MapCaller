@@ -307,11 +307,11 @@ bool ProduceReadAlignment(ReadItem_t& read)
 		//	ShowSimplePairInfo(iter->FragPairVec);
 		//	pthread_mutex_unlock(&Lock);
 		//}
-		if (bDebugMode)
-		{
-			printf("Process aln_can#%d: score=%d\n", iter - read.AlnCanVec.begin() + 1, iter->score);
-			ShowSimplePairInfo(iter->FragPairVec);
-		}
+		//if (bDebugMode)
+		//{
+		//	printf("Process aln_can#%d: score=%d\n", iter - read.AlnCanVec.begin() + 1, iter->score);
+		//	ShowSimplePairInfo(iter->FragPairVec);
+		//}
 		bHead = bTail = true; FragPairNum = (int)iter->FragPairVec.size(), TailIdx = FragPairNum - 1;
 		for (i = 0; i < FragPairNum; i++)
 		{
@@ -356,11 +356,11 @@ bool ProduceReadAlignment(ReadItem_t& read)
 				}
 			}
 		}
-		if (bDebugMode)
-		{
-			printf("Done mapping: head(%s), tail(%s)\n", bHead ? "Yes" : "No", bTail ? "Yes" : "No");
-			ShowSimplePairInfo(iter->FragPairVec);
-		}
+		//if (bDebugMode)
+		//{
+		//	printf("Done mapping: head(%s), tail(%s)\n", bHead ? "Yes" : "No", bTail ? "Yes" : "No");
+		//	ShowSimplePairInfo(iter->FragPairVec);
+		//}
 		if (iter->score == 0) continue;
 		else if (!bHead && !bTail) iter->score = 0;
 		else

@@ -82,7 +82,7 @@ int AlignmentRescue(uint32_t EstDist, ReadItem_t& read1, ReadItem_t& read2)
 	else if (score2 - score1 > (int)(read1.rlen>>2)) iFixStrategy = 2;
 	else iFixStrategy = 3;
 
-	if (bDebugMode) printf("Rescue strategy = %d: score1=%d score2=%d\n", iFixStrategy, score1, score2);
+	//if (bDebugMode) printf("Rescue strategy = %d: score1=%d score2=%d\n", iFixStrategy, score1, score2);
 
 	num1 = (int)read1.AlnCanVec.size(); num2 = (int)read2.AlnCanVec.size();
 	if (iFixStrategy == 1 || iFixStrategy == 3) // map read2 with read1's AlnCans;
@@ -139,7 +139,7 @@ int AlignmentRescue(uint32_t EstDist, ReadItem_t& read1, ReadItem_t& read2)
 			}
 		}
 	}
-	if (bDebugMode) printf("Identify %d resuced alignments\n", nPaired);
+	//if (bDebugMode) printf("Identify %d resuced alignments\n", nPaired);
 
 	return nPaired;
 }

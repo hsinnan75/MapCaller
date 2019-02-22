@@ -160,7 +160,8 @@ int main(int argc, char* argv[])
 			}
 			else if (parameter == "-filter" && i + 1 < argc) MinVarConfScore = atoi(argv[++i]);
 			else if (parameter == "-size" && i + 1 < argc) FragmentSize = atoi(argv[++i]);
-			else if (parameter == "-dp") MinBaseDepth = atoi(argv[++i]);
+			else if (parameter == "-dp" && i + 1 < argc) MinBaseDepth = atoi(argv[++i]);
+			else if (parameter == "-ad" && i + 1 < argc) MinAlleleFreq = atoi(argv[++i]);
 			else if ((parameter == "-sam" || parameter == "-out" || parameter == "-o") && i + 1 < argc)
 			{
 				bSAMoutput = true;

@@ -146,6 +146,7 @@ int CheckSomaticMutationFrequency(MappingRecord_t& Profile, int thr, char ref_ba
 void *IdentifyVariants(void *arg)
 {
 	VarPos_t VarPos;
+	bool bSNP = false;
 	pair<char, int> p;
 	int64_t gPos, end;
 	vector<int64_t> myDupVec;
@@ -159,6 +160,7 @@ void *IdentifyVariants(void *arg)
 	
 	for (pre_cov = 0; gPos < end; gPos++)
 	{
+		bSNP = false;
 		cov = GetProfileColumnSize(MappingRecordArr[gPos]); //MappingRecordArr[gPos].count;
 
 		if ((cov + MappingRecordArr[gPos].multi_hit) >= maxCov) myDupVec.push_back(gPos);
@@ -191,17 +193,17 @@ void *IdentifyVariants(void *arg)
 				VarPos.gPos = gPos; VarPos.type = var_SUB; VarPos.DP = cov; VarPos.NS = p.second;
 				//if (p.second >= (int)(cov*0.8) || ((VarPos.qscore = -100 * log10((1.0 - (1.0*p.second / cov))))) > MaxQscore) VarPos.qscore = MaxQscore;
 				VarPos.qscore = CalQualityScore(p.second, cov);
-				if (VarPos.qscore >= 10) MyVarPosVec.push_back(VarPos);
+				if (VarPos.qscore >= 10) bSNP = true, MyVarPosVec.push_back(VarPos);
 			}
 			else if ((diploid_cov = CheckDiploid(cov, MappingRecordArr[gPos])) > p.second)
 			{
 				VarPos.gPos = gPos; VarPos.type = var_SUB; VarPos.DP = cov; VarPos.NS = diploid_cov - p.second;
 				//if (diploid_cov >= (int)(cov*0.8) || (VarPos.qscore = -100 * log10((1.0 - (1.0*diploid_cov / cov)))) > MaxQscore) VarPos.qscore = MaxQscore;
 				VarPos.qscore = CalQualityScore(diploid_cov, cov);
-				if (VarPos.qscore >= 10) MyVarPosVec.push_back(VarPos);
+				if (VarPos.qscore >= 10) bSNP = true, MyVarPosVec.push_back(VarPos);
 			}
 		}
-		else if (bSomatic && cov >= MinBaseDepth)
+		if (!bSNP && bSomatic && cov >= MinBaseDepth)
 		{
 			if ((VarPos.NS = CheckSomaticMutationFrequency(MappingRecordArr[gPos], (int)(cov*0.01), RefSequence[gPos])) > 0)
 			{

@@ -135,11 +135,12 @@ uint8_t CalQualityScore(int a, int b)
 int CheckSomaticMutationFrequency(MappingRecord_t& Profile, int thr, char ref_base)
 {
 	int freq = 0;
+	unsigned char c = nst_nt4_table[(int)ref_base];
 
-	if (ref_base != 'A' && Profile.A >= MinAlleleFreq && Profile.A >= thr) freq += Profile.A;
-	if (ref_base != 'C' && Profile.C >= MinAlleleFreq && Profile.C >= thr) freq += Profile.C;
-	if (ref_base != 'G' && Profile.G >= MinAlleleFreq && Profile.G >= thr) freq += Profile.G;
-	if (ref_base != 'T' && Profile.T >= MinAlleleFreq && Profile.T >= thr) freq += Profile.T;
+	if (c != 0 && Profile.A >= MinAlleleFreq && Profile.A >= thr) freq += Profile.A;
+	if (c != 1 && Profile.C >= MinAlleleFreq && Profile.C >= thr) freq += Profile.C;
+	if (c != 2 && Profile.G >= MinAlleleFreq && Profile.G >= thr) freq += Profile.G;
+	if (c != 2 && Profile.T >= MinAlleleFreq && Profile.T >= thr) freq += Profile.T;
 
 	return freq;
 }

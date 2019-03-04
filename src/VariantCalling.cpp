@@ -208,7 +208,7 @@ void *IdentifyVariants(void *arg)
 		}
 		if (!bSNP && bSomatic && cov >= MinBaseDepth)
 		{
-			if ((VarPos.NS = CheckSomaticMutationFrequency(MappingRecordArr[gPos], (int)(cov*0.01), RefSequence[gPos])) > 0)
+			if ((VarPos.NS = CheckSomaticMutationFrequency(MappingRecordArr[gPos], (int)(cov*0.1), RefSequence[gPos])) > 0)
 			{
 				VarPos.gPos = gPos; VarPos.type = var_Som; VarPos.DP = cov;
 				VarPos.qscore = CalQualityScore(VarPos.NS, cov);
@@ -478,7 +478,8 @@ void GenVariantCallingFile()
 			if (RefSequence[gPos] != 'C' && MappingRecordArr[gPos].C >= MinAlleleFreq && MappingRecordArr[gPos].C >= thr) n++, ALTstr += ",C";;
 			if (RefSequence[gPos] != 'G' && MappingRecordArr[gPos].G >= MinAlleleFreq && MappingRecordArr[gPos].G >= thr) n++, ALTstr += ",G";;
 			if (RefSequence[gPos] != 'T' && MappingRecordArr[gPos].T >= MinAlleleFreq && MappingRecordArr[gPos].T >= thr) n++, ALTstr += ",T";;
-			bHomozygote = (n == 1 ? true : false); if (ALTstr[0] == ',') ALTstr = ALTstr.substr(1);
+			//bHomozygote = (n == 1 ? true : false); if (ALTstr[0] == ',') ALTstr = ALTstr.substr(1);
+			bHomozygote = false; if (ALTstr[0] == ',') ALTstr = ALTstr.substr(1);
 			fprintf(outFile, "%s	%d	.	%c	%s	%d	%s	DP=%d;AD=%d;AF=%.3f;GT=%s;TYPE=SUBSTITUTE\n", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos, RefSequence[VarPosVec[i].gPos], ALTstr.c_str(), VarPosVec[i].qscore, (VarPosVec[i].qscore >= MinVarConfScore ? "PASS" : failstr), VarPosVec[i].DP, VarPosVec[i].NS, 1.0*VarPosVec[i].NS / VarPosVec[i].DP, (bHomozygote ? "1|1" : "0|1"));
 		}
 		else if (VarPosVec[i].type == var_INS)

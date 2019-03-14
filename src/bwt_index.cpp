@@ -253,11 +253,11 @@ void RestoreReferenceInfo()
 		ChrLocMap.insert(make_pair(ChromosomeVec[i].FowardLocation + ChromosomeVec[i].len - 1, i));
 		ChrLocMap.insert(make_pair(ChromosomeVec[i].ReverseLocation + ChromosomeVec[i].len - 1, i));
 
-		if (bDebugMode)
-		{
-			string chr_name = ChromosomeVec[i].name; 
-			if (chr_name == "chr3") ObservGenomicPos = ChromosomeVec[i].FowardLocation + 33183883;
-		}
+		//if (bDebugMode)
+		//{
+		//	string chr_name = ChromosomeVec[i].name; 
+		//	if (chr_name == "chr3") ObservGenomicPos = ChromosomeVec[i].FowardLocation + 33183883;
+		//}
 	}
 	RefSequence = new char[TwoGenomeSize + 1]; RefSequence[TwoGenomeSize] = '\0';
 	RestoreReferenceSequences();

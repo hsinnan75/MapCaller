@@ -247,11 +247,11 @@ void *IdentifyVariants(void *arg)
 				MyVarPosVec.push_back(VarPos);
 			}
 		}
-		if (gPos == ObservGenomicPos)
-		{
-			Coordinate_t coor = DetermineCoordinate(gPos);
-			sprintf(DebugMsg, "chr=%d, Pos=%d, ACGT=[%d %d %d %d], dp=%d/%d, mutation_freq=%d", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos, MappingRecordArr[gPos].A, MappingRecordArr[gPos].C, MappingRecordArr[gPos].G, MappingRecordArr[gPos].T, cov, MinBaseDepth, CheckSomaticMutationFrequency(MappingRecordArr[gPos], (int)(cov*0.01), RefSequence[gPos]));
-		}
+		//if (gPos == ObservGenomicPos)
+		//{
+		//	Coordinate_t coor = DetermineCoordinate(gPos);
+		//	sprintf(DebugMsg, "chr=%d, Pos=%d, ACGT=[%d %d %d %d], dp=%d/%d, mutation_freq=%d", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos, MappingRecordArr[gPos].A, MappingRecordArr[gPos].C, MappingRecordArr[gPos].G, MappingRecordArr[gPos].T, cov, MinBaseDepth, CheckSomaticMutationFrequency(MappingRecordArr[gPos], (int)(cov*0.01), RefSequence[gPos]));
+		//}
 		pre_cov = cov;
 	}
 	myDupVec.push_back(TwoGenomeSize);
@@ -586,6 +586,6 @@ void VariantCalling()
 		fprintf(stderr, "Write all the predicted sample variations to file [%s]...\n", VcfFileName); GenVariantCallingFile();
 	}
 	fprintf(stderr, "SV calling has be done in %lld seconds.\n", (long long)(time(NULL) - StartProcessTime));
-	if (bDebugMode) fprintf(stderr, "%s\n", DebugMsg);
+	//if (bDebugMode) fprintf(stderr, "%s\n", DebugMsg);
 	delete[] ThrIDarr; delete[] ThreadArr;
 }

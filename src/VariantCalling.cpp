@@ -135,16 +135,48 @@ uint8_t CalQualityScore(int a, int b)
 
 int CheckSomaticMutationFrequency(MappingRecord_t& Profile, int thr, char ref_base)
 {
-	int freq = 0;
+	int i, f, freq1 = 0, freq2 = 0;
 	unsigned char c = nst_nt4_table[(int)ref_base];
 
-	if (c != 0 && Profile.A >= MinAlleleFreq && Profile.A >= thr) freq += Profile.A;
-	if (c != 1 && Profile.C >= MinAlleleFreq && Profile.C >= thr) freq += Profile.C;
-	if (c != 2 && Profile.G >= MinAlleleFreq && Profile.G >= thr) freq += Profile.G;
-	if (c != 3 && Profile.T >= MinAlleleFreq && Profile.T >= thr) freq += Profile.T;
+	for (i = 0; i < 4; i++)
+	{
+		if (c == i) continue;
+		switch (i)
+		{
+		case 0: f = Profile.A; break;
+		case 1: f = Profile.C; break;
+		case 2: f = Profile.G; break;
+		case 3: f = Profile.T; break;
+		}
+		if (f >= thr)
+		{
+			if (f > freq1)
+			{
+				freq2 = freq1;
+				freq1 = f;
+			}
+			else if (f > freq2) freq2 = f;
+		}
+	}
+	if (freq1 < MinAlleleFreq || freq2 > (int)(freq1 * 0.2)) freq1 = 0;
 
-	return freq;
+	return freq1;
 }
+
+char IdentifySomaticMutation(MappingRecord_t& Profile, char ref_base)
+{
+	char ret_base;
+	int i, f, max_freq = 0;
+	unsigned char c = nst_nt4_table[(int)ref_base];
+
+	if (c != 0 && Profile.A > max_freq) ret_base = 'A', max_freq = Profile.A;
+	if (c != 1 && Profile.C > max_freq) ret_base = 'C', max_freq = Profile.C;
+	if (c != 2 && Profile.G > max_freq) ret_base = 'G', max_freq = Profile.G;
+	if (c != 3 && Profile.T > max_freq) ret_base = 'T', max_freq = Profile.T;
+
+	return ret_base;
+}
+
 void *IdentifyVariants(void *arg)
 {
 	VarPos_t VarPos;
@@ -208,10 +240,10 @@ void *IdentifyVariants(void *arg)
 		}
 		if (!bSNP && bSomatic && cov >= MinBaseDepth)
 		{
-			if ((VarPos.NS = CheckSomaticMutationFrequency(MappingRecordArr[gPos], (int)(cov*0.1), RefSequence[gPos])) > 0)
+			if ((VarPos.NS = CheckSomaticMutationFrequency(MappingRecordArr[gPos], (int)(cov*0.02), RefSequence[gPos])) > 0)
 			{
 				VarPos.gPos = gPos; VarPos.type = var_Som; VarPos.DP = cov;
-				VarPos.qscore = CalQualityScore(VarPos.NS, cov);
+				VarPos.qscore = CalQualityScore(VarPos.NS, cov*0.5);
 				MyVarPosVec.push_back(VarPos);
 			}
 		}
@@ -472,14 +504,8 @@ void GenVariantCallingFile()
 		}
 		else if (VarPosVec[i].type == var_Som)
 		{
-			VarNumMap[var_SUB]++;
-			n = 0; thr = (int)(GetProfileColumnSize(MappingRecordArr[gPos])*0.01); ALTstr.clear();
-			if (RefSequence[gPos] != 'A' && MappingRecordArr[gPos].A >= MinAlleleFreq && MappingRecordArr[gPos].A >= thr) n++, ALTstr += ",A";;
-			if (RefSequence[gPos] != 'C' && MappingRecordArr[gPos].C >= MinAlleleFreq && MappingRecordArr[gPos].C >= thr) n++, ALTstr += ",C";;
-			if (RefSequence[gPos] != 'G' && MappingRecordArr[gPos].G >= MinAlleleFreq && MappingRecordArr[gPos].G >= thr) n++, ALTstr += ",G";;
-			if (RefSequence[gPos] != 'T' && MappingRecordArr[gPos].T >= MinAlleleFreq && MappingRecordArr[gPos].T >= thr) n++, ALTstr += ",T";;
-			//bHomozygote = (n == 1 ? true : false); if (ALTstr[0] == ',') ALTstr = ALTstr.substr(1);
-			bHomozygote = false; if (ALTstr[0] == ',') ALTstr = ALTstr.substr(1);
+			VarNumMap[var_SUB]++; bHomozygote = false;
+			n = 0; ALTstr = IdentifySomaticMutation(MappingRecordArr[gPos], RefSequence[gPos]);
 			fprintf(outFile, "%s	%d	.	%c	%s	%d	%s	DP=%d;AD=%d;AF=%.3f;GT=%s;TYPE=SUBSTITUTE\n", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos, RefSequence[VarPosVec[i].gPos], ALTstr.c_str(), VarPosVec[i].qscore, (VarPosVec[i].qscore >= MinVarConfScore ? "PASS" : failstr), VarPosVec[i].DP, VarPosVec[i].NS, 1.0*VarPosVec[i].NS / VarPosVec[i].DP, (bHomozygote ? "1|1" : "0|1"));
 		}
 		else if (VarPosVec[i].type == var_INS)

@@ -34,6 +34,7 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 	for (vector<AlnCan_t>::iterator iter = AlnCanVec.begin(); iter != AlnCanVec.end(); iter++)
 	{
 		if (iter->score == 0) continue;
+		if (bSomatic && iter->score < (read->rlen - 2)) continue;
 
 		num = iter->FragPairVec.size(); TailIdx = num - 1;
 

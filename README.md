@@ -94,7 +94,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
 -p the input read file consists of interleaved paired-end sequences [default: false]
 
--sam STR SAM output [optional, default: no SAM output]
+-sam STR SAM/BAM output [optional, default: no mapping output, out.sam for SAM output, out.bam for BAM output]
 
 -vcf STR VCF output [default: output.vcf]
 

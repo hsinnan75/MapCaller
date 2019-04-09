@@ -1,6 +1,9 @@
 .KEEP_STAT:
 
-all:		main index
+all:		main
+
+htslib:
+		make -C src/htslib
 
 main:
 		make -C src && mv src/MapCaller .

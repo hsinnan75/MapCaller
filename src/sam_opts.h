@@ -28,7 +28,7 @@ DEALINGS IN THE SOFTWARE.  */
 #include <stdio.h>
 #include <limits.h>
 #include <getopt.h>
-#include <htslib/hts.h>
+#include "htslib/htslib/hts.h"
 
 typedef struct sam_global_args {
     htsFormat in;

@@ -180,7 +180,7 @@ static void BWTIncSetBuildSizeAndTextAddr(BWTInc *bwtInc)
 							 - (3 + bwtInc->numberOfIterationDone * OCC_INTERVAL / BIT_PER_CHAR) * (sizeof(bgint_t) / 4)) 
 							 / 3 / (sizeof(bgint_t) / 4);
 		if (maxBuildSize < CHAR_PER_WORD) {
-			fprintf(stderr, "BWTIncSetBuildSizeAndTextAddr(): Not enough space allocated to continue construction!\n");
+			fprintf(stdout, "BWTIncSetBuildSizeAndTextAddr(): Not enough space allocated to continue construction!\n");
 			exit(1);
 		}
 		if (bwtInc->incMaxBuildSize > 0) {
@@ -193,7 +193,7 @@ static void BWTIncSetBuildSizeAndTextAddr(BWTInc *bwtInc)
 	}
 
 	if (bwtInc->buildSize < CHAR_PER_WORD) {
-		fprintf(stderr, "BWTIncSetBuildSizeAndTextAddr(): Not enough space allocated to continue construction!\n");
+		fprintf(stdout, "BWTIncSetBuildSizeAndTextAddr(): Not enough space allocated to continue construction!\n");
 		exit(1);
 	}
 
@@ -376,7 +376,7 @@ BWTInc *BWTIncCreate(const bgint_t textLength, unsigned int initialMaxBuildSize,
 		+ OCC_INTERVAL / BIT_PER_CHAR * n_iter * 2 * (sizeof(bgint_t) / 4) // buffer at the end of occ array 
 		+ incMaxBuildSize/5 * 3 * (sizeof(bgint_t) / 4); // space for the 3 temporary arrays in each iteration
 	if (bwtInc->availableWord < MIN_AVAILABLE_WORD) bwtInc->availableWord = MIN_AVAILABLE_WORD; // lh3: otherwise segfaul when availableWord is too small
-	fprintf(stderr, "[%s] textLength=%ld, availableWord=%ld\n", __func__, (long)textLength, (long)bwtInc->availableWord);
+	fprintf(stdout, "[%s] textLength=%ld, availableWord=%ld\n", __func__, (long)textLength, (long)bwtInc->availableWord);
 	bwtInc->workingMemory = (unsigned*)calloc(bwtInc->availableWord, BYTES_IN_WORD);
 
 	return bwtInc;
@@ -472,7 +472,7 @@ static void ForwardDNAAllOccCountNoLimit(const unsigned int*  dna, const bgint_t
 			} else if (sum == 0x00000000) {
 				occCount[3] += 256;
 			} else {
-				fprintf(stderr, "ForwardDNAAllOccCountNoLimit(): DNA occ sum exception!\n");
+				fprintf(stdout, "ForwardDNAAllOccCountNoLimit(): DNA occ sum exception!\n");
 				exit(1);
 			}
 		}
@@ -1448,24 +1448,24 @@ BWTInc *BWTIncConstructFromPacked(const char *inputFileName, bgint_t initialMaxB
 	packedFile = (FILE*)fopen(inputFileName, "rb");
 
 	if (packedFile == NULL) {
-		fprintf(stderr, "BWTIncConstructFromPacked() : Cannot open %s : %s\n",
+		fprintf(stdout, "BWTIncConstructFromPacked() : Cannot open %s : %s\n",
 				inputFileName, strerror(errno));
 		exit(1);
 	}
 
 	if (fseek(packedFile, -1, SEEK_END) != 0) {
-		fprintf(stderr, "BWTIncConstructFromPacked() : Can't seek on %s : %s\n",
+		fprintf(stdout, "BWTIncConstructFromPacked() : Can't seek on %s : %s\n",
 				inputFileName, strerror(errno));
 		exit(1);
 	}
 	packedFileLen = ftell(packedFile);
 	if (packedFileLen == -1) {
-		fprintf(stderr, "BWTIncConstructFromPacked() : Can't ftell on %s : %s\n",
+		fprintf(stdout, "BWTIncConstructFromPacked() : Can't ftell on %s : %s\n",
 				inputFileName, strerror(errno));
 		exit(1);
 	}
 	if (fread(&lastByteLength, sizeof(unsigned char), 1, packedFile) != 1) {
-		fprintf(stderr,
+		fprintf(stdout,
 				"BWTIncConstructFromPacked() : Can't read from %s : %s\n",
 				inputFileName,
 				ferror(packedFile)? strerror(errno) : "Unexpected end of file");
@@ -1485,19 +1485,19 @@ BWTInc *BWTIncConstructFromPacked(const char *inputFileName, bgint_t initialMaxB
 	textSizeInByte = textToLoad / CHAR_PER_BYTE;	// excluded the odd byte
 
 	if (fseek(packedFile, -((long)textSizeInByte + 2), SEEK_CUR) != 0) {
-		fprintf(stderr, "BWTIncConstructFromPacked() : Can't seek on %s : %s\n",
+		fprintf(stdout, "BWTIncConstructFromPacked() : Can't seek on %s : %s\n",
 				inputFileName, strerror(errno));
 		exit(1);
 	}
 	if (fread(bwtInc->textBuffer, sizeof(unsigned char), textSizeInByte + 1, packedFile) != textSizeInByte + 1) {
-		fprintf(stderr,
+		fprintf(stdout,
 				"BWTIncConstructFromPacked() : Can't read from %s : %s\n",
 				inputFileName,
 				ferror(packedFile)? strerror(errno) : "Unexpected end of file");
 		exit(1);
 	}
 	if (fseek(packedFile, -((long)textSizeInByte + 1), SEEK_CUR) != 0) {
-		fprintf(stderr, "BWTIncConstructFromPacked() : Can't seek on %s : %s\n",
+		fprintf(stdout, "BWTIncConstructFromPacked() : Can't seek on %s : %s\n",
 				inputFileName, strerror(errno));
 		exit(1);
 	}
@@ -1514,19 +1514,19 @@ BWTInc *BWTIncConstructFromPacked(const char *inputFileName, bgint_t initialMaxB
 		}
 		textSizeInByte = textToLoad / CHAR_PER_BYTE;
 		if (fseek(packedFile, -((long)textSizeInByte), SEEK_CUR) != 0) {
-			fprintf(stderr, "BWTIncConstructFromPacked() : Can't seek on %s : %s\n",
+			fprintf(stdout, "BWTIncConstructFromPacked() : Can't seek on %s : %s\n",
 					inputFileName, strerror(errno));
 			exit(1);
 		}
 		if (fread(bwtInc->textBuffer, sizeof(unsigned char), textSizeInByte, packedFile) != textSizeInByte) {
-			fprintf(stderr,
+			fprintf(stdout,
 				"BWTIncConstructFromPacked() : Can't read from %s : %s\n",
 				inputFileName,
 				ferror(packedFile)? strerror(errno) : "Unexpected end of file");
 			exit(1);
 		}
 		if (fseek(packedFile, -((long)textSizeInByte), SEEK_CUR) != 0) {
-			fprintf(stderr, "BWTIncConstructFromPacked() : Can't seek on %s : %s\n",
+			fprintf(stdout, "BWTIncConstructFromPacked() : Can't seek on %s : %s\n",
 					inputFileName, strerror(errno));
 			exit(1);
 		}
@@ -1534,7 +1534,7 @@ BWTInc *BWTIncConstructFromPacked(const char *inputFileName, bgint_t initialMaxB
 		BWTIncConstruct(bwtInc, textToLoad);
 		processedTextLength += textToLoad;
 		if (bwtInc->numberOfIterationDone % 10 == 0) {
-			fprintf(stderr, "[BWTIncConstructFromPacked] %lu iterations done. %lu characters processed.\n",
+			fprintf(stdout, "[BWTIncConstructFromPacked] %lu iterations done. %lu characters processed.\n",
 					(long)bwtInc->numberOfIterationDone, (long)processedTextLength);
 		}
 	}
@@ -1574,7 +1574,7 @@ void BWTSaveBwtCodeAndOcc(const BWT *bwt, const char *bwtFileName, const char *o
 
 	bwtFile = (FILE*)fopen(bwtFileName, "wb");
 	if (bwtFile == NULL) {
-		fprintf(stderr,
+		fprintf(stdout,
 				"BWTSaveBwtCodeAndOcc(): Cannot open %s for writing: %s\n",
 				bwtFileName, strerror(errno));
 		exit(1);
@@ -1587,12 +1587,12 @@ void BWTSaveBwtCodeAndOcc(const BWT *bwt, const char *bwtFileName, const char *o
 				  sizeof(bgint_t), ALPHABET_SIZE, bwtFile) != ALPHABET_SIZE
 		|| fwrite(bwt->bwtCode,
 				  sizeof(unsigned int), bwtLength, bwtFile) != bwtLength) {
-		fprintf(stderr, "BWTSaveBwtCodeAndOcc(): Error writing to %s : %s\n",
+		fprintf(stdout, "BWTSaveBwtCodeAndOcc(): Error writing to %s : %s\n",
 				bwtFileName, strerror(errno));
 		exit(1);
 	}
 	if (fclose(bwtFile) != 0) {
-		fprintf(stderr, "BWTSaveBwtCodeAndOcc(): Error on closing %s : %s\n",
+		fprintf(stdout, "BWTSaveBwtCodeAndOcc(): Error on closing %s : %s\n",
 				bwtFileName, strerror(errno));
 		exit(1);
 	}

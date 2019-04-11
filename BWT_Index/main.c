@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
 	if (argc != 3)
 	{
-		fprintf(stderr, "Usage: %s Ref_File[ex. ref.fa] Prefix[ex. MyRef]\n", argv[0]);
+		fprintf(stdout, "Usage: %s Ref_File[ex. ref.fa] Prefix[ex. MyRef]\n", argv[0]);
 	}
 	else bwa_idx_build(argv[1], argv[2]);
 

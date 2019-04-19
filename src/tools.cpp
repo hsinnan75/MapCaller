@@ -93,7 +93,7 @@ void ShowSimplePairInfo(vector<FragPair_t>& FragPairVec)
 				printf("\t\t%s\n", str);
 				delete[] str;
 			}
-			else if (iter->rLen > 0 && iter->gLen > 0)
+			else //if (iter->rLen > 0 || iter->gLen > 0)
 			{
 				printf("\t\t%s\n\t\t%s\n", iter->aln1.c_str(), iter->aln2.c_str());
 			}
@@ -185,6 +185,26 @@ void ShowProfileColumn(int64_t gPos)
 
 void ShowVariationProfile(int64_t begin_pos, int64_t end_pos)
 {
-	printf("ShowVariationProfile\n");
-	for (int64_t gPos = begin_pos; gPos < end_pos; gPos++) ShowProfileColumn(gPos);
+	if (end_pos >= GenomeSize) end_pos = GenomeSize - 1;
+	for (int64_t gPos = begin_pos; gPos <= end_pos; gPos++) ShowProfileColumn(gPos);
+}
+
+void ShowIndSeq(int64_t begin_pos, int64_t end_pos)
+{
+	for (map<int64_t, map<string, uint16_t> >::iterator iter = InsertSeqMap.begin(); iter != InsertSeqMap.end(); iter++)
+	{
+		if (iter->first >= begin_pos && iter->first <= end_pos)
+		{
+			for (map<string, uint16_t>::iterator SeqMapIter = iter->second.begin(); SeqMapIter != iter->second.end(); SeqMapIter++)
+				fprintf(stdout, "INS:%lld	[%s] freq=%d\n", (long long)iter->first, (char*)SeqMapIter->first.c_str(), SeqMapIter->second);
+		}
+	}
+	for (map<int64_t, map<string, uint16_t> >::iterator iter = DeleteSeqMap.begin(); iter != DeleteSeqMap.end(); iter++)
+	{
+		if (iter->first >= begin_pos && iter->first < end_pos)
+		{
+			for (map<string, uint16_t>::iterator SeqMapIter = iter->second.begin(); SeqMapIter != iter->second.end(); SeqMapIter++)
+				fprintf(stdout, "DEL:%lld	%d	[%s]\n", (long long)iter->first, SeqMapIter->second, (char*)SeqMapIter->first.c_str());
+		}
+	}
 }

@@ -2,15 +2,17 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.0";
+const char* VersionStr = "0.9.9";
 
+string CmdLine;
+float FrequencyThr;
 time_t StartProcessTime;
-int64_t ObservGenomicPos;
 MappingRecord_t* MappingRecordArr = NULL;
 vector<string> ReadFileNameVec1, ReadFileNameVec2;
+int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
-bool bDebugMode, bPairEnd, bUnique, bSAMoutput, bVCFoutput, bSomatic, gzCompressed, FastQFormat;
-int iThreadNum, ObserveBegPos, ObserveEndPos, FragmentSize, MinBaseDepth, MinAlleleFreq, MinVarConfScore;
+int iThreadNum, FragmentSize, MinAlleleFreq, MinIndFreq, MinVarConfScore;
+bool bDebugMode, bSensitive, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic, gzCompressed, FastQFormat;
 
 void ShowProgramUsage(const char* program)
 {
@@ -20,9 +22,9 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -f            files with #1 mates reads (format:fa, fq, fq.gz)\n");
 	fprintf(stderr, "         -f2           files with #2 mates reads (format:fa, fq, fq.gz)\n");
 	fprintf(stderr, "         -size         Sequncing fragment size [%d]\n", FragmentSize);
-	fprintf(stderr, "         -dp INT       Minimal read depth for variant calling [%d]\n", MinBaseDepth);
 	fprintf(stderr, "         -ad INT       Minimal ALT allele count [%d]\n", MinAlleleFreq);
 	fprintf(stderr, "         -sam          SAM output filename [NULL]\n");
+	fprintf(stderr, "         -bam          BAM output filename [NULL]\n");
 	fprintf(stderr, "         -vcf          VCF output filename [%s]\n", VcfFileName);
 	fprintf(stderr, "         -m            output multiple alignments\n");
 	fprintf(stderr, "         -somatic      detect somatic mutations [false]\n");
@@ -105,11 +107,13 @@ int main(int argc, char* argv[])
 	string parameter, str;
 
 	iThreadNum = 16;
+	bSensitive = false;
 	bPairEnd = false;
 	bDebugMode = false;
 	bUnique = true;
 	FastQFormat = true;
 	bSAMoutput = false;
+	bSAMFormat = true;
 	bSomatic = false;
 	bVCFoutput = true;
 	gzCompressed = false;
@@ -117,9 +121,10 @@ int main(int argc, char* argv[])
 	ObservGenomicPos = -1;
 	ObserveBegPos = -1;
 	ObserveEndPos = -1;
-	MinBaseDepth = 5;
-	MinAlleleFreq = 3;
+	MinAlleleFreq = 10;
 	MinVarConfScore = 10;
+	FrequencyThr = 0.2;
+	MinIndFreq = 5;
 	VcfFileName = (char*)"output.vcf";
 	RefSequence = IndexFileName = SamFileName = NULL;
 
@@ -131,6 +136,8 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
+		for (CmdLine = argv[0], i = 1; i < argc; i++) CmdLine += " " + (string)argv[i];
+
 		for (i = 1; i < argc; i++)
 		{
 			parameter = argv[i];
@@ -160,13 +167,21 @@ int main(int argc, char* argv[])
 			}
 			else if (parameter == "-filter" && i + 1 < argc) MinVarConfScore = atoi(argv[++i]);
 			else if (parameter == "-size" && i + 1 < argc) FragmentSize = atoi(argv[++i]);
-			else if (parameter == "-dp" && i + 1 < argc) MinBaseDepth = atoi(argv[++i]);
 			else if (parameter == "-ad" && i + 1 < argc) MinAlleleFreq = atoi(argv[++i]);
-			else if ((parameter == "-sam" || parameter == "-out" || parameter == "-o") && i + 1 < argc)
+			else if (parameter == "-ind" && i + 1 < argc) MinIndFreq = atoi(argv[++i]);
+			else if ((parameter == "-sam") && i + 1 < argc)
 			{
 				bSAMoutput = true;
+				bSAMFormat = true;
 				SamFileName = argv[++i];
 			}
+			else if ((parameter == "-bam") && i + 1 < argc)
+			{
+				bSAMoutput = true;
+				bSAMFormat = false;
+				SamFileName = argv[++i];
+			}
+			else if (parameter == "-freq" && i + 1 < argc) FrequencyThr = atof(argv[++i]);
 			else if ((parameter == "-vcf") && i + 1 < argc) VcfFileName = argv[++i];
 			else if (parameter == "-no_vcf") bVCFoutput = false;
 			else if (parameter == "-somatic") bSomatic = true;
@@ -176,6 +191,7 @@ int main(int argc, char* argv[])
 			{
 				ObserveBegPos = atoi(argv[++i]);
 				ObserveEndPos = atoi(argv[++i]);
+				fprintf(stderr, "obr[%lld - %lld]\n", ObserveBegPos, ObserveEndPos);
 			}
 			else if (parameter == "-m") bUnique = false;
 			else if (parameter == "-d" || parameter == "-debug") bDebugMode = true;
@@ -209,6 +225,8 @@ int main(int argc, char* argv[])
 		if (CheckInputFiles() == false) exit(0);
 		if (SamFileName != NULL && CheckOutputFileName(SamFileName) == false) exit(0);
 		if (VcfFileName != NULL && CheckOutputFileName(VcfFileName) == false) exit(0);
+		//if (MinAlleleFreq > MinBaseDepth) MinAlleleFreq = MinBaseDepth;
+		//fprintf(stderr, "AD=%d\n", MinAlleleFreq);
 
 		if (IndexFileName != NULL && CheckBWAIndexFiles(IndexFileName)) RefIdx = bwa_idx_load(IndexFileName);
 		else
@@ -236,7 +254,6 @@ int main(int argc, char* argv[])
 			StartProcessTime = time(NULL);
 			Mapping();
 			if (bVCFoutput) VariantCalling();
-			//if (bVCFoutput && ObserveBegPos != -1 && ObserveEndPos != -1) ShowVariationProfile(ObserveBegPos, ObserveEndPos);
 			bwa_idx_destroy(RefIdx);
 			if (RefSequence != NULL) delete[] RefSequence;
 			if (MappingRecordArr != NULL) delete[] MappingRecordArr;

@@ -156,7 +156,6 @@ typedef struct
 	uint16_t C;
 	uint16_t G;
 	uint16_t T;
-	uint32_t multi_hit;
 } MappingRecord_t;
 
 typedef struct
@@ -181,16 +180,18 @@ typedef struct
 
 typedef struct
 {
-	uint8_t type;
-	int64_t gPos;
-	uint8_t qscore;
-	uint32_t gEnd;
 	uint16_t NS; // AD (allel depth)
 	uint16_t DP; // total depth
-} VarPos_t;
+	int64_t gPos;
+	string ALTstr;
+	bool GenoType; //0:homo, 1:heter
+	uint8_t qscore;
+	uint8_t VarType;
+} Variant_t;
 
 // Global variables
 extern bwt_t *Refbwt;
+extern string CmdLine;
 extern bwaidx_t *RefIdx;
 extern uint32_t avgDist;
 extern const char* VersionStr;
@@ -202,10 +203,10 @@ extern MappingRecord_t* MappingRecordArr;
 extern vector<Chromosome_t> ChromosomeVec;
 extern vector<CoordinatePair_t> DistantPairVec;
 extern vector<string> ReadFileNameVec1, ReadFileNameVec2;
-extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos;
 extern char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
-extern bool bDebugMode, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bVCFoutput, bSomatic;
-extern int iThreadNum, iChromsomeNum, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinBaseDepth, MinAlleleFreq, MinVarConfScore, ObserveBegPos, ObserveEndPos;
+extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos, ObserveBegPos, ObserveEndPos;
+extern bool bDebugMode, bSensitive, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic;
+extern int iThreadNum, iChromsomeNum, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleFreq, MinIndFreq, MinVarConfScore;
 
 extern vector<DiscordPair_t> InversionSiteVec, TranslocationSiteVec;
 extern map<int64_t, map<string, uint16_t> > InsertSeqMap, DeleteSeqMap;
@@ -222,6 +223,7 @@ extern void VariantCalling();
 
 // ReadMapping.cpp
 extern void Mapping();
+extern int CheckAlnNumber(vector<AlnCan_t>& AlnCanVec);
 extern void ShowFragPairCluster(vector<AlnCan_t>& AlnCanVec);
 extern bool CompByPosDiff(const FragPair_t& p1, const FragPair_t& p2);
 extern vector<AlnCan_t> SimplePairClustering(int rlen, vector<FragPair_t>& SimplePairVec);
@@ -234,10 +236,11 @@ extern int AlignmentRescue(uint32_t EstDist, ReadItem_t& read1, ReadItem_t& read
 
 // AlignmentProfile.cpp
 extern void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec);
-extern void UpdateMultiHitCount(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec);
+//extern void UpdateMultiHitCount(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec);
 
 // SamReport.cpp
 extern void GenerateSingleSamStream(ReadItem_t& read, vector<string>& SamStreamVec);
+extern Coordinate_t GetAlnCoordinate(bool orientation, vector<FragPair_t>& FragPairVec);
 extern void GeneratePairedSamStream(ReadItem_t& read1, ReadItem_t& read2, vector<string>& SamStreamVec);
 
 // tools.cpp
@@ -248,6 +251,7 @@ extern bool CheckFragValidity(FragPair_t FragPair);
 extern void SelfComplementarySeq(int len, char* rseq);
 extern Coordinate_t DetermineCoordinate(int64_t gPos);
 extern int GetProfileColumnSize(MappingRecord_t& Profile);
+extern void ShowIndSeq(int64_t begin_pos, int64_t end_pos);
 extern void ShowFragmentPair(char* ReadSeq, FragPair_t& fp);
 extern void ShowSimplePairInfo(vector<FragPair_t>& FragPairVec);
 extern void GetComplementarySeq(int len, char* seq, char* rseq);

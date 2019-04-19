@@ -262,7 +262,8 @@ void RestoreReferenceInfo()
 	RefSequence = new char[TwoGenomeSize + 1]; RefSequence[TwoGenomeSize] = '\0';
 	RestoreReferenceSequences();
 
-	//printf("GenomeSize=%lld\n", GenomeSize);
+	//for (i = 0; i < iChromsomeNum; i++) printf("%s, %lld\n", ChromosomeVec[i].name, ChromosomeVec[i].FowardLocation);
+	////printf("GenomeSize=%lld\n", GenomeSize);
 	//for (map<int64_t, int>::iterator iter = ChrLocMap.begin(); iter != ChrLocMap.end(); iter++)
 	//{
 	//	i = iter->second;

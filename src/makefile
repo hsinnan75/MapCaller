@@ -13,7 +13,7 @@ OBJECT		= $(SOURCE:%.cpp=%.o)
 			$(Compiler) $(FLAGS) -c $<
 
 main:		$(OBJECT)
-			$(Compiler) $(FLAGS) $(OBJECT) -o MapCaller $(LIB)
+			$(Compiler) $(FLAGS) $(OBJECT) -o MapCaller $(LIB) htslib/libhts.a -lbz2 -llzma
 
 clean:
 		rm -f *.o *~

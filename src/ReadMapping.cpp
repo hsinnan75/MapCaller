@@ -1,14 +1,19 @@
 #include "structure.h"
+#include "htslib/htslib/sam.h"
+#include "sam_opts.h"
+#include "htslib/htslib/kseq.h"
+#include "htslib/htslib/kstring.h"
 
 #define MinInversionSize 1000
 #define MaxPairedDistance 2000
 #define MaxInversionSize 10000000
 #define MinTranslocationSize 1000
 
-gzFile gzOutput;
 FILE *vcf_output;
+FILE *sam_out = 0;
+samFile *bam_out = 0;
+bam_hdr_t *header = NULL;
 bool bSepLibrary = false;
-FILE *sam_output = stdout;
 FILE *ReadFileHandler1, *ReadFileHandler2;
 gzFile gzReadFileHandler1, gzReadFileHandler2;
 static pthread_mutex_t LibraryLock, ProfileLock, OutputLock;
@@ -67,17 +72,54 @@ void ResetPairedIdx(vector<AlnCan_t>& AlnCanVec)
 	for (vector<AlnCan_t>::iterator iter = AlnCanVec.begin(); iter != AlnCanVec.end(); iter++) iter->PairedAlnCanIdx = -1;
 }
 
+static bam_hdr_t *sam_hdr_sanitise(bam_hdr_t *h)
+{
+	if (!h) return NULL;
+	if (h->l_text == 0) return h;
+
+	uint32_t i;
+	char *cp = h->text;
+	for (i = 0; i < h->l_text; i++) {
+		// NB: l_text excludes terminating nul.  This finds early ones.
+		if (cp[i] == 0) break;
+	}
+	if (i < h->l_text) { // Early nul found.  Complain if not just padding.
+		uint32_t j = i;
+		while (j < h->l_text && cp[j] == '\0') j++;
+	}
+	return h;
+}
+
+bam_hdr_t *SamHdr2BamHdr(kstring_t *str)
+{
+	bam_hdr_t *h = NULL;
+	h = sam_hdr_parse(str->l, str->s);
+	h->l_text = str->l; h->text = str->s;
+
+	return sam_hdr_sanitise(h);
+}
+
 void OutputSamHeaders()
 {
 	int i, len;
 	char buffer[1024];
+	kstring_t str = { 0, 0, NULL };
+
 	len = sprintf(buffer, "@PG\tID:MapCaller\tPN:MapCaller\tVN:%s\n", VersionStr);
 
-	fprintf(sam_output, "%s", buffer);
+	if(bSAMFormat) fprintf(sam_out, "%s", buffer);
+	else kputsn(buffer, len, &str);
+
 	for (i = 0; i < iChromsomeNum; i++)
 	{
 		len = sprintf(buffer, "@SQ\tSN:%s\tLN:%lld\n", ChromosomeVec[i].name, ChromosomeVec[i].len);
-		fprintf(sam_output, "%s", buffer);
+		if (bSAMFormat) fprintf(sam_out, "%s", buffer);
+		else kputsn(buffer, len, &str);
+	}
+	if (!bSAMFormat)
+	{
+		header = SamHdr2BamHdr(&str);
+		sam_hdr_write(bam_out, header);
 	}
 }
 
@@ -422,10 +464,8 @@ void *ReadMapping(void *arg)
 					RemoveRedundantAlnCan(ReadArr[i].AlnCanVec); 
 					RemoveRedundantAlnCan(ReadArr[j].AlnCanVec); 
 				}
-				else
-				{
-					MaskUnPairedAlnCan(ReadArr[i].AlnCanVec, ReadArr[j].AlnCanVec);
-				}
+				else MaskUnPairedAlnCan(ReadArr[i].AlnCanVec, ReadArr[j].AlnCanVec);
+
 				if (ProduceReadAlignment(ReadArr[i])) MappedNum++;
 				if (ProduceReadAlignment(ReadArr[j])) MappedNum++;
 				//if (bDebugMode)
@@ -505,11 +545,42 @@ void *ReadMapping(void *arg)
 			pthread_mutex_lock(&OutputLock);
 			iTotalReadNum += ReadNum; iTotalMappingNum += MappedNum; iTotalPairedNum += PairedNum; TotalPairedDistance += myTotalDistance, ReadLengthSum += myReadLengthSum;
 			if (iTotalPairedNum > 1000) avgDist = (int)(1.*TotalPairedDistance / iTotalPairedNum + .5);
+
+			//Coordinate_t coor1, coor2;
+			//extern Coordinate_t GetAlnCoordinate(bool orientation, vector<FragPair_t>& FragPairVec);
+			//for (i = 0, j = 1; i != ReadNum; i += 2, j += 2)
+			//{
+			//	if (CheckAlnNumber(ReadArr[i].AlnCanVec) == 1 && CheckAlnNumber(ReadArr[j].AlnCanVec) == 1)
+			//	{
+			//		coor1 = GetAlnCoordinate(ReadArr[i].AlnCanVec[ReadArr[i].AlnSummary.BestAlnCanIdx].orientation, ReadArr[i].AlnCanVec[ReadArr[i].AlnSummary.BestAlnCanIdx].FragPairVec);
+			//		coor2 = GetAlnCoordinate(ReadArr[j].AlnCanVec[ReadArr[j].AlnSummary.BestAlnCanIdx].orientation, ReadArr[j].AlnCanVec[ReadArr[j].AlnSummary.BestAlnCanIdx].FragPairVec);
+			//		if (coor1.ChromosomeIdx == 0 && coor2.ChromosomeIdx == 0)
+			//		{
+			//			fprintf(stdout, ">%s/1\n%s\n", ReadArr[i].header, ReadArr[i].seq);
+			//			char *seq = new char[ReadArr[j].rlen + 1];
+			//			GetComplementarySeq(ReadArr[j].rlen, ReadArr[j].seq, seq);
+			//			fprintf(stdout, ">%s/2\n%s\n", ReadArr[j].header, seq);
+			//			delete[] seq;
+			//		}
+			//	}
+			//}
 			if (bSAMoutput)
 			{
-				for (vector<string>::iterator iter = SamStreamVec.begin(); iter != SamStreamVec.end(); iter++)
+				if (bSAMFormat)
 				{
-					fprintf(sam_output, "%s", iter->c_str()); fflush(sam_output);
+					for (vector<string>::iterator iter = SamStreamVec.begin(); iter != SamStreamVec.end(); iter++) fprintf(sam_out, "%s\n", iter->c_str());
+					fflush(sam_out);
+				}
+				else
+				{
+					bam1_t *b = bam_init1();
+					kstring_t str = { 0, 0, NULL };
+					for (vector<string>::iterator iter = SamStreamVec.begin(); iter != SamStreamVec.end(); iter++)
+					{
+						str.s = (char*)iter->c_str(); str.l = iter->length();
+						if (sam_parse1(&str, header, b) >= 0) sam_write1(bam_out, header, b);
+					}
+					bam_destroy1(b);
 				}
 			}
 			pthread_mutex_unlock(&OutputLock);
@@ -519,22 +590,23 @@ void *ReadMapping(void *arg)
 				pthread_mutex_lock(&ProfileLock);
 				for (i = 0; i != ReadNum; i++)
 				{
+					//if (strcmp(ReadArr[i].header, "NC_000913_mut_1472703_1473141_0_1_0_0_0:0:0_2:0:0_45ec") == 0) ShowFragPairCluster(ReadArr[i].AlnCanVec);
 					if (ReadArr[i].AlnSummary.score == 0) continue;
-					n = CheckAlnNumber(ReadArr[i].AlnCanVec);
-					if (n == 1) UpdateProfile(ReadArr + i, ReadArr[i].AlnCanVec);
-					else if (n > 1) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
+					if ((n = CheckAlnNumber(ReadArr[i].AlnCanVec)) == 1) UpdateProfile(ReadArr + i, ReadArr[i].AlnCanVec);
+					//else if (n > 1) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
 				}
 				pthread_mutex_unlock(&ProfileLock);
 			}
 		}
-		else
+		else //singled-end reads
 		{
 			MappedNum = 0;
 			for (i = 0; i != ReadNum; i++)
 			{
 				SimplePairVec = IdentifySimplePairs(ReadArr[i].rlen, ReadArr[i].EncodeSeq);
 				ReadArr[i].AlnCanVec = SimplePairClustering(ReadArr[i].rlen, SimplePairVec);
-				RemoveRedundantAlnCan(ReadArr[i].AlnCanVec); //printf("ReadCluster1\n"), ShowFragPairCluster(ReadArr[i].AlnCanVec);
+				//ShowFragPairCluster(ReadArr[i].AlnCanVec);
+				RemoveRedundantAlnCan(ReadArr[i].AlnCanVec); 
 				if (ProduceReadAlignment(ReadArr[i])) MappedNum++;
 			}
 			if (bSAMoutput) for (SamStreamVec.clear(), i = 0; i != ReadNum; i++) GenerateSingleSamStream(ReadArr[i], SamStreamVec);
@@ -542,9 +614,21 @@ void *ReadMapping(void *arg)
 			iTotalReadNum += ReadNum; iTotalMappingNum += MappedNum;
 			if (bSAMoutput)
 			{
-				for (vector<string>::iterator iter = SamStreamVec.begin(); iter != SamStreamVec.end(); iter++)
+				if (bSAMFormat)
 				{
-					fprintf(sam_output, "%s", iter->c_str()); fflush(sam_output);
+					for (vector<string>::iterator iter = SamStreamVec.begin(); iter != SamStreamVec.end(); iter++) fprintf(sam_out, "%s\n", iter->c_str());
+					fflush(sam_out);
+				}
+				else
+				{
+					bam1_t *b = bam_init1();
+					kstring_t str = { 0, 0, NULL };
+					for (vector<string>::iterator iter = SamStreamVec.begin(); iter != SamStreamVec.end(); iter++)
+					{
+						str.s = (char*)iter->c_str(); str.l = iter->length();
+						if (sam_parse1(&str, header, b) >= 0) sam_write1(bam_out, header, b);
+					}
+					bam_destroy1(b);
 				}
 			}
 			pthread_mutex_unlock(&OutputLock);
@@ -555,9 +639,8 @@ void *ReadMapping(void *arg)
 				for (i = 0; i != ReadNum; i++)
 				{
 					if (ReadArr[i].AlnSummary.score == 0) continue;
-					n = CheckAlnNumber(ReadArr[i].AlnCanVec);
-					if(n == 1) UpdateProfile(ReadArr + i, ReadArr[i].AlnCanVec);
-					else if (n > 1) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
+					if ((n = CheckAlnNumber(ReadArr[i].AlnCanVec)) == 1) UpdateProfile(ReadArr + i, ReadArr[i].AlnCanVec);
+					//else if (n > 1) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
 				}
 				pthread_mutex_unlock(&ProfileLock);
 			}
@@ -616,7 +699,6 @@ void *CheckMappingCoverage(void *arg)
 	return (void*)(1);
 }
 
-
 void Mapping()
 {
 	char buf[1];
@@ -626,7 +708,11 @@ void Mapping()
 	//iThreadNum = 1;
 	ThrIdArr = new int[iThreadNum];  for (i = 0; i < iThreadNum; i++) ThrIdArr[i] = i;
 
-	if (bSAMoutput && SamFileName != NULL) sam_output = fopen(SamFileName, "w");
+	if (bSAMoutput && SamFileName != NULL)
+	{
+		if (bSAMFormat) sam_out = fopen(SamFileName, "w");
+		else bam_out = sam_open_format(SamFileName, "wb", NULL);
+	}
 	if (bSAMoutput) OutputSamHeaders();
 
 	for (int LibraryID = 0; LibraryID < (int)ReadFileNameVec1.size(); LibraryID++)
@@ -676,11 +762,13 @@ void Mapping()
 	fprintf(stderr, "\rAll the %lld %s reads have been processed in %lld seconds.\n", (long long)iTotalReadNum, (bPairEnd ? "paired-end" : "single-end"), (long long)(time(NULL) - StartProcessTime));
 	if (iTotalReadNum > 0) fprintf(stderr, "%12lld (%6.2f%%) reads are mapped to the reference genome.\n", (long long)iTotalMappingNum, (int)(10000 * (1.0*iTotalMappingNum / iTotalReadNum) + 0.00005) / 100.0);
 
-	if (bSAMoutput && SamFileName != NULL) fclose(sam_output);
-
+	if (bSAMoutput)
+	{
+		if (bSAMFormat) fclose(sam_out);
+		else sam_close(bam_out);
+	}
 	if (bVCFoutput)
 	{
-		iThreadNum = 1;
 		for (i = 0; i < iThreadNum; i++) pthread_create(&ThreadArr[i], NULL, CheckMappingCoverage, &ThrIdArr[i]);
 		for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);
 

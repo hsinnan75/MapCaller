@@ -331,7 +331,7 @@ void GenerateSingleSamStream(ReadItem_t& read, vector<string>& SamStreamVec)
 
 	if (read.AlnSummary.score == 0)
 	{
-		len = sprintf(buffer, "%s\t4\t*\t0\t0\t*\t*\t0\t0\t%s\t%s\tAS:i:0\tXS:i:0\n", read.header, read.seq, read.qual);
+		len = sprintf(buffer, "%s\t4\t*\t0\t0\t*\t*\t0\t0\t%s\t%s\tAS:i:0\tXS:i:0", read.header, read.seq, (FastQFormat ? read.qual : "*"));
 		SamStreamVec.push_back(buffer);
 	}
 	else
@@ -350,13 +350,17 @@ void GenerateSingleSamStream(ReadItem_t& read, vector<string>& SamStreamVec)
 			{
 				if(!read.AlnCanVec[i].orientation && rseq == NULL)
 				{
-					rseq = new char[read.rlen + 1]; rqual = new char[read.rlen + 1]; rqual[read.rlen] = '\0'; 
+					rseq = new char[read.rlen + 1]; 
 					GetComplementarySeq(read.rlen, seq, rseq);
-					GetReverseQualityStr(read.rlen, read.qual, rqual);
+					if (FastQFormat)
+					{
+						rqual = new char[read.rlen + 1]; rqual[read.rlen] = '\0';
+						GetReverseQualityStr(read.rlen, read.qual, rqual);
+					}
 				}
 				CIGAR = GenerateCIGARstring(read.rlen, read.AlnCanVec[i].orientation, read.AlnCanVec[i].FragPairVec);
 				coor = GetAlnCoordinate(read.AlnCanVec[i].orientation, read.AlnCanVec[i].FragPairVec);
-				len = sprintf(buffer, "%s\t%d\t%s\t%lld\t%d\t%s\t*\t0\t0\t%s\t%s\tNM:i:%d\tAS:i:%d\tXS:i:%d\n", read.header, read.AlnCanVec[i].SamFlag, ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos, mapq, CIGAR.c_str(), (read.AlnCanVec[i].orientation ? seq : rseq), (read.AlnCanVec[i].orientation ? read.qual : rqual), read.rlen - read.AlnCanVec[i].score, read.AlnSummary.score, read.AlnSummary.sub_score);
+				len = sprintf(buffer, "%s\t%d\t%s\t%lld\t%d\t%s\t*\t0\t0\t%s\t%s\tNM:i:%d\tAS:i:%d\tXS:i:%d", read.header, read.AlnCanVec[i].SamFlag, ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos, mapq, CIGAR.c_str(), (read.AlnCanVec[i].orientation ? seq : rseq), (FastQFormat ? (read.AlnCanVec[i].orientation ? read.qual : rqual) : "*"), read.rlen - read.AlnCanVec[i].score, read.AlnSummary.score, read.AlnSummary.sub_score);
 				SamStreamVec.push_back(buffer);
 				if (bUnique) break;
 			}
@@ -364,7 +368,7 @@ void GenerateSingleSamStream(ReadItem_t& read, vector<string>& SamStreamVec)
 		if (rseq != NULL)
 		{
 			delete[] rseq;
-			delete[] rqual;
+			if (FastQFormat) delete[] rqual;
 			rseq = rqual = NULL;
 		}
 	}
@@ -395,7 +399,7 @@ void GeneratePairedSamStream(ReadItem_t& read1, ReadItem_t& read2, vector<string
 			SamFlag |= (read2.AlnCanVec[read2.AlnSummary.BestAlnCanIdx].orientation ? 0x10 : 0x20);
 			SamFlag |= (read2.AlnCanVec[read2.AlnSummary.BestAlnCanIdx].orientation ? 0x20 : 0x10);
 		}
-		len = sprintf(buffer, "%s\t%d\t*\t0\t0\t*\t*\t0\t0\t%s\t%s\tAS:i:0\tXS:i:0\n", read1.header, SamFlag, read1.seq, read1.qual);
+		len = sprintf(buffer, "%s\t%d\t*\t0\t0\t*\t*\t0\t0\t%s\t%s\tAS:i:0\tXS:i:0", read1.header, SamFlag, read1.seq, (FastQFormat ? read1.qual: "*"));
 		SamStreamVec.push_back(buffer);
 	}
 	else
@@ -420,9 +424,9 @@ void GeneratePairedSamStream(ReadItem_t& read1, ReadItem_t& read2, vector<string
 				{
 					coor2 = GetAlnCoordinate(read2.AlnCanVec[j].orientation, read2.AlnCanVec[j].FragPairVec);
 					dist = (int)(coor2.gPos - coor1.gPos + (read1.AlnCanVec[i].orientation ? read2.rlen : 0 - read1.rlen));
-					len = sprintf(buffer, "%s\t%d\t%s\t%lld\t%d\t%s\t=\t%lld\t%d\t%s\t%s\tNM:i:%d\tAS:i:%d\tXS:i:%d\n", read1.header, read1.AlnCanVec[i].SamFlag, ChromosomeVec[coor1.ChromosomeIdx].name, coor1.gPos, mapq, CIGAR.c_str(), coor2.gPos, dist, (read1.AlnCanVec[i].orientation ? seq : rseq), (read1.AlnCanVec[i].orientation ? read1.qual : rqual.c_str()), read1.rlen - read1.AlnCanVec[i].score, read1.AlnSummary.score, read1.AlnSummary.sub_score);
+					len = sprintf(buffer, "%s\t%d\t%s\t%lld\t%d\t%s\t=\t%lld\t%d\t%s\t%s\tNM:i:%d\tAS:i:%d\tXS:i:%d", read1.header, read1.AlnCanVec[i].SamFlag, ChromosomeVec[coor1.ChromosomeIdx].name, coor1.gPos, mapq, CIGAR.c_str(), coor2.gPos, dist, (read1.AlnCanVec[i].orientation ? seq : rseq), (FastQFormat ? (read1.AlnCanVec[i].orientation ? read1.qual : rqual.c_str()) : "*"), read1.rlen - read1.AlnCanVec[i].score, read1.AlnSummary.score, read1.AlnSummary.sub_score);
 				}
-				else len = sprintf(buffer, "%s\t%d\t%s\t%lld\t%d\t%s\t*\t0\t0\t%s\t%s\tNM:i:%d\tAS:i:%d\tXS:i:%d\n", read1.header, read1.AlnCanVec[i].SamFlag, ChromosomeVec[coor1.ChromosomeIdx].name, coor1.gPos, mapq, CIGAR.c_str(), (read1.AlnCanVec[i].orientation ? seq : rseq), (read1.AlnCanVec[i].orientation ? read1.qual : rqual.c_str()), read1.rlen - read1.AlnCanVec[i].score, read1.AlnSummary.score, read1.AlnSummary.sub_score);
+				else len = sprintf(buffer, "%s\t%d\t%s\t%lld\t%d\t%s\t*\t0\t0\t%s\t%s\tNM:i:%d\tAS:i:%d\tXS:i:%d", read1.header, read1.AlnCanVec[i].SamFlag, ChromosomeVec[coor1.ChromosomeIdx].name, coor1.gPos, mapq, CIGAR.c_str(), (read1.AlnCanVec[i].orientation ? seq : rseq), (FastQFormat ? (read1.AlnCanVec[i].orientation ? read1.qual : rqual.c_str()) : "*"), read1.rlen - read1.AlnCanVec[i].score, read1.AlnSummary.score, read1.AlnSummary.sub_score);
 				SamStreamVec.push_back(buffer);
 				if (bUnique) break;
 			}
@@ -444,7 +448,7 @@ void GeneratePairedSamStream(ReadItem_t& read1, ReadItem_t& read2, vector<string
 			SamFlag |= (read1.AlnCanVec[read1.AlnSummary.BestAlnCanIdx].orientation ? 0x10 : 0x20);
 			SamFlag |= (read1.AlnCanVec[read1.AlnSummary.BestAlnCanIdx].orientation ? 0x20 : 0x10);
 		}
-		len = sprintf(buffer, "%s\t%d\t*\t0\t0\t*\t*\t0\t0\t%s\t%s\tAS:i:0\tXS:i:0\n", read2.header, SamFlag, read2.seq, read2.qual);
+		len = sprintf(buffer, "%s\t%d\t*\t0\t0\t*\t*\t0\t0\t%s\t%s\tAS:i:0\tXS:i:0", read2.header, SamFlag, read2.seq, (FastQFormat ? read2.qual : "*"));
 		SamStreamVec.push_back(buffer);
 	}
 	else
@@ -468,9 +472,9 @@ void GeneratePairedSamStream(ReadItem_t& read1, ReadItem_t& read2, vector<string
 				{
 					coor1 = GetAlnCoordinate(read1.AlnCanVec[i].orientation, read1.AlnCanVec[i].FragPairVec);
 					dist = 0 - (int)(coor2.gPos - coor1.gPos + (read1.AlnCanVec[i].orientation ? read2.rlen : 0 - read1.rlen));
-					len = sprintf(buffer, "%s\t%d\t%s\t%lld\t%d\t%s\t=\t%lld\t%d\t%s\t%s\tNM:i:%d\tAS:i:%d\tXS:i:%d\n", read2.header, read2.AlnCanVec[j].SamFlag, ChromosomeVec[coor2.ChromosomeIdx].name, coor2.gPos, mapq, CIGAR.c_str(), coor1.gPos, dist, (read2.AlnCanVec[j].orientation ? seq : rseq), (FastQFormat ? (read2.AlnCanVec[j].orientation ? read2.qual : rqual.c_str()) : "*"), read2.rlen - read2.AlnCanVec[j].score, read2.AlnSummary.score, read2.AlnSummary.sub_score);
+					len = sprintf(buffer, "%s\t%d\t%s\t%lld\t%d\t%s\t=\t%lld\t%d\t%s\t%s\tNM:i:%d\tAS:i:%d\tXS:i:%d", read2.header, read2.AlnCanVec[j].SamFlag, ChromosomeVec[coor2.ChromosomeIdx].name, coor2.gPos, mapq, CIGAR.c_str(), coor1.gPos, dist, (read2.AlnCanVec[j].orientation ? seq : rseq), (FastQFormat ? (read2.AlnCanVec[j].orientation ? read2.qual : rqual.c_str()) : "*"), read2.rlen - read2.AlnCanVec[j].score, read2.AlnSummary.score, read2.AlnSummary.sub_score);
 				}
-				else len = sprintf(buffer, "%s\t%d\t%s\t%lld\t%d\t%s\t*\t0\t0\t%s\t%s\tNM:i:%d\tAS:i:%d\tXS:i:%d\n", read2.header, read2.AlnCanVec[j].SamFlag, ChromosomeVec[coor2.ChromosomeIdx].name, coor2.gPos, mapq, CIGAR.c_str(), (read2.AlnCanVec[j].orientation ? seq : rseq), (FastQFormat ? (read2.AlnCanVec[j].orientation ? read2.qual : rqual.c_str()) : "*"), read2.rlen - read2.AlnCanVec[j].score, read2.AlnSummary.score, read2.AlnSummary.sub_score);
+				else len = sprintf(buffer, "%s\t%d\t%s\t%lld\t%d\t%s\t*\t0\t0\t%s\t%s\tNM:i:%d\tAS:i:%d\tXS:i:%d", read2.header, read2.AlnCanVec[j].SamFlag, ChromosomeVec[coor2.ChromosomeIdx].name, coor2.gPos, mapq, CIGAR.c_str(), (read2.AlnCanVec[j].orientation ? seq : rseq), (FastQFormat ? (read2.AlnCanVec[j].orientation ? read2.qual : rqual.c_str()) : "*"), read2.rlen - read2.AlnCanVec[j].score, read2.AlnSummary.score, read2.AlnSummary.sub_score);
 				SamStreamVec.push_back(buffer);
 				if (bUnique) break;
 			}

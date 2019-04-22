@@ -23,23 +23,6 @@ bool CheckIndStrOccu(string& IndSeq, map<int64_t, map<string, uint16_t> >::itera
 	return bChecked;
 }
 
-bool CheckNeighboringBreakPoints(int64_t gPos)
-{
-	int count = 0;
-	map<int64_t, uint16_t>::iterator iter1, iter2;
-
-	if (gPos >= GenomeSize) gPos = TwoGenomeSize - 1 - gPos;
-
-	iter1 = BreakPointMap.lower_bound(gPos - 150);
-	iter2 = BreakPointMap.upper_bound(gPos + 150);
-	for (; iter1 != iter2; iter1++)
-	{
-		if (abs(iter1->first - gPos) <= 150) count += iter1->second;
-	}
-	if (count < 5) return false;
-	else return true;
-}
-
 void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 {
 	int64_t gPos;
@@ -95,25 +78,11 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 				}
 				else if (iter->FragPairVec[i].gLen == 0) // ins
 				{
-					IndSeq = iter->FragPairVec[i].aln1;
-					InsertSeqMap[gPos - 1][IndSeq]++;
-					//if (gPos > ObserveBegPos && gPos < ObserveEndPos)
-					//{
-					//	printf("Add ins1: score=%d/%d\n", read->AlnSummary.score, read->AlnSummary.sub_score);
-					//	ShowSimplePairInfo(iter->FragPairVec);
-					//	printf("read=%s\n", read->seq);
-					//}
+					InsertSeqMap[gPos - 1][iter->FragPairVec[i].aln1]++;
 				}
 				else if (iter->FragPairVec[i].rLen == 0) // del
 				{
-					IndSeq = iter->FragPairVec[i].aln2;
-					DeleteSeqMap[gPos][IndSeq]++;
-					//if (gPos > ObserveBegPos && gPos < ObserveEndPos)
-					//{
-					//	printf("Add del1: score=%d/%d\n", read->AlnSummary.score, read->AlnSummary.sub_score);
-					//	ShowSimplePairInfo(iter->FragPairVec);
-					//	printf("read=%s\n", read->seq);
-					//}
+					DeleteSeqMap[gPos][iter->FragPairVec[i].aln2]++;
 				}
 				else
 				{
@@ -125,12 +94,6 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 							IndSeq = iter->FragPairVec[i].aln1.substr(j, ext_len);
 							InsertSeqMap[gPos - 1][IndSeq]++;
 							j += ext_len; rPos += ext_len;
-							//if (gPos > ObserveBegPos && gPos < ObserveEndPos)
-							//{
-							//	printf("Add ins2: score=%d/%d\n", read->AlnSummary.score, read->AlnSummary.sub_score);
-							//	ShowSimplePairInfo(iter->FragPairVec);
-							//	printf("read=%s\n", read->seq);
-							//}
 						}
 						else if (iter->FragPairVec[i].aln1[j] == '-') // del
 						{
@@ -138,12 +101,6 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 							IndSeq = iter->FragPairVec[i].aln2.substr(j, ext_len);
 							DeleteSeqMap[gPos][IndSeq]++;
 							j += ext_len; gPos += ext_len;
-							//if (gPos > ObserveBegPos && gPos < ObserveEndPos)
-							//{
-							//	printf("Add del2: score=%d/%d\n", read->AlnSummary.score, read->AlnSummary.sub_score);
-							//	ShowSimplePairInfo(iter->FragPairVec);
-							//	printf("read=%s\n", read->seq);
-							//}
 						}
 						else
 						{
@@ -181,26 +138,12 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 				else if (iter->FragPairVec[i].gLen == 0) // ins
 				{
 					gPos = TwoGenomeSize - 1 - iter->FragPairVec[i].gPos;
-					IndSeq = iter->FragPairVec[i].aln1;
-					InsertSeqMap[gPos][IndSeq]++;
-					//if (gPos > ObserveBegPos && gPos < ObserveEndPos)
-					//{
-					//	printf("Add ins3: score=%d/%d\n", read->AlnSummary.score, read->AlnSummary.sub_score);
-					//	ShowSimplePairInfo(iter->FragPairVec);
-					//	printf("read=%s\n", read->seq);
-					//}
+					InsertSeqMap[gPos][iter->FragPairVec[i].aln1]++;
 				}
 				else if (iter->FragPairVec[i].rLen == 0) // del
 				{
-					IndSeq = iter->FragPairVec[i].aln2;
 					gPos = (TwoGenomeSize - iter->FragPairVec[i].gPos - iter->FragPairVec[i].gLen);
-					DeleteSeqMap[gPos][IndSeq]++;
-					//if (gPos > ObserveBegPos && gPos < ObserveEndPos)
-					//{
-					//	printf("Add del3: score=%d/%d\n", read->AlnSummary.score, read->AlnSummary.sub_score);
-					//	ShowSimplePairInfo(iter->FragPairVec);
-					//	printf("read=%s\n", read->seq);
-					//}
+					DeleteSeqMap[gPos][iter->FragPairVec[i].aln2]++;
 				}
 				else
 				{
@@ -214,12 +157,6 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 							ext_len = 1; while (iter->FragPairVec[i].aln2[j + ext_len] == '-') ext_len++;
 							IndSeq = iter->FragPairVec[i].aln1.substr(j, ext_len);
 							InsertSeqMap[gPos - 1][IndSeq]++;
-							//if (gPos > ObserveBegPos && gPos < ObserveEndPos)
-							//{
-							//	printf("Add ins4: score=%d/%d\n", read->AlnSummary.score, read->AlnSummary.sub_score);
-							//	ShowSimplePairInfo(iter->FragPairVec);
-							//	printf("read=%s\n", read->seq);
-							//}
 							j += ext_len; rPos += ext_len;
 						}
 						else if (iter->FragPairVec[i].aln1[j] == '-') // del
@@ -227,12 +164,6 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 							ext_len = 1; while (iter->FragPairVec[i].aln1[j + ext_len] == '-') ext_len++;
 							IndSeq = iter->FragPairVec[i].aln2.substr(j, ext_len);
 							DeleteSeqMap[gPos][IndSeq]++;
-							//if (gPos > ObserveBegPos && gPos < ObserveEndPos)
-							//{
-							//	printf("Add del4: score=%d/%d\n", read->AlnSummary.score, read->AlnSummary.sub_score);
-							//	ShowSimplePairInfo(iter->FragPairVec);
-							//	printf("read=%s\n", read->seq);
-							//}
 							j += ext_len; gPos += ext_len;
 						}
 						else

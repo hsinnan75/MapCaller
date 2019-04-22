@@ -581,9 +581,9 @@ void VariantCalling()
 	//iThreadNum = 1;
 	for (i = 0; i < iThreadNum; i++) pthread_create(&ThreadArr[i], NULL, IdentifyVariants, &ThrIDarr[i]);
 	for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);
-	//IdentifyBreakPointCandidates();
-	//if (BreakPointCanVec.size() > 0 && InversionSiteVec.size() > 0) IdentifyInversions();
-	//if (BreakPointCanVec.size() > 0 && TranslocationSiteVec.size() > 0) IdentifyTranslocations();
+	IdentifyBreakPointCandidates();
+	if (BreakPointCanVec.size() > 0 && InversionSiteVec.size() > 0) IdentifyInversions();
+	if (BreakPointCanVec.size() > 0 && TranslocationSiteVec.size() > 0) IdentifyTranslocations();
 	fprintf(stderr, "\tWrite all the predicted sample variations to file [%s]...\n", VcfFileName); GenVariantCallingFile();
 
 	fprintf(stderr, "SV calling has be done in %lld seconds.\n", (long long)(time(NULL) - StartProcessTime));

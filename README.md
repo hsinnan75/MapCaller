@@ -1,4 +1,4 @@
-MapCaller: An efficient and versatile approach for short-read alignment and variant detection in high-throughput sequenced genomes
+MapCaller: An efficient and versatile approach for short-read mapping and variant identification using high-throughput sequenced data.
 ===================
 
 Developers: Dr. Hsin-Nan Lin and Dr. Wen-Lian Hsu. Institute of Information Science, Academia Sinica, Taiwan.

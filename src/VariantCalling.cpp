@@ -522,7 +522,7 @@ void *IdentifyVariants(void *arg)
 				MyVariantVec.push_back(Variant);
 			}
 			//SUB
-			if (cov >= cov_thr && cov > ins_freq && cov > del_freq)
+			if (cov >= cov_thr)
 			{
 				vec.clear(); ref_base = nst_nt4_table[RefSequence[gPos]]; freq_thr = cov*(bSomatic ? 0.02 : FrequencyThr);
 				if (freq_thr < MinAlleleFreq) freq_thr = MinAlleleFreq; if (freq_thr > cov_thr) freq_thr = cov_thr;
@@ -568,6 +568,7 @@ void *IdentifyVariants(void *arg)
 void VariantCalling()
 {
 	int i, *ThrIDarr;
+	time_t t = time(NULL);
 	pthread_t *ThreadArr = new pthread_t[iThreadNum];
 
 	ThrIDarr = new int[iThreadNum];  for (i = 0; i < iThreadNum; i++) ThrIDarr[i] = i;
@@ -586,7 +587,7 @@ void VariantCalling()
 	if (BreakPointCanVec.size() > 0 && TranslocationSiteVec.size() > 0) IdentifyTranslocations();
 	fprintf(stderr, "\tWrite all the predicted sample variations to file [%s]...\n", VcfFileName); GenVariantCallingFile();
 
-	fprintf(stderr, "SV calling has be done in %lld seconds.\n", (long long)(time(NULL) - StartProcessTime));
+	fprintf(stderr, "variant calling has been done in %lld seconds.\n", (long long)(time(NULL) - t));
 	delete[] ThrIDarr; delete[] ThreadArr; delete[] BlockDepthArr;
 }
 

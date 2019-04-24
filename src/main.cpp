@@ -107,6 +107,7 @@ int main(int argc, char* argv[])
 	string parameter, str;
 
 	iThreadNum = 16;
+
 	bSensitive = false;
 	bPairEnd = false;
 	bDebugMode = false;
@@ -117,14 +118,15 @@ int main(int argc, char* argv[])
 	bSomatic = false;
 	bVCFoutput = true;
 	gzCompressed = false;
+
+	MinIndFreq = 5;
 	FragmentSize = 500;
+	MinAlleleFreq = 10;
+	FrequencyThr = 0.2;
+	MinVarConfScore = 10;
 	ObservGenomicPos = -1;
 	ObserveBegPos = -1;
 	ObserveEndPos = -1;
-	MinAlleleFreq = 10;
-	MinVarConfScore = 10;
-	FrequencyThr = 0.2;
-	MinIndFreq = 5;
 	VcfFileName = (char*)"output.vcf";
 	RefSequence = IndexFileName = SamFileName = NULL;
 
@@ -257,6 +259,8 @@ int main(int argc, char* argv[])
 			bwa_idx_destroy(RefIdx);
 			if (RefSequence != NULL) delete[] RefSequence;
 			if (MappingRecordArr != NULL) delete[] MappingRecordArr;
+
+			fprintf(stderr, "All done! It took %lld to complete the data analysis.\n", (long long)(time(NULL)- StartProcessTime));
 		}
 	}
 	return 0;

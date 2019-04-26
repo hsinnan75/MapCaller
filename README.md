@@ -16,10 +16,16 @@ Please use the command
   ```
 to download the package of MapCaller.
 
+# Dependencies
+
+To compile MapCaller, it requires libboost-all-dev, libbz2-dev, and liblzma-dev pre-installed in your system.
+
 # Compiling
 To compile MapCaller and the index tool, please just type 'make' to compile MapCaller and bwt_index. If the compilation or the program fails, please contact me (arith@iis.sinica.edu.tw), Thanks.
 
 # Changes
+version 0.9.9: Second version released.
+
 version 0.9.0: First version released.
 
 # Get updates

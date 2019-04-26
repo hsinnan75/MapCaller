@@ -161,10 +161,10 @@ int main(int argc, char* argv[])
 			}
 			else if (parameter == "-t" && i + 1 < argc)
 			{
-				if ((iThreadNum = atoi(argv[++i])) > 40)
+				if ((iThreadNum = atoi(argv[++i])) <= 0)
 				{
-					fprintf(stderr, "Warning! Thread number is limited to 40!\n");
-					iThreadNum = 40;
+					fprintf(stderr, "Warning! The thread number should be positive!\n");
+					iThreadNum = 4;
 				}
 			}
 			else if (parameter == "-filter" && i + 1 < argc) MinVarConfScore = atoi(argv[++i]);
@@ -260,7 +260,7 @@ int main(int argc, char* argv[])
 			if (RefSequence != NULL) delete[] RefSequence;
 			if (MappingRecordArr != NULL) delete[] MappingRecordArr;
 
-			fprintf(stderr, "All done! It took %lld to complete the data analysis.\n", (long long)(time(NULL)- StartProcessTime));
+			fprintf(stderr, "All done! It took %lld seconds to complete the data analysis.\n", (long long)(time(NULL)- StartProcessTime));
 		}
 	}
 	return 0;

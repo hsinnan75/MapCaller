@@ -18,7 +18,7 @@ FILE *ReadFileHandler1, *ReadFileHandler2;
 gzFile gzReadFileHandler1, gzReadFileHandler2;
 static pthread_mutex_t LibraryLock, ProfileLock, OutputLock;
 vector<DiscordPair_t> InversionSiteVec, TranslocationSiteVec;
-uint32_t avgCov, lowCov, minCov, maxCov, avgReadLength, avgDist = 1000;
+uint32_t avgCov, avgReadLength, avgDist = 1000;
 int64_t iTotalReadNum = 0, iTotalMappingNum = 0, iTotalPairedNum = 0, iAlignedBase = 0, iTotalCoverage = 0, TotalPairedDistance = 0, ReadLengthSum = 0;
 
 void ShowMappedRegion(vector<FragPair_t>& FragPairVec)
@@ -772,13 +772,14 @@ void Mapping()
 		for (i = 0; i < iThreadNum; i++) pthread_create(&ThreadArr[i], NULL, CheckMappingCoverage, &ThrIdArr[i]);
 		for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);
 
-		avgCov = (int)(1.0*iTotalCoverage / iAlignedBase + .5); maxCov = (int)(avgCov * 1.5);
+		avgCov = (int)(1.0*iTotalCoverage / iAlignedBase + .5); 
+		//maxCov = (int)(avgCov * 1.5);
 		//fprintf(stderr, "\tread alignment coverage = %lld / %lld (%.4f%%)\n", iAlignedBase, GenomeSize, 100*(1.0*iAlignedBase / GenomeSize));
-		if ((minCov = (int)(avgCov * 0.33)) < 5) minCov = 5; else if (minCov > 100) minCov = 100;
-		if ((lowCov = (int)(avgCov * 0.10)) < 2) lowCov = 2; else if (lowCov > 5) lowCov = 5;
+		//if ((minCov = (int)(avgCov * 0.33)) < 5) minCov = 5; else if (minCov > 100) minCov = 100;
+		//if ((lowCov = (int)(avgCov * 0.10)) < 2) lowCov = 2; else if (lowCov > 5) lowCov = 5;
 		fprintf(stderr, "\tEst. AvgCoverage = %d\n", avgCov);
 	}
-	else avgCov = minCov = maxCov = 0;
+	else avgCov = 0;
 
 	delete[] ThrIdArr; delete[] ThreadArr;
 

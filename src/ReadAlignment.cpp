@@ -197,7 +197,7 @@ void ProcessNormalPair(char* seq, FragPair_t& fp)
 
 bool CheckLocalAlignmentQuality(FragPair_t& fp)
 {
-	int i, n, mis, len, AlnType, iStatus, ins_num = 0, del_num = 0;
+	int i, n, mis, len, AlnType, iStatus;
 
 	AlnType = -1; len = (int)fp.aln1.length(); n = mis = iStatus = 0;
 	for (i = 0; i < len; i++)
@@ -208,7 +208,6 @@ bool CheckLocalAlignmentQuality(FragPair_t& fp)
 			{
 				AlnType = 0;
 				iStatus++;
-				del_num++;
 			}
 		}
 		else if (fp.aln2[i] == '-') // ins
@@ -217,7 +216,6 @@ bool CheckLocalAlignmentQuality(FragPair_t& fp)
 			{
 				AlnType = 1; 
 				iStatus++;
-				ins_num++;
 			}
 		}
 		else // type 2
@@ -230,7 +228,7 @@ bool CheckLocalAlignmentQuality(FragPair_t& fp)
 			}
 		}
 	}
-	if (iStatus >= 4 || (ins_num > 0 && del_num > 0) || (mis >= 3 && mis >= (int)(n*0.3)))
+	if (iStatus >= 4 || (mis >= 3 && mis >= (int)(n*0.3)))
 	{
 		//if (bDebugMode) printf("BadAlignment\n%s\n%s\nIdy=%.4f\n", fp.aln1.c_str(), fp.aln2.c_str(), CalFragAlnSeqIdy(fp.aln1, fp.aln2));
 		return false;
@@ -246,10 +244,7 @@ int EvaluateAlignmentScore(vector<FragPair_t>& FragPairVec)
 	for (iter = FragPairVec.begin(); iter != FragPairVec.end(); iter++)
 	{
 		if (iter->bSimple) score += iter->rLen;
-		else if ((len = (int)iter->aln1.length()) > 0)
-		{
-			score += CalFragPairMatches(len, iter->aln1, iter->aln2);
-		}
+		else if ((len = (int)iter->aln1.length()) > 0) score += CalFragPairMatches(len, iter->aln1, iter->aln2);
 	}
 	return score;
 }
@@ -422,31 +417,28 @@ bool ProduceReadAlignment(ReadItem_t& read)
 					read.AlnSummary.score = iter->score;
 					read.AlnSummary.BestAlnCanIdx = (int)(iter - read.AlnCanVec.begin());
 				}
-				else if (iter->score > read.AlnSummary.sub_score)
-				{
-					read.AlnSummary.sub_score = iter->score;
-				}
+				else if (iter->score > read.AlnSummary.sub_score) read.AlnSummary.sub_score = iter->score;
 			}
 		}
 	}
 	//if (read.AlnSummary.score == 0) ShowFragPairCluster(read.AlnCanVec);
 	for (iter = read.AlnCanVec.begin(); iter != read.AlnCanVec.end(); iter++) if (iter->score < read.AlnSummary.score) iter->score = 0;
-	if (ObserveBegPos != -1)
-	{
-		for (iter = read.AlnCanVec.begin(); iter != read.AlnCanVec.end(); iter++)
-		{
-			//Display alignments
-			if (iter->score == 0) continue;
-			Coordinate_t coor = GetAlnCoordinate(iter->FragPairVec.begin()->gPos < GenomeSize ? true : false, iter->FragPairVec);
-			if (coor.ChromosomeIdx == 0 && coor.gPos >= ObserveBegPos && coor.gPos + read.rlen < ObserveEndPos)
-			{
-				//Display alignments
-				pthread_mutex_lock(&Lock);
-				printf("read: %s, score=%d (%d/%d) len=%d, PairedIdx=%d\n\n", read.header, iter->score, read.AlnSummary.score, read.AlnSummary.sub_score, read.rlen, iter->PairedAlnCanIdx);
-				ShowSimplePairInfo(iter->FragPairVec);
-				pthread_mutex_unlock(&Lock);
-			}
-		}
-	}
+	//if (ObserveBegPos != -1)
+	//{
+	//	for (iter = read.AlnCanVec.begin(); iter != read.AlnCanVec.end(); iter++)
+	//	{
+	//		//Display alignments
+	//		if (iter->score == 0) continue;
+	//		Coordinate_t coor = GetAlnCoordinate(iter->FragPairVec.begin()->gPos < GenomeSize ? true : false, iter->FragPairVec);
+	//		if (coor.ChromosomeIdx == 0 && coor.gPos >= ObserveBegPos && coor.gPos + read.rlen < ObserveEndPos)
+	//		{
+	//			//Display alignments
+	//			pthread_mutex_lock(&Lock);
+	//			printf("read: %s, score=%d (%d/%d) len=%d, PairedIdx=%d\n\n", read.header, iter->score, read.AlnSummary.score, read.AlnSummary.sub_score, read.rlen, iter->PairedAlnCanIdx);
+	//			ShowSimplePairInfo(iter->FragPairVec);
+	//			pthread_mutex_unlock(&Lock);
+	//		}
+	//	}
+	//}
 	return (read.AlnSummary.score > 0);
 }

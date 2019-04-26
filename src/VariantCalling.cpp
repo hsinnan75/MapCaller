@@ -2,6 +2,7 @@
 
 #define MaxQscore 30
 #define BlockSize 100
+#define BreakPointFreqThr 3
 #define INV_TNL_ThrRatio 0.5
 #define var_SUB 0 // substitution
 #define var_INS 1 // insertion
@@ -41,11 +42,6 @@ bool CompByDist(const CoordinatePair_t& p1, const CoordinatePair_t& p2)
 {
 	return p1.dist < p2.dist;
 }
-
-//bool CompByFirstCoor(const CoordinatePair_t& p1, const CoordinatePair_t& p2)
-//{
-//	return p1.gPos1 < p2.gPos1;
-//}
 
 bool CompByVarPos(const Variant_t& p1, const Variant_t& p2)
 {
@@ -232,7 +228,7 @@ void IdentifyBreakPointCandidates()
 		if (iter->first - p.first > avgReadLength)
 		{
 			//printf("Break!\n");
-			if (total_freq > MinAlleleFreq)
+			if (total_freq >= BreakPointFreqThr)
 			{
 				bp.gPos = p.first;
 				bp.left_score = bp.rigt_score = 0;
@@ -454,7 +450,7 @@ void GenVariantCallingFile()
 		}
 	}
 	std::fclose(outFile);
-	fprintf(stderr, "\t%d(snp); %d(ins); %d(del); %d(trans); %d(inversion)\n\n", VarNumVec[var_SUB], VarNumVec[var_INS], VarNumVec[var_DEL], VarNumVec[var_TNL] >> 1, VarNumVec[var_INV] >> 1);
+	fprintf(stderr, "\t%d(snp); %d(ins); %d(del); %d(trans); %d(inversion)\n", VarNumVec[var_SUB], VarNumVec[var_INS], VarNumVec[var_DEL], VarNumVec[var_TNL] >> 1, VarNumVec[var_INV] >> 1);
 }
 
 void *IdentifyVariants(void *arg)

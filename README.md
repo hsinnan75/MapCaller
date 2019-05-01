@@ -60,9 +60,9 @@ Please note that if you find bwt_index does not work in your computer system, yo
   ```
 To perform variant calling, MapCaller requires the the index files of the reference genome and at least one read file (two read files for the separated paired-end reads). Users should use -i to specify the prefix of the index files (including the directory path).
 
- case 1: standard vcf output / sam output (optional)
+ case 1: standard vcf output / sam output (optional) / bam output (optional)
   ```
- $ ./MapCaller -i ecoli -f ReadFile1.fa -f2 ReadFile2.fa -vcf out.vcf [-sam out.sam]
+ $ ./MapCaller -i ecoli -f ReadFile1.fa -f2 ReadFile2.fa -vcf out.vcf [-sam out.sam][-bam out.bam]
   ```
 
  case 2: multiple input 

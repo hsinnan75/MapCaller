@@ -156,6 +156,7 @@ typedef struct
 	uint16_t C;
 	uint16_t G;
 	uint16_t T;
+	uint8_t iFirst;
 } MappingRecord_t;
 
 typedef struct

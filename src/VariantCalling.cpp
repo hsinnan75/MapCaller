@@ -415,6 +415,8 @@ void GenVariantCallingFile()
 
 	outFile = fopen(VcfFileName, "w"); ShowMetaInfo();
 
+	sort(VariantVec.begin(), VariantVec.end(), CompByVarPos);
+
 	sprintf(failstr, "q%d", MinVarConfScore);
 	for (num = (int)VariantVec.size(), i = 0; i < num; i++)
 	{
@@ -555,7 +557,7 @@ void *IdentifyVariants(void *arg)
 	if ((n = (int)MyVariantVec.size()) > 0)
 	{
 		pthread_mutex_lock(&Lock);
-		copy(MyVariantVec.begin(), MyVariantVec.end(), back_inserter(VariantVec)); inplace_merge(VariantVec.begin(), VariantVec.end() - n, VariantVec.end(), CompByVarPos);
+		copy(MyVariantVec.begin(), MyVariantVec.end(), back_inserter(VariantVec));
 		pthread_mutex_unlock(&Lock);
 	}
 	return (void*)(1);

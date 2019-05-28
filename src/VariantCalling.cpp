@@ -522,8 +522,10 @@ void *IdentifyVariants(void *arg)
 			//SUB
 			if (cov >= cov_thr)
 			{
-				vec.clear(); ref_base = nst_nt4_table[RefSequence[gPos]]; freq_thr = cov*(bSomatic ? 0.02 : FrequencyThr);
+				vec.clear(); ref_base = nst_nt4_table[RefSequence[gPos]]; freq_thr = cov*(bSomatic ? 0.01 : FrequencyThr);
 				if (freq_thr < MinAlleleFreq) freq_thr = MinAlleleFreq; if (freq_thr > cov_thr) freq_thr = cov_thr;
+				if (bSomatic && freq_thr > MinAlleleFreq) freq_thr = MinAlleleFreq;
+
 				if (ref_base != 0 && MappingRecordArr[gPos].A >= freq_thr) vec.push_back(make_pair('A', MappingRecordArr[gPos].A));
 				if (ref_base != 1 && MappingRecordArr[gPos].C >= freq_thr) vec.push_back(make_pair('C', MappingRecordArr[gPos].C));
 				if (ref_base != 2 && MappingRecordArr[gPos].G >= freq_thr) vec.push_back(make_pair('G', MappingRecordArr[gPos].G));
@@ -535,7 +537,7 @@ void *IdentifyVariants(void *arg)
 					else Variant.GenoType = 1;
 
 					Variant.ALTstr = vec[0].first;
-					Variant.qscore = bSomatic ? (int)(2.0* Variant.NS / (cov*0.01)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)));
+					Variant.qscore = (int)(10.0 * Variant.NS / freq_thr);
 					if (Variant.qscore > 30) Variant.qscore = 30;
 					/*if (Variant.qscore >= MinVarConfScore) */
 					MyVariantVec.push_back(Variant);
@@ -546,7 +548,7 @@ void *IdentifyVariants(void *arg)
 					Variant.GenoType = 1;
 
 					Variant.ALTstr.resize(3); Variant.ALTstr[0] = vec[0].first; Variant.ALTstr[1] = ',';  Variant.ALTstr[1] = vec[1].first;
-					Variant.qscore = bSomatic ? (int)(2.0* Variant.NS / (cov*0.01)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)));
+					Variant.qscore = (int)(10.0 * Variant.NS / freq_thr);
 					if (Variant.qscore > 30) Variant.qscore = 30;
 					/*if (Variant.qscore >= MinVarConfScore) */
 					MyVariantVec.push_back(Variant);

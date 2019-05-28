@@ -556,6 +556,7 @@ void *IdentifyVariants(void *arg)
 	}
 	if ((n = (int)MyVariantVec.size()) > 0)
 	{
+		sort(MyVariantVec.begin(), MyVariantVec.end(), CompByVarPos);
 		pthread_mutex_lock(&Lock);
 		copy(MyVariantVec.begin(), MyVariantVec.end(), back_inserter(VariantVec));
 		pthread_mutex_unlock(&Lock);

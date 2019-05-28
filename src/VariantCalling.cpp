@@ -535,7 +535,7 @@ void *IdentifyVariants(void *arg)
 					else Variant.GenoType = 1;
 
 					Variant.ALTstr = vec[0].first;
-					Variant.qscore = bSomatic ? (int)(1.0* Variant.NS / (cov*0.01)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)));
+					Variant.qscore = bSomatic ? (int)(2.0* Variant.NS / (cov*0.01)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)));
 					if (Variant.qscore > 30) Variant.qscore = 30;
 					/*if (Variant.qscore >= MinVarConfScore) */
 					MyVariantVec.push_back(Variant);

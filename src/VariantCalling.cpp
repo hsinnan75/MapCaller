@@ -495,7 +495,7 @@ void *IdentifyVariants(void *arg)
 		if (nst_nt4_table[RefSequence[gPos]] != 4)
 		{
 			cov = GetProfileColumnSize(MappingRecordArr[gPos]);
-			if (MappingRecordArr[gPos].multi_hit >= MinAlleleFreq && MappingRecordArr[gPos].multi_hit > (int)(cov >> 1)) continue;
+			if (bSomatic && MappingRecordArr[gPos].multi_hit >= MinAlleleFreq && MappingRecordArr[gPos].multi_hit > (int)(cov >> 1)) continue;
 
 			if ((cov_thr = BlockDepthArr[(int)(gPos / BlockSize)] >> 1) < 5) cov_thr = 5;
 			if (cov_thr > MinAlleleFreq) cov_thr = MinAlleleFreq;

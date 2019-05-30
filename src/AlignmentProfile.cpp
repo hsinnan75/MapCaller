@@ -23,6 +23,21 @@ bool CheckIndStrOccu(string& IndSeq, map<int64_t, map<string, uint16_t> >::itera
 	return bChecked;
 }
 
+int CheckMismatch(vector<FragPair_t>& FragPairVec)
+{
+	int i, len, mis = 0;
+	vector<FragPair_t>::iterator iter;
+	for (iter = FragPairVec.begin(); iter != FragPairVec.end(); iter++)
+	{
+		if (!iter->bSimple && iter->rLen > 0 && iter->gLen > 0)
+		{
+			len = (int)iter->aln1.length();
+			for (i = 0; i < len; i++) if (iter->aln1[i] != iter->aln2[i] && iter->aln1[i] != '-' && iter->aln2[i] != '-') mis++;
+		}
+	}
+	return mis;
+}
+
 void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 {
 	int64_t gPos;
@@ -56,7 +71,9 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 			}
 			continue;
 		}
+		//if (bSomatic && CheckMismatch(iter->FragPairVec) > 2) continue;
 		//if (bSomatic && iter->score < (read->rlen - 2)) continue;
+
 		if (iter->FragPairVec[0].gPos < GenomeSize)
 		{
 			//gPos = iter->FragPairVec[0].gPos;
@@ -197,4 +214,22 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 	//	ShowFragPairCluster(AlnCanVec);
 	//	pthread_mutex_unlock(&Lock);
 	//}
+}
+
+void UpdateMultiHitCount(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
+{
+	int64_t gPos, gPosEnd;
+	vector<AlnCan_t>::iterator iter;
+	vector<FragPair_t>::iterator FragIter;
+
+	for (iter = AlnCanVec.begin(); iter != AlnCanVec.end(); iter++)
+	{
+		if (iter->score != 0)
+		{
+			if (iter->orientation) gPos = iter->FragPairVec.begin()->gPos, gPosEnd = iter->FragPairVec.rbegin()->gPos + iter->FragPairVec.rbegin()->gLen;
+			else gPos = TwoGenomeSize - (iter->FragPairVec.begin()->gPos + iter->FragPairVec.begin()->gLen), gPosEnd = TwoGenomeSize - iter->FragPairVec.rbegin()->gPos;
+			//printf("%lld - %lld (len=%d / %d)\n", gPos, gPosEnd - 1, gPosEnd - gPos, read->rlen);
+			for (; gPos < gPosEnd; gPos++) if (MappingRecordArr[gPos].multi_hit < 65535) MappingRecordArr[gPos].multi_hit++;
+		}
+	}
 }

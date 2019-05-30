@@ -72,7 +72,7 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 			continue;
 		}
 		//if (bSomatic && CheckMismatch(iter->FragPairVec) > 2) continue;
-		//if (bSomatic && iter->score < (read->rlen - 2)) continue;
+		//if (bSomatic && iter->PairedAlnCanIdx == -1) continue;
 
 		if (iter->FragPairVec[0].gPos < GenomeSize)
 		{

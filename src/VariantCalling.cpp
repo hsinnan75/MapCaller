@@ -173,8 +173,10 @@ map<int64_t, bool> LoadObservedPos()
 		getline(file, str); if (str == "") break;
 		ss.clear(); ss.str(str); ss >> p;
 		//m.insert(make_pair(p - 1, (str[str.length()-1] == '+' ? true : false)));
-		if(str.find("snp")!=string::npos) m.insert(make_pair(p - 1, (str.find('t') != string::npos ? true : false)));
-		else m.insert(make_pair(p, (str.find('t') != string::npos ? true : false)));
+		if(str.find("snp")!=string::npos) m.insert(make_pair(p - 1, (str.find("_t") != string::npos ? true : false)));
+		else m.insert(make_pair(p, (str.find("_t") != string::npos ? true : false)));
+
+		if (m.size() == 2000) break;
 	}
 	file.close();
 	return m;
@@ -493,18 +495,16 @@ void *IdentifyVariants(void *arg)
 		if (nst_nt4_table[RefSequence[gPos]] != 4)
 		{
 			cov = GetProfileColumnSize(MappingRecordArr[gPos]);
-			//if (MappingRecordArr[gPos].multi_hit >= (int)(cov*FrequencyThr)) continue;
+			if (MappingRecordArr[gPos].multi_hit >= MinAlleleFreq && MappingRecordArr[gPos].multi_hit > (int)(cov >> 1)) continue;
 
 			if ((cov_thr = BlockDepthArr[(int)(gPos / BlockSize)] >> 1) < 5) cov_thr = 5;
 			if (cov_thr > MinAlleleFreq) cov_thr = MinAlleleFreq;
 
 			if ((ins_thr = (int)(cov_thr*0.25)) < MinIndFreq) ins_thr = MinIndFreq;
 			if ((del_thr = (int)(cov_thr*0.35)) < MinIndFreq) del_thr = MinIndFreq;
-
-			//if (bDebugMode && gPos < ChromosomeVec[0].len && (it = obs_map.find(gPos)) != obs_map.end()) bShow = true; else bShow = false;
 			ins_freq = GetAreaIndFrequency(gPos, InsertSeqMap, ins_str); del_freq = GetAreaIndFrequency(gPos, DeleteSeqMap, del_str);
 
-			//if (bShow)
+			//if (bDebugMode && gPos < ChromosomeVec[0].len && (it = obs_map.find(gPos)) != obs_map.end())
 			//{
 			//	pthread_mutex_lock(&Lock);
 			//	ShowVariationProfile(gPos - 5, gPos + 5); fflush(stdout);
@@ -513,7 +513,6 @@ void *IdentifyVariants(void *arg)
 			//	fflush(stdout);
 			//	pthread_mutex_unlock(&Lock);
 			//}
-			//if (ins_freq >= MinIndFreq)
 			if (ins_freq >= ins_thr)
 			{
 				Variant.gPos = gPos; Variant.VarType = var_INS; Variant.DP = (cov_thr << 1); Variant.NS = ins_freq; 
@@ -522,7 +521,6 @@ void *IdentifyVariants(void *arg)
 				/*if (Variant.qscore >= MinVarConfScore)*/
 				MyVariantVec.push_back(Variant);
 			}
-			//if (del_freq >= MinIndFreq)
 			if (del_freq >= del_thr)
 			{
 				Variant.gPos = gPos - 1; Variant.VarType = var_DEL; Variant.DP = (cov_thr << 1); Variant.NS = del_freq;
@@ -534,8 +532,8 @@ void *IdentifyVariants(void *arg)
 			//SUB
 			if (cov >= cov_thr)
 			{
-				vec.clear(); ref_base = nst_nt4_table[RefSequence[gPos]]; freq_thr = cov*(bSomatic ? 0.01 : FrequencyThr);
-				if (freq_thr < MinAlleleFreq) freq_thr = MinAlleleFreq; if (freq_thr > cov_thr) freq_thr = cov_thr;
+				vec.clear(); ref_base = nst_nt4_table[RefSequence[gPos]]; freq_thr = (int)(cov*(bSomatic ? 0.01 : FrequencyThr));
+				if (freq_thr < MinAlleleFreq) freq_thr = MinAlleleFreq;/* if (freq_thr > cov_thr) freq_thr = cov_thr;*/
 				//if (bSomatic && freq_thr > MinAlleleFreq) freq_thr = MinAlleleFreq;
 
 				if (ref_base != 0 && MappingRecordArr[gPos].A >= freq_thr) vec.push_back(make_pair('A', MappingRecordArr[gPos].A));
@@ -545,25 +543,21 @@ void *IdentifyVariants(void *arg)
 				if (vec.size() == 1)
 				{
 					Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.DP = cov; Variant.NS = vec[0].second;
-					if (vec[0].second >= (cov - freq_thr)) Variant.GenoType = 0;
-					else Variant.GenoType = 1;
-
+					if (vec[0].second >= (cov - freq_thr)) Variant.GenoType = 0; else Variant.GenoType = 1;
+					//pthread_mutex_lock(&Lock); ShowVariationProfile(gPos - 5, gPos + 5); pthread_mutex_unlock(&Lock);
 					Variant.ALTstr = vec[0].first;
-					Variant.qscore = (int)(10.0 * Variant.NS / freq_thr);
-					if (Variant.qscore > 30) Variant.qscore = 30;
-					/*if (Variant.qscore >= MinVarConfScore) */
+					Variant.qscore = (int)(10.0 * Variant.NS / freq_thr); if (Variant.qscore > 30) Variant.qscore = 30;
+
 					MyVariantVec.push_back(Variant);
 				}
 				else if (vec.size() == 2 && CheckDiploidFrequency(cov, vec))
 				{
-
 					Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.DP = cov; Variant.NS = vec[0].second + vec[1].second;
 					Variant.GenoType = 1;
-
+					//pthread_mutex_lock(&Lock); ShowVariationProfile(gPos - 5, gPos + 5); pthread_mutex_unlock(&Lock);
 					Variant.ALTstr.resize(3); Variant.ALTstr[0] = vec[0].first; Variant.ALTstr[1] = ',';  Variant.ALTstr[1] = vec[1].first;
-					Variant.qscore = (int)(10.0 * Variant.NS / freq_thr);
-					if (Variant.qscore > 30) Variant.qscore = 30;
-					/*if (Variant.qscore >= MinVarConfScore) */
+					Variant.qscore = (int)(10.0 * Variant.NS / freq_thr); if (Variant.qscore > 30) Variant.qscore = 30;
+
 					MyVariantVec.push_back(Variant);
 				}
 			}
@@ -587,7 +581,7 @@ void VariantCalling()
 
 	ThrIDarr = new int[iThreadNum];  for (i = 0; i < iThreadNum; i++) ThrIDarr[i] = i;
 
-	//if (ObserveBegPos != -1) printf("Profile[%lld-%lld]\n", ObserveBegPos, ObserveEndPos), ShowVariationProfile(ObserveBegPos, ObserveEndPos);
+	if (ObserveBegPos != -1) printf("Profile[%lld-%lld]\n", ObserveBegPos, ObserveEndPos), ShowVariationProfile(ObserveBegPos, ObserveEndPos);
 	//iThreadNum = 1;
 	BlockNum = (int)(GenomeSize / BlockSize); if (((int64_t)BlockNum * BlockSize) < GenomeSize) BlockNum += 1; 
 	BlockDepthArr = new int[BlockNum]();

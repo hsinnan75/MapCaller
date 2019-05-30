@@ -157,7 +157,6 @@ typedef struct
 	uint16_t G;
 	uint16_t T;
 	uint16_t multi_hit;
-	//uint8_t iFirst;
 } MappingRecord_t;
 
 typedef struct

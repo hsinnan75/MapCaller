@@ -593,7 +593,7 @@ void *ReadMapping(void *arg)
 					//if (strcmp(ReadArr[i].header, "NC_000913_mut_1472703_1473141_0_1_0_0_0:0:0_2:0:0_45ec") == 0) ShowFragPairCluster(ReadArr[i].AlnCanVec);
 					if (ReadArr[i].AlnSummary.score == 0) continue;
 					if ((n = CheckAlnNumber(ReadArr[i].AlnCanVec)) == 1) UpdateProfile(ReadArr + i, ReadArr[i].AlnCanVec);
-					else if (n > 1) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
+					else if (n > 1 && bSomatic) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
 				}
 				pthread_mutex_unlock(&ProfileLock);
 			}
@@ -640,7 +640,7 @@ void *ReadMapping(void *arg)
 				{
 					if (ReadArr[i].AlnSummary.score == 0) continue;
 					if ((n = CheckAlnNumber(ReadArr[i].AlnCanVec)) == 1) UpdateProfile(ReadArr + i, ReadArr[i].AlnCanVec);
-					else if (n > 1) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
+					else if (n > 1 && bSomatic) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
 				}
 				pthread_mutex_unlock(&ProfileLock);
 			}

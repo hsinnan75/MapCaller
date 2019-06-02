@@ -76,10 +76,6 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 
 		if (iter->FragPairVec[0].gPos < GenomeSize)
 		{
-			//gPos = iter->FragPairVec[0].gPos;
-			//if (MappingRecordArr[gPos].iFirst == 10) continue;
-			//MappingRecordArr[gPos].iFirst++;
-
 			for (i = 0; i < num; i++)
 			{
 				rPos = iter->FragPairVec[i].rPos; gPos = iter->FragPairVec[i].gPos;
@@ -140,10 +136,6 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 		}
 		else
 		{
-			//gPos = TwoGenomeSize - iter->FragPairVec.rbegin()->gPos - iter->FragPairVec.rbegin()->gLen;
-			//if (MappingRecordArr[gPos].iFirst == 10) continue;
-			//MappingRecordArr[gPos].iFirst++;
-
 			for (i = 0; i < num; i++)
 			{
 				if (iter->FragPairVec[i].bSimple)

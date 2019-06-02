@@ -24,13 +24,11 @@ To compile MapCaller, it requires libboost-all-dev, libbz2-dev, and liblzma-dev 
 To compile MapCaller and the index tool, please just type 'make' to compile MapCaller and bwt_index. If the compilation or the program fails, please contact me (arith@iis.sinica.edu.tw), Thanks.
 
 # Changes
+version 0.9.9.3: Adjust read depth threshold for somatic mutation detection.
+
 version 0.9.9.2: Remove variants which appear in repetitive regions.
 
 version 0.9.9.1: Adjust read depth threshold.
-
-version 0.9.9: Second version released.
-
-version 0.9.0: First version released.
 
 # Get updates
   ```

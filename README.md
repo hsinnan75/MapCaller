@@ -102,13 +102,15 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
 -f2 STR read filename2 [optional, fasta or fastq or fq.gz], f and f2 are files with paired reads
 
--p the input read file consists of interleaved paired-end sequences [default: false]
+-p the input read file consists of interleaved paired-end sequences [false]
 
--sam STR SAM/BAM output [optional, default: no mapping output, out.sam for SAM output, out.bam for BAM output]
+-sam STR SAM output [optional, default: no mapping output]
 
--vcf STR VCF output [default: output.vcf]
+-bam STR BAM output [optional, default: no mapping output]
 
--filter INT Minimal quality score [default:10]
+-vcf STR VCF output [output.vcf]
+
+-filter Apply variant filters (under test) [false]
 
 -no_vcf No VCF output [false]
 
@@ -120,7 +122,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
 -somatic detect somatic mutations [false]
 
--m output multiple alignments [default: false]
+-m output multiple alignments [false]
 
 -v version number
 

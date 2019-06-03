@@ -181,6 +181,14 @@ typedef struct
 
 typedef struct
 {
+	bool q10;
+	bool bad_haplotype;
+	bool clustered_event;
+	bool str_contraction;
+} Filter_t;
+
+typedef struct
+{
 	uint16_t NS; // AD (allel depth)
 	uint16_t DP; // total depth
 	int64_t gPos;
@@ -188,6 +196,7 @@ typedef struct
 	bool GenoType; //0:homo, 1:heter
 	uint8_t qscore;
 	uint8_t VarType;
+	Filter_t Filter;
 } Variant_t;
 
 // Global variables
@@ -206,7 +215,7 @@ extern vector<CoordinatePair_t> DistantPairVec;
 extern vector<string> ReadFileNameVec1, ReadFileNameVec2;
 extern char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
 extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos, ObserveBegPos, ObserveEndPos;
-extern bool bDebugMode, bSensitive, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic;
+extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic;
 extern int iThreadNum, iChromsomeNum, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleFreq, MinIndFreq, MinVarConfScore;
 
 extern vector<DiscordPair_t> InversionSiteVec, TranslocationSiteVec;

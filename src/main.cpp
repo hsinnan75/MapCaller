@@ -2,7 +2,7 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.3";
+const char* VersionStr = "0.9.9.4";
 
 string CmdLine;
 float FrequencyThr;
@@ -12,7 +12,7 @@ vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
 int iThreadNum, FragmentSize, MinAlleleFreq, MinIndFreq, MinVarConfScore;
-bool bDebugMode, bSensitive, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic, gzCompressed, FastQFormat;
+bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic, gzCompressed, FastQFormat;
 
 void ShowProgramUsage(const char* program)
 {
@@ -30,7 +30,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -somatic      detect somatic mutations [false]\n");
 	fprintf(stderr, "         -no_vcf       No VCF output [false]\n");
 	fprintf(stderr, "         -p            paired-end reads are interlaced in the same file\n");
-	fprintf(stderr, "         -filter       Minimal quality score [%d]\n", MinVarConfScore);
+	fprintf(stderr, "         -filter       apply variant filters (under test) [false]\n");
 	fprintf(stderr, "         -v            version\n");
 	fprintf(stderr, "\n");
 }
@@ -108,10 +108,10 @@ int main(int argc, char* argv[])
 
 	iThreadNum = 16;
 
-	bSensitive = false;
 	bPairEnd = false;
 	bDebugMode = false;
 	bUnique = true;
+	bFilter = false;
 	FastQFormat = true;
 	bSAMoutput = false;
 	bSAMFormat = true;
@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
 					iThreadNum = 4;
 				}
 			}
-			else if (parameter == "-filter" && i + 1 < argc) MinVarConfScore = atoi(argv[++i]);
+			else if (parameter == "-filter") bFilter = true;
 			else if (parameter == "-size" && i + 1 < argc) FragmentSize = atoi(argv[++i]);
 			else if (parameter == "-ad" && i + 1 < argc) MinAlleleFreq = atoi(argv[++i]);
 			else if (parameter == "-ind" && i + 1 < argc) MinIndFreq = atoi(argv[++i]);

@@ -59,13 +59,13 @@ bool CheckOutputFileName(char *FileName)
 	return bRet;
 }
 
-bool CheckInputFiles()
+bool CheckInputFiles(vector<string>& ReadFileNameVec)
 {
 	struct stat s;
 	string filetype;
 	bool bRet = true;
 
-	for (vector<string>::iterator iter = ReadFileNameVec1.begin(); iter != ReadFileNameVec1.end(); iter++)
+	for (vector<string>::iterator iter = ReadFileNameVec.begin(); iter != ReadFileNameVec.end(); iter++)
 	{
 		if (stat(iter->c_str(), &s) == -1)
 		{
@@ -81,25 +81,6 @@ bool CheckInputFiles()
 			{
 				bRet = false;
 				fprintf(stderr, "Wrong file type:[%s]\n", iter->c_str());
-				break;
-			}
-		}
-	}
-	for (vector<string>::iterator iter = ReadFileNameVec2.begin(); iter != ReadFileNameVec2.end(); iter++)
-	{
-		if (stat(iter->c_str(), &s) == -1)
-		{
-			bRet = false;
-			fprintf(stderr, "Cannot access file:[%s]\n", iter->c_str());
-		}
-		else
-		{
-			filetype = iter->substr(iter->find_last_of('.') + 1);
-			for (string::iterator ii = filetype.begin(); ii != filetype.end(); ii++) *ii = tolower(*ii);
-			if (filetype != "fq" && filetype != "fa" && filetype != "fastq" && filetype != "fasta" && filetype != "gz")
-			{
-				bRet = false;
-				fprintf(stderr, "Wrong file type:[%s]\n", (char*)iter->c_str());
 				break;
 			}
 		}
@@ -248,7 +229,7 @@ int main(int argc, char* argv[])
 			fprintf(stderr, "Read2:\n"); for (vector<string>::iterator iter = ReadFileNameVec2.begin(); iter != ReadFileNameVec2.end(); iter++) fprintf(stderr, "\t%s\n", (char*)iter->c_str());
 			exit(0);
 		}
-		if (CheckInputFiles() == false) exit(0);
+		if (CheckInputFiles(ReadFileNameVec1) == false || CheckInputFiles(ReadFileNameVec2) == false) exit(0);
 		if (SamFileName != NULL && CheckOutputFileName(SamFileName) == false) exit(0);
 		if (VcfFileName != NULL && CheckOutputFileName(VcfFileName) == false) exit(0);
 		//if (MinAlleleFreq > MinBaseDepth) MinAlleleFreq = MinBaseDepth;

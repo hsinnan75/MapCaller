@@ -62,6 +62,7 @@ bool CheckOutputFileName(char *FileName)
 bool CheckInputFiles()
 {
 	struct stat s;
+	string filetype;
 	bool bRet = true;
 
 	for (vector<string>::iterator iter = ReadFileNameVec1.begin(); iter != ReadFileNameVec1.end(); iter++)
@@ -70,6 +71,18 @@ bool CheckInputFiles()
 		{
 			bRet = false;
 			fprintf(stderr, "Cannot access file:[%s]\n", (char*)iter->c_str());
+			break;
+		}
+		else
+		{
+			filetype = iter->substr(iter->find_last_of('.') + 1);
+			for (string::iterator ii = filetype.begin(); ii != filetype.end(); ii++) *ii = tolower(*ii);
+			if (filetype != "fq" && filetype != "fa" && filetype != "fastq" && filetype != "fasta" && filetype != "gz")
+			{
+				bRet = false;
+				fprintf(stderr, "Wrong file type:[%s]\n", iter->c_str());
+				break;
+			}
 		}
 	}
 	for (vector<string>::iterator iter = ReadFileNameVec2.begin(); iter != ReadFileNameVec2.end(); iter++)
@@ -77,7 +90,18 @@ bool CheckInputFiles()
 		if (stat(iter->c_str(), &s) == -1)
 		{
 			bRet = false;
-			fprintf(stderr, "Cannot access file:[%s]\n", (char*)iter->c_str());
+			fprintf(stderr, "Cannot access file:[%s]\n", iter->c_str());
+		}
+		else
+		{
+			filetype = iter->substr(iter->find_last_of('.') + 1);
+			for (string::iterator ii = filetype.begin(); ii != filetype.end(); ii++) *ii = tolower(*ii);
+			if (filetype != "fq" && filetype != "fa" && filetype != "fastq" && filetype != "fasta" && filetype != "gz")
+			{
+				bRet = false;
+				fprintf(stderr, "Wrong file type:[%s]\n", (char*)iter->c_str());
+				break;
+			}
 		}
 	}
 	return bRet;

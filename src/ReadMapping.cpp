@@ -772,7 +772,7 @@ void Mapping()
 		for (i = 0; i < iThreadNum; i++) pthread_create(&ThreadArr[i], NULL, CheckMappingCoverage, &ThrIdArr[i]);
 		for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);
 
-		avgCov = (int)(1.0*iTotalCoverage / iAlignedBase + .5); 
+		avgCov = (int)(1.0*iTotalCoverage / iAlignedBase + .5); if (avgCov < 0) avgCov = 0;
 		//maxCov = (int)(avgCov * 1.5);
 		//fprintf(stderr, "\tread alignment coverage = %lld / %lld (%.4f%%)\n", iAlignedBase, GenomeSize, 100*(1.0*iAlignedBase / GenomeSize));
 		//if ((minCov = (int)(avgCov * 0.33)) < 5) minCov = 5; else if (minCov > 100) minCov = 100;

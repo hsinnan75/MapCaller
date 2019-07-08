@@ -23,6 +23,9 @@ To compile MapCaller, it requires libboost-all-dev, libbz2-dev, and liblzma-dev 
 # Compiling
 To compile MapCaller and the index tool, please just type 'make' to compile MapCaller and bwt_index. If the compilation or the program fails, please contact me (arith@iis.sinica.edu.tw), Thanks.
 
+# Test
+You may run ./run_test to test MapCaller with a toy example.
+
 # Changes
 version 0.9.9.4: Add variant filters
 

@@ -2,7 +2,7 @@
 #test indexing
 echo
 echo "Test1 -- Generate index files with a reference file"
-echo "Command=./bwa_index test/ref.fa test/RefIdx"
+echo "Command=./bwt_index test/ref.fa test/RefIdx"
 echo
 ./bwt_index test/ref.fa test/RefIdx
 

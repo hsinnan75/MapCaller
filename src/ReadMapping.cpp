@@ -791,17 +791,9 @@ void Mapping()
 	}
 	else avgDist = avgReadLength = 0;
 
-	////int cov;
-	//for (int64_t gPos = 0; gPos < GenomeSize; gPos++)
+	//for (int64_t gPos = 0; gPos < 100000000; gPos+=10)
 	//{
-	//	if (gPos % 10 == 0) ShowProfileColumn(gPos);
-	//	//cov += (GetProfileColumnSize(MappingRecordArr[gPos]) + MappingRecordArr[gPos].multi_hit);
-	//	//if (gPos % 100 == 99)
-	//	//{
-	//	//	ShowProfileColumn(gPos);
-	//	//	printf("%lld\t\t%d\n", gPos + 1, cov / 100);
-	//	//	cov = 0;
-	//	//}
+	//	ShowProfileColumn(gPos);
 	//}
 	//if (ObserveBegPos != -1 && ObserveEndPos != -1)
 	//{

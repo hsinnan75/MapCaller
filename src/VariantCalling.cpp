@@ -215,6 +215,7 @@ void IdentifyBreakPointCandidates()
 	uint32_t total_freq;
 	pair<int64_t, uint16_t> p;
 
+	//fprintf(stderr, "\t\tIdentify breakpoints"); fflush(stderr);
 	BreakPointMap.insert(make_pair(TwoGenomeSize, 0)); total_freq = 0; p = make_pair(0, 0);
 	for (map<int64_t, uint16_t>::iterator iter = BreakPointMap.begin(); iter != BreakPointMap.end(); iter++)
 	{
@@ -242,6 +243,7 @@ void IdentifyBreakPointCandidates()
 		}
 		//printf("Pos=%lld freq=%d\n", (long long)iter->first, iter->second);
 	}
+	//fprintf(stderr, "\n");
 }
 
 int CalRegionCov(int64_t begPos, int64_t endPos)
@@ -264,6 +266,7 @@ void IdentifyTranslocations()
 	vector<DiscordPair_t>::iterator Iter1, Iter2;
 	uint32_t i, j, n, TNLnum, num, score, LCov, RCov, cov_thr, Lscore, Rscore;
 
+	//fprintf(stderr, "\t\tIdentify translocations"); fflush(stderr);
 	//for (Iter1 = TranslocationSiteVec.begin(); Iter1 != TranslocationSiteVec.end(); Iter1++)  printf("Pos=%lld Dist=%lld\n", (long long)Iter1->gPos, (long long)Iter1->dist);
 	for (num = (int)BreakPointCanVec.size(), TNLnum = i = 0; i < num; i++)
 	{
@@ -314,6 +317,8 @@ void IdentifyTranslocations()
 		}
 	}
 	if (TNLnum > 0) inplace_merge(VariantVec.begin(), VariantVec.end() - TNLnum, VariantVec.end(), CompByVarPos);
+
+	//fprintf(stderr, "\n");
 }
 
 void IdentifyInversions()
@@ -325,6 +330,7 @@ void IdentifyInversions()
 	vector<DiscordPair_t>::iterator Iter1, Iter2;
 	uint32_t i, j, n, LCov, RCov, cov_thr, INVnum, num, score, Lscore, Rscore;
 
+	//fprintf(stderr, "\t\tIdentify inversions"); fflush(stderr);
 	//for (Iter1 = InversionSiteVec.begin(); Iter1 != InversionSiteVec.end(); Iter1++) printf("Pos=%lld Dist=%lld\n", (long long)Iter1->gPos, (long long)Iter1->dist);
 	for (num = (int)BreakPointCanVec.size(), INVnum = i = 0; i < num; i++)
 	{
@@ -376,6 +382,8 @@ void IdentifyInversions()
 		}
 	}
 	if (INVnum > 0) inplace_merge(VariantVec.begin(), VariantVec.end() - INVnum, VariantVec.end(), CompByVarPos);
+
+	//fprintf(stderr, "\n");
 }
 
 bool CheckNearbyVariant(int i, int num, int dist)

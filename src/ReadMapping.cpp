@@ -593,7 +593,8 @@ void *ReadMapping(void *arg)
 					//if (strcmp(ReadArr[i].header, "NC_000913_mut_1472703_1473141_0_1_0_0_0:0:0_2:0:0_45ec") == 0) ShowFragPairCluster(ReadArr[i].AlnCanVec);
 					if (ReadArr[i].AlnSummary.score == 0) continue;
 					if ((n = CheckAlnNumber(ReadArr[i].AlnCanVec)) == 1) UpdateProfile(ReadArr + i, ReadArr[i].AlnCanVec);
-					else if (n > 1 && bSomatic) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
+					else UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
+					//else if (n > 1 && bSomatic) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
 				}
 				pthread_mutex_unlock(&ProfileLock);
 			}
@@ -640,7 +641,8 @@ void *ReadMapping(void *arg)
 				{
 					if (ReadArr[i].AlnSummary.score == 0) continue;
 					if ((n = CheckAlnNumber(ReadArr[i].AlnCanVec)) == 1) UpdateProfile(ReadArr + i, ReadArr[i].AlnCanVec);
-					else if (n > 1 && bSomatic) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
+					else UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
+					//else if (n > 1 && bSomatic) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
 				}
 				pthread_mutex_unlock(&ProfileLock);
 			}
@@ -773,10 +775,6 @@ void Mapping()
 		for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);
 
 		avgCov = (int)(1.0*iTotalCoverage / iAlignedBase + .5); if (avgCov < 0) avgCov = 0;
-		//maxCov = (int)(avgCov * 1.5);
-		//fprintf(stderr, "\tread alignment coverage = %lld / %lld (%.4f%%)\n", iAlignedBase, GenomeSize, 100*(1.0*iAlignedBase / GenomeSize));
-		//if ((minCov = (int)(avgCov * 0.33)) < 5) minCov = 5; else if (minCov > 100) minCov = 100;
-		//if ((lowCov = (int)(avgCov * 0.10)) < 2) lowCov = 2; else if (lowCov > 5) lowCov = 5;
 		fprintf(stderr, "\tEst. AvgCoverage = %d\n", avgCov);
 	}
 	else avgCov = 0;
@@ -793,6 +791,18 @@ void Mapping()
 	}
 	else avgDist = avgReadLength = 0;
 
+	////int cov;
+	//for (int64_t gPos = 0; gPos < GenomeSize; gPos++)
+	//{
+	//	if (gPos % 10 == 0) ShowProfileColumn(gPos);
+	//	//cov += (GetProfileColumnSize(MappingRecordArr[gPos]) + MappingRecordArr[gPos].multi_hit);
+	//	//if (gPos % 100 == 99)
+	//	//{
+	//	//	ShowProfileColumn(gPos);
+	//	//	printf("%lld\t\t%d\n", gPos + 1, cov / 100);
+	//	//	cov = 0;
+	//	//}
+	//}
 	//if (ObserveBegPos != -1 && ObserveEndPos != -1)
 	//{
 	//	for (map<int64_t, map<string, uint16_t> >::iterator iter = InsertSeqMap.begin(); iter != InsertSeqMap.end(); iter++)

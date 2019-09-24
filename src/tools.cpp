@@ -180,7 +180,7 @@ int GetProfileColumnSize(MappingRecord_t& Profile)
 
 void ShowProfileColumn(int64_t gPos)
 {
-	int cov = GetProfileColumnSize(MappingRecordArr[gPos]);
+	int cov = GetProfileColumnSize(MappingRecordArr[gPos]) + MappingRecordArr[gPos].multi_hit;
 	printf("%lld[%c]: cov=%d [A=%d C=%d G=%d T=%d] dup=%d\n", gPos, RefSequence[gPos], cov, MappingRecordArr[gPos].A, MappingRecordArr[gPos].C, MappingRecordArr[gPos].G, MappingRecordArr[gPos].T, MappingRecordArr[gPos].multi_hit);
 }
 
@@ -190,7 +190,7 @@ void ShowVariationProfile(int64_t begin_pos, int64_t end_pos)
 	Coordinate_t coor = DetermineCoordinate(gPos);
 	if (end_pos >= GenomeSize) end_pos = GenomeSize - 1;
 	printf("%s-%lld\n", ChromosomeVec[coor.ChromosomeIdx].name, coor.gPos);
-	for (int64_t gPos = begin_pos; gPos <= end_pos; gPos++) ShowProfileColumn(gPos);
+	for (gPos = begin_pos; gPos <= end_pos; gPos++) ShowProfileColumn(gPos);
 	printf("\n\n");
 }
 

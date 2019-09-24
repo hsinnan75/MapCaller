@@ -652,9 +652,9 @@ void VariantCalling()
 	for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);
 
 	// Identify structural variants
-	//IdentifyBreakPointCandidates();
-	//if (BreakPointCanVec.size() > 0 && InversionSiteVec.size() > 0) IdentifyInversions();
-	//if (BreakPointCanVec.size() > 0 && TranslocationSiteVec.size() > 0) IdentifyTranslocations();
+	IdentifyBreakPointCandidates();
+	if (BreakPointCanVec.size() > 0 && InversionSiteVec.size() > 0) IdentifyInversions();
+	if (BreakPointCanVec.size() > 0 && TranslocationSiteVec.size() > 0) IdentifyTranslocations();
 	fprintf(stderr, "\tWrite all the predicted sample variations to file [%s]...\n", VcfFileName); GenVariantCallingFile();
 
 	fprintf(stderr, "variant calling has been done in %lld seconds.\n", (long long)(time(NULL) - t));

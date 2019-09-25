@@ -27,6 +27,8 @@ To compile MapCaller and the index tool, please just type 'make' to compile MapC
 You may run 'run_test.sh' to test MapCaller with a toy example.
 
 # Changes
+version 0.9.9.5: Fix a bug on read count
+
 version 0.9.9.4: Add variant filters
 
 version 0.9.9.3: Adjust read depth threshold for somatic mutation detection.

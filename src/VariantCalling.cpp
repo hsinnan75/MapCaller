@@ -215,13 +215,11 @@ void IdentifyBreakPointCandidates()
 	uint32_t total_freq;
 	pair<int64_t, uint16_t> p;
 
-	//fprintf(stderr, "\t\tIdentify breakpoints"); fflush(stderr);
 	BreakPointMap.insert(make_pair(TwoGenomeSize, 0)); total_freq = 0; p = make_pair(0, 0);
 	for (map<int64_t, uint16_t>::iterator iter = BreakPointMap.begin(); iter != BreakPointMap.end(); iter++)
 	{
-		if (iter->first - p.first > avgReadLength)
+		if (iter->first - p.first > avgReadLength) // break
 		{
-			//printf("Break!\n");
 			if (total_freq >= BreakPointFreqThr)
 			{
 				bp.gPos = p.first;
@@ -243,7 +241,6 @@ void IdentifyBreakPointCandidates()
 		}
 		//printf("Pos=%lld freq=%d\n", (long long)iter->first, iter->second);
 	}
-	//fprintf(stderr, "\n");
 }
 
 int CalRegionCov(int64_t begPos, int64_t endPos)
@@ -289,7 +286,7 @@ void IdentifyTranslocations()
 			}
 			else score++;
 		}
-		if (Lscore < cov_thr || Lscore < (int)(LCov*INV_TNL_ThrRatio)) Lscore = 0;
+		if (Lscore < cov_thr || Lscore < (int)(LCov*INV_TNL_ThrRatio)) continue;
 
 		RCov = CalRegionCov(gPos, gPos + FragmentSize);
 		DiscordPair.gPos = gPos; Iter1 = upper_bound(TranslocationSiteVec.begin(), TranslocationSiteVec.end(), DiscordPair, CompByDiscordPos);
@@ -307,7 +304,7 @@ void IdentifyTranslocations()
 			}
 			else score++;
 		}
-		if (Rscore < cov_thr || Rscore < (int)(RCov*INV_TNL_ThrRatio)) Rscore = 0;
+		if (Rscore < cov_thr || Rscore < (int)(RCov*INV_TNL_ThrRatio)) continue;
 
 		//printf("TNL_can =%lld (Cov=%d vs %d): Lscore=%d Rscore=%d\n", (long long)gPos, LCov, RCov, Lscore, Rscore);
 		if (Lscore > 0 && Rscore > 0)
@@ -321,7 +318,6 @@ void IdentifyTranslocations()
 		}
 	}
 	if (TNLnum > 0) inplace_merge(VariantVec.begin(), VariantVec.end() - TNLnum, VariantVec.end(), CompByVarPos);
-	//fprintf(stderr, "\n");
 }
 
 void IdentifyInversions()
@@ -353,7 +349,7 @@ void IdentifyInversions()
 			}
 			else score++;
 		}
-		if (Lscore < cov_thr || Lscore < (int)(LCov*INV_TNL_ThrRatio)) Lscore = 0;
+		if (Lscore < cov_thr || Lscore < (int)(LCov*INV_TNL_ThrRatio)) continue;
 
 		RCov = CalRegionCov(gPos, gPos + FragmentSize);
 		DiscordPair.gPos = gPos; Iter1 = upper_bound(InversionSiteVec.begin(), InversionSiteVec.end(), DiscordPair, CompByDiscordPos);
@@ -371,7 +367,7 @@ void IdentifyInversions()
 			}
 			else score++;
 		}
-		if (Rscore < cov_thr || Rscore < (int)(RCov*INV_TNL_ThrRatio)) Rscore = 0;
+		if (Rscore < cov_thr || Rscore < (int)(RCov*INV_TNL_ThrRatio)) continue;
 
 		//printf("INV_can =%lld (Cov=%d vs %d): Lscore=%d Rscore=%d\n", (long long)gPos, LCov, RCov, Lscore, Rscore);
 		if (Lscore > 0 && Rscore > 0)

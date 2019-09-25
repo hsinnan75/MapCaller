@@ -76,14 +76,13 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
 - Read files
 
-    All reads files should be in FASTA or FASTQ format. FASTQ files can be compressed with gzip format. We do not support FASTA files with gzip compression.
-    Read sequences should be capital letters. The quality scores in FASTQ are not considered in the alignments. The alignment result will not be different in either format.
-
+    All reads files should be in FASTA/FASTQ format. Input files can be compressed with gzip format.
+    Read sequences should be capital letters. The quality scores in FASTQ are not considered in the alignments. 
     If paired-end reads are separated into two files, use -f and -f2 to indicate the two filenames. The i-th reads in the two files are paired. If paired-end reads are in the same file, use -p. The first and second reads are paired, the third and fourth reads are paired, and so on. For the latter case, use -p to indicate the input file contains paired-end reads.
 
 - Output file
 
-    MapCaller outputs a SAM file [optional] and a VCF file. 
+    MapCaller outputs a SAM/BAM file [optional] and a VCF file. 
 
 # Parameter setting
 

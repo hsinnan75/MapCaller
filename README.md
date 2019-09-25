@@ -26,17 +26,6 @@ To compile MapCaller and the index tool, please just type 'make' to compile MapC
 # Test
 You may run 'run_test.sh' to test MapCaller with a toy example.
 
-# Changes
-version 0.9.9.5: Fix a bug on read count
-
-version 0.9.9.4: Add variant filters
-
-version 0.9.9.3: Adjust read depth threshold for somatic mutation detection.
-
-version 0.9.9.2: Remove variants which appear in repetitive regions.
-
-version 0.9.9.1: Adjust read depth threshold.
-
 # Get updates
   ```
   $ ./MapCaller update
@@ -132,3 +121,9 @@ To perform variant calling, MapCaller requires the the index files of the refere
 -h help
 
   ```
+# Changes
+version 0.9.9.1: Adjust read depth threshold.
+version 0.9.9.2: Remove variants which appear in repetitive regions.
+version 0.9.9.3: Adjust read depth threshold for somatic mutation detection.
+version 0.9.9.4: Add variant filters
+version 0.9.9.5: Fix a bug on read count

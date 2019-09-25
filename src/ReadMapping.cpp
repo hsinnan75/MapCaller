@@ -654,7 +654,7 @@ void *ReadMapping(void *arg)
 			if (FastQFormat) delete[] ReadArr[i].qual;
 			delete[] ReadArr[i].EncodeSeq;
 		}
-		//if (iTotalReadNum >= 1000000) break;
+		//if (iTotalReadNum >= 100000000) break;
 	}
 	delete[] ReadArr;
 

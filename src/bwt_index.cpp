@@ -238,7 +238,7 @@ void RestoreReferenceInfo()
 	GenomeSize = RefIdx->bns->l_pac; TwoGenomeSize = (GenomeSize << 1);
 	iChromsomeNum = RefIdx->bns->n_seqs; ChromosomeVec.resize(iChromsomeNum);
 
-	fprintf(stderr, "Load the reference sequences (%d chromosome%s, total size = %lld bp)...\n", iChromsomeNum, (iChromsomeNum == 1? "":"s"), GenomeSize);
+	fprintf(stderr, "Load the reference sequence%s (%d chromosome%s, total size = %lld bp)...\n", (iChromsomeNum == 1 ? "" : "s"), iChromsomeNum, (iChromsomeNum == 1? "":"s"), GenomeSize);
 	fseek(RefIdx->bns->fp_pac, 0, SEEK_SET);
 	size_t ret = fread(RefIdx->pac, 1, GenomeSize / 4 + 1, RefIdx->bns->fp_pac);
 
@@ -252,12 +252,6 @@ void RestoreReferenceInfo()
 
 		ChrLocMap.insert(make_pair(ChromosomeVec[i].FowardLocation + ChromosomeVec[i].len - 1, i));
 		ChrLocMap.insert(make_pair(ChromosomeVec[i].ReverseLocation + ChromosomeVec[i].len - 1, i));
-
-		//if (bDebugMode)
-		//{
-		//	string chr_name = ChromosomeVec[i].name; 
-		//	if (chr_name == "chr3") ObservGenomicPos = ChromosomeVec[i].FowardLocation + 33183883;
-		//}
 	}
 	RefSequence = new char[TwoGenomeSize + 1]; RefSequence[TwoGenomeSize] = '\0';
 	RestoreReferenceSequences();

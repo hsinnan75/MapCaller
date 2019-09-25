@@ -251,6 +251,7 @@ int CalRegionCov(int64_t begPos, int64_t endPos)
 	int cov = 0;
 	int64_t gPos;
 
+	if (endPos > GenomeSize) endPos = GenomeSize - 1;
 	for (gPos = begPos; gPos <= endPos; gPos++) cov += GetProfileColumnSize(MappingRecordArr[gPos]);
 
 	if (endPos >= begPos) return (int)(cov / (endPos - begPos + 1));
@@ -266,17 +267,19 @@ void IdentifyTranslocations()
 	vector<DiscordPair_t>::iterator Iter1, Iter2;
 	uint32_t i, j, n, TNLnum, num, score, LCov, RCov, cov_thr, Lscore, Rscore;
 
-	//fprintf(stderr, "\t\tIdentify translocations"); fflush(stderr);
 	//for (Iter1 = TranslocationSiteVec.begin(); Iter1 != TranslocationSiteVec.end(); Iter1++)  printf("Pos=%lld Dist=%lld\n", (long long)Iter1->gPos, (long long)Iter1->dist);
 	for (num = (int)BreakPointCanVec.size(), TNLnum = i = 0; i < num; i++)
 	{
-		gPos = BreakPointCanVec[i].gPos; LCov = CalRegionCov(gPos - FragmentSize, gPos - (avgReadLength >> 1));
+		gPos = BreakPointCanVec[i].gPos;
+		
+		LCov = CalRegionCov(gPos - FragmentSize, gPos - (avgReadLength >> 1));
 		cov_thr = BlockDepthArr[(int)(gPos / BlockSize)] >> 1;
 		DiscordPair.gPos = gPos - FragmentSize; Iter1 = lower_bound(TranslocationSiteVec.begin(), TranslocationSiteVec.end(), DiscordPair, CompByDiscordPos);
 		DiscordPair.gPos = gPos - (avgReadLength >> 1); Iter2 = lower_bound(TranslocationSiteVec.begin(), TranslocationSiteVec.end(), DiscordPair, CompByDiscordPos);
-		vec.clear(); for (; Iter1 != Iter2; Iter1++) vec.push_back((Iter1->dist / 1000))/*, printf("gPos=%lld, dist=%lld\n", Iter1->gPos, Iter1->dist)*/; 
-		sort(vec.begin(), vec.end()); vec.push_back(TwoGenomeSize);
-		for (n = (int)vec.size(), Lscore = 0, score = j = 1; j < n; j++)
+		if (Iter1 == TranslocationSiteVec.end() || Iter2 == TranslocationSiteVec.end()) continue;
+		vec.clear(); for (; Iter1 != Iter2; Iter1++) vec.push_back((Iter1->dist / 1000)); 
+		sort(vec.begin(), vec.end()); vec.push_back(TwoGenomeSize); n = (int)vec.size();
+		for (Lscore = 0, score = j = 1; j < n; j++)
 		{
 			//printf("Lcan_%d: %lld (score=%d)\n", j + 1, vec[j], score);
 			if (vec[j] - vec[j - 1] > 1)
@@ -291,9 +294,10 @@ void IdentifyTranslocations()
 		RCov = CalRegionCov(gPos, gPos + FragmentSize);
 		DiscordPair.gPos = gPos; Iter1 = upper_bound(TranslocationSiteVec.begin(), TranslocationSiteVec.end(), DiscordPair, CompByDiscordPos);
 		DiscordPair.gPos = gPos + FragmentSize; Iter2 = lower_bound(TranslocationSiteVec.begin(), TranslocationSiteVec.end(), DiscordPair, CompByDiscordPos);
-		vec.clear(); for (; Iter1 != Iter2; Iter1++) vec.push_back((Iter1->dist / 1000))/*, printf("gPos=%lld, dist=%lld\n", Iter1->gPos, Iter1->dist)*/; 
-		sort(vec.begin(), vec.end()); vec.push_back(TwoGenomeSize);
-		for (n = (int)vec.size(), Rscore = 0, score = j = 1; j < n; j++)
+		if (Iter1 == TranslocationSiteVec.end() || Iter2 == TranslocationSiteVec.end()) continue;
+		vec.clear(); for (; Iter1 != Iter2; Iter1++) vec.push_back((Iter1->dist / 1000));
+		sort(vec.begin(), vec.end()); vec.push_back(TwoGenomeSize); n = (int)vec.size();
+		for (Rscore = 0, score = j = 1; j < n; j++)
 		{
 			//printf("Rcan_%d: %lld (score=%d)\n", j + 1, vec[j], score);
 			if (vec[j] - vec[j - 1] > 1)
@@ -317,7 +321,6 @@ void IdentifyTranslocations()
 		}
 	}
 	if (TNLnum > 0) inplace_merge(VariantVec.begin(), VariantVec.end() - TNLnum, VariantVec.end(), CompByVarPos);
-
 	//fprintf(stderr, "\n");
 }
 
@@ -330,7 +333,6 @@ void IdentifyInversions()
 	vector<DiscordPair_t>::iterator Iter1, Iter2;
 	uint32_t i, j, n, LCov, RCov, cov_thr, INVnum, num, score, Lscore, Rscore;
 
-	//fprintf(stderr, "\t\tIdentify inversions"); fflush(stderr);
 	//for (Iter1 = InversionSiteVec.begin(); Iter1 != InversionSiteVec.end(); Iter1++) printf("Pos=%lld Dist=%lld\n", (long long)Iter1->gPos, (long long)Iter1->dist);
 	for (num = (int)BreakPointCanVec.size(), INVnum = i = 0; i < num; i++)
 	{
@@ -338,8 +340,8 @@ void IdentifyInversions()
 		cov_thr = BlockDepthArr[(int)(gPos / BlockSize)] >> 1;
 		DiscordPair.gPos = gPos - FragmentSize; Iter1 = lower_bound(InversionSiteVec.begin(), InversionSiteVec.end(), DiscordPair, CompByDiscordPos);
 		DiscordPair.gPos = gPos - (avgReadLength >> 1); Iter2 = lower_bound(InversionSiteVec.begin(), InversionSiteVec.end(), DiscordPair, CompByDiscordPos);
-
-		vec.clear(); for (; Iter1 != Iter2; Iter1++) vec.push_back((Iter1->dist / 1000))/*, printf("gPos=%lld, dist=%lld\n", Iter1->gPos, Iter1->dist)*/;
+		if (Iter1 == InversionSiteVec.end() || Iter2 == InversionSiteVec.end()) continue;
+		vec.clear(); for (; Iter1 != Iter2; Iter1++) vec.push_back((Iter1->dist / 1000));
 		sort(vec.begin(), vec.end()); vec.push_back(TwoGenomeSize);
 		for (n = (int)vec.size(), Lscore = 0, score = j = 1; j < n; j++)
 		{
@@ -356,7 +358,8 @@ void IdentifyInversions()
 		RCov = CalRegionCov(gPos, gPos + FragmentSize);
 		DiscordPair.gPos = gPos; Iter1 = upper_bound(InversionSiteVec.begin(), InversionSiteVec.end(), DiscordPair, CompByDiscordPos);
 		DiscordPair.gPos = gPos + FragmentSize; Iter2 = lower_bound(InversionSiteVec.begin(), InversionSiteVec.end(), DiscordPair, CompByDiscordPos);
-		vec.clear(); for (; Iter1 != Iter2; Iter1++) vec.push_back((Iter1->dist / 1000))/*, printf("gPos=%lld, dist=%lld\n", Iter1->gPos, Iter1->dist)*/;
+		if (Iter1 == InversionSiteVec.end() || Iter2 == InversionSiteVec.end()) continue;
+		vec.clear(); for (; Iter1 != Iter2; Iter1++) vec.push_back((Iter1->dist / 1000));
 		sort(vec.begin(), vec.end()); vec.push_back(TwoGenomeSize);
 		for (n = (int)vec.size(), Rscore = 0, score = j = 1; j < n; j++)
 		{
@@ -382,8 +385,6 @@ void IdentifyInversions()
 		}
 	}
 	if (INVnum > 0) inplace_merge(VariantVec.begin(), VariantVec.end() - INVnum, VariantVec.end(), CompByVarPos);
-
-	//fprintf(stderr, "\n");
 }
 
 bool CheckNearbyVariant(int i, int num, int dist)
@@ -459,7 +460,6 @@ void GenVariantCallingFile()
 	outFile = fopen(VcfFileName, "w"); ShowMetaInfo();
 
 	//sort(VariantVec.begin(), VariantVec.end(), CompByVarPos);
-	//sprintf(failstr, "q%d", MinVarConfScore);
 	for (num = (int)VariantVec.size(), i = 0; i < num; i++)
 	{
 		gPos = VariantVec[i].gPos; coor = DetermineCoordinate(gPos);

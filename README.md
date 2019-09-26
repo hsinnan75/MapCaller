@@ -76,7 +76,8 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
 - Read files
 
-    All reads files should be in FASTA/FASTQ format. Input files can be compressed with gzip format.
+    MapCaller is designed for NGS short reads. All reads files should be in FASTA/FASTQ format. Input files can be compressed with gzip format.
+    Please note, if reads are stored in FASTA format, each read sequence is not allowed to be wrapped (split over multiple lines).
     Read sequences should be capital letters. The quality scores in FASTQ are not considered in the alignments. 
     If paired-end reads are separated into two files, use -f and -f2 to indicate the two filenames. The i-th reads in the two files are paired. If paired-end reads are in the same file, use -p. The first and second reads are paired, the third and fourth reads are paired, and so on. For the latter case, use -p to indicate the input file contains paired-end reads.
 

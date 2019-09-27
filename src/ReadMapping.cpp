@@ -786,7 +786,7 @@ void Mapping()
 		avgDist = (int)(1.*TotalPairedDistance / iTotalPairedNum + .5);
 		avgReadLength = (int)(1.*ReadLengthSum / iTotalPairedNum + .5);
 		FragmentSize = avgDist + avgReadLength;
-		fprintf(stderr, "%12lld (%6.2f%%) reads are mapped as paires.\n", (long long)(iTotalPairedNum << 1), (int)(10000 * (1.0*(iTotalPairedNum << 1) / iTotalReadNum) + 0.00005) / 100.0);
+		fprintf(stderr, "%12lld (%6.2f%%) reads are mapped in pairs.\n", (long long)(iTotalPairedNum << 1), (int)(10000 * (1.0*(iTotalPairedNum << 1) / iTotalReadNum) + 0.00005) / 100.0);
 		fprintf(stderr, "\tEst. fragment size = %d, insert size = %d\n", FragmentSize, avgDist - avgReadLength);
 	}
 	else avgDist = avgReadLength = 0;

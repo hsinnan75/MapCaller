@@ -248,9 +248,9 @@ int CalRegionCov(int64_t begPos, int64_t endPos)
 	int cov = 0;
 	int64_t gPos;
 
-	if (endPos > GenomeSize) endPos = GenomeSize - 1;
+	if (begPos < 0) begPos = 0; if (endPos > GenomeSize) endPos = GenomeSize - 1;
+	if (endPos < begPos) return 0;
 	for (gPos = begPos; gPos <= endPos; gPos++) cov += GetProfileColumnSize(MappingRecordArr[gPos]);
-
 	if (endPos >= begPos) return (int)(cov / (endPos - begPos + 1));
 	else return 0;
 }

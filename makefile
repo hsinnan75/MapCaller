@@ -11,3 +11,5 @@ main:
 index:
 		make -C BWT_Index && mv BWT_Index/bwt_index .
 
+clean:
+		rm -f MapCaller bwt_index

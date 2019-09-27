@@ -2,7 +2,7 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.5";
+const char* VersionStr = "0.9.9.6";
 
 string CmdLine;
 float FrequencyThr;
@@ -18,9 +18,10 @@ void ShowProgramUsage(const char* program)
 {
 	fprintf(stderr, "MapCaller v%s\n\n", VersionStr);
 	fprintf(stderr, "Usage: %s -i Index_Prefix -f <ReadFile_A1 ReadFile_B1 ...> [-f2 <ReadFile_A2 ReadFile_B2 ...>]\n\n", program);
-	fprintf(stderr, "Options: -t INT        number of threads [%d]\n", iThreadNum);
+	fprintf(stderr, "Options: -i STR        BWT_Index_Prefix\n");
 	fprintf(stderr, "         -f            files with #1 mates reads (format:fa, fq, fq.gz)\n");
 	fprintf(stderr, "         -f2           files with #2 mates reads (format:fa, fq, fq.gz)\n");
+	fprintf(stderr, "         -t INT        number of threads [%d]\n", iThreadNum);
 	fprintf(stderr, "         -size         Sequncing fragment size [%d]\n", FragmentSize);
 	fprintf(stderr, "         -ad INT       Minimal ALT allele count [%d]\n", MinAlleleFreq);
 	fprintf(stderr, "         -sam          SAM output filename [NULL]\n");

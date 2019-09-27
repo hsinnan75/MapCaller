@@ -127,3 +127,4 @@ version 0.9.9.2: Remove variants which appear in repetitive regions.
 version 0.9.9.3: Adjust read depth threshold for somatic mutation detection.
 version 0.9.9.4: Add variant filters
 version 0.9.9.5: Fix a bug on read count
+version 0.9.9.6: Fix a bug on read count

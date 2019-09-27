@@ -13,3 +13,7 @@ index:
 
 clean:
 		rm -f MapCaller bwt_index
+		make clean -C src
+		make clean -C src/htslib
+		make clean -C BWT_Index
+

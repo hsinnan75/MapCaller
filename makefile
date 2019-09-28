@@ -1,6 +1,6 @@
 .KEEP_STAT:
 
-all:		htslib main index
+all:		htslib index main
 
 htslib:
 		make -C src/htslib

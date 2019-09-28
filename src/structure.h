@@ -280,7 +280,7 @@ extern vector<FragPair_t> SimplePairRescue(int64_t LowerBound, int64_t UpperBoun
 
 // KmerAnalysis.cpp
 extern vector<KmerItem_t> CreateKmerVecFromReadSeq(int len, char* seq);
-extern vector<KmerPair_t> IdentifyCommonKmers(int MaxShift, vector<KmerItem_t>& vec1, vector<KmerItem_t>& vec2);
+extern vector<KmerPair_t> IdentifyCommonKmers(uint32_t MaxShift, vector<KmerItem_t>& vec1, vector<KmerItem_t>& vec2);
 extern vector<FragPair_t> GenerateSimplePairsFromCommonKmers(int thr, int64_t gPos, vector<KmerPair_t>& KmerPairVec);
 //extern vector<SeedPair_t> GenerateSimplePairsFromFragmentPair(int MaxDist, int len1, char* frag1, int len2, char* frag2);
 

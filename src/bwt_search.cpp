@@ -241,39 +241,39 @@ bwtSearchResult_t BWT_Search(uint8_t* seq, int start, int stop)
 //	return SPvec;
 //}
 
-void BWT_Check(uint8_t* seq, int start, int stop)
-{
-	int i, pos, p;
-	bwtintv_t ik, ok[4];
-	bwtint_t tk[4], tl[4];
-
-	p = (int)seq[start];
-	ik.x[0] = Refbwt->L2[p] + 1;
-	ik.x[1] = Refbwt->L2[3 - p] + 1;
-	ik.x[2] = Refbwt->L2[p + 1] - Refbwt->L2[p];
-
-	for (pos = start + 1; pos < stop; pos++)
-	{
-		printf("pos=%d\n", pos);
-		printf("ik=[%lld,%lld,%lld]\n", ik.x[0], ik.x[1], ik.x[2]);
-
-		bwt_2occ4(Refbwt, ik.x[1] - 1, ik.x[1] - 1 + ik.x[2], tk, tl);
-		for (i = 0; i != 4; ++i) {
-			ok[i].x[1] = Refbwt->L2[i] + 1 + tk[i];
-			ok[i].x[2] = tl[i] - tk[i];
-			printf("ok[%d].x[1]=%d\n", i, ok[i].x[1]);
-		}
-		ok[3].x[0] = ik.x[0] + (ik.x[1] <= Refbwt->primary && ik.x[1] + ik.x[2] - 1 >= Refbwt->primary);
-		ok[2].x[0] = ok[3].x[0] + ok[3].x[2];
-		ok[1].x[0] = ok[2].x[0] + ok[2].x[2];
-		ok[0].x[0] = ok[1].x[0] + ok[1].x[2];
-		i = 3 - seq[pos];
-		if (ok[i].x[2] == 0) break; // extension ends
-		else ik = ok[i];
-		if ((p = (int)ik.x[2]) <= OCC_Thr)
-		{
-			for (i = 0; i < p; i++) printf("loc=%d\n", bwt_sa(ik.x[0] + i));
-		}
-		printf("\n\n");
-	}
-}
+//void BWT_Check(uint8_t* seq, int start, int stop)
+//{
+//	int i, pos, p;
+//	bwtintv_t ik, ok[4];
+//	bwtint_t tk[4], tl[4];
+//
+//	p = (int)seq[start];
+//	ik.x[0] = Refbwt->L2[p] + 1;
+//	ik.x[1] = Refbwt->L2[3 - p] + 1;
+//	ik.x[2] = Refbwt->L2[p + 1] - Refbwt->L2[p];
+//
+//	for (pos = start + 1; pos < stop; pos++)
+//	{
+//		//printf("pos=%d\n", pos);
+//		//printf("ik=[%lld,%lld,%lld]\n", (long long)ik.x[0], (long long)ik.x[1], (long long)ik.x[2]);
+//
+//		bwt_2occ4(Refbwt, ik.x[1] - 1, ik.x[1] - 1 + ik.x[2], tk, tl);
+//		for (i = 0; i != 4; ++i) {
+//			ok[i].x[1] = Refbwt->L2[i] + 1 + tk[i];
+//			ok[i].x[2] = tl[i] - tk[i];
+//			//printf("ok[%d].x[1]=%d\n", i, ok[i].x[1]);
+//		}
+//		ok[3].x[0] = ik.x[0] + (ik.x[1] <= Refbwt->primary && ik.x[1] + ik.x[2] - 1 >= Refbwt->primary);
+//		ok[2].x[0] = ok[3].x[0] + ok[3].x[2];
+//		ok[1].x[0] = ok[2].x[0] + ok[2].x[2];
+//		ok[0].x[0] = ok[1].x[0] + ok[1].x[2];
+//		i = 3 - seq[pos];
+//		if (ok[i].x[2] == 0) break; // extension ends
+//		else ik = ok[i];
+//		if ((p = (int)ik.x[2]) <= OCC_Thr)
+//		{
+//			//for (i = 0; i < p; i++) printf("loc=%d\n", bwt_sa(ik.x[0] + i));
+//		}
+//		//printf("\n\n");
+//	}
+//}

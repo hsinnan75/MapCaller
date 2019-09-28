@@ -1,38 +1,7 @@
 #include "structure.h"
 
-static pthread_mutex_t Lock;
-
-//AlnCan_t IdentifyBestAlnCan(vector<FragPair_t>& SimplePairVec)
-//{
-//	AlnCan_t AlnCan;
-//	int i, j, score, score_thr, HeadIdx, num = (int)SimplePairVec.size();
-//
-//	sort(SimplePairVec.begin(), SimplePairVec.end(), CompByPosDiff);
-//
-//	//HeadIdx = 0; AlnCan.score = 0; score = SimplePairVec[0].rLen;
-//	//for (i = 0, j = 1; j < num; i++, j++)
-//	//{
-//	//	if (SimplePairVec[j].rPos == SimplePairVec[i].rPos || abs(SimplePairVec[j].PosDiff - SimplePairVec[i].PosDiff) > MaxPosDiff)
-//	//	{
-//	//		if (score > AlnCan.score)
-//	//		{
-//	//			AlnCan.score = score; AlnCan.FragPairVec.clear();
-//	//			copy(SimplePairVec.begin() + HeadIdx, SimplePairVec.begin() + j, back_inserter(AlnCan.FragPairVec));
-//	//		}
-//	//		HeadIdx = j;  score = SimplePairVec[j].rLen;
-//	//	}
-//	//	else score += SimplePairVec[j].rLen;
-//	//}
-//	//if (score > AlnCan.score)
-//	//{
-//	//	AlnCan.score = score; AlnCan.FragPairVec.clear();
-//	//	copy(SimplePairVec.begin() + HeadIdx, SimplePairVec.begin() + j, back_inserter(AlnCan.FragPairVec));
-//	//}
-//	return AlnCan;
-//}
 AlnCan_t IdentifyBestAlnCan(vector<FragPair_t>& SimplePairVec)
 {
-	bool *UsedArr;
 	AlnCan_t AlnCan;
 	int i, j, num, score;
 
@@ -53,13 +22,6 @@ AlnCan_t IdentifyBestAlnCan(vector<FragPair_t>& SimplePairVec)
 		}
 		i = j;
 	}
-	//pthread_mutex_lock(&Lock);
-	//printf("score=%d\n", AlnCan.score);
-	//printf("Simple Pairs\n"); ShowSimplePairInfo(SimplePairVec);
-	//printf("BestAlnCan\n"); ShowSimplePairInfo(AlnCan.FragPairVec);
-	//printf("\n\n");
-	//pthread_mutex_unlock(&Lock);
-
 	return AlnCan;
 }
 
@@ -71,8 +33,9 @@ int AlignmentRescue(uint32_t EstDist, ReadItem_t& read1, ReadItem_t& read2)
 	vector<KmerPair_t> KmerPairVec;
 	vector<AlnCan_t>::iterator iter;
 	vector<FragPair_t> SimplePairVec;
+	map<int64_t, int>::iterator mi1, mi2;
 	vector<KmerItem_t> KmerVec1, KmerVec2;
-	int i, j, slen, thr, score1, score2, num1, num2, iFixStrategy, nPaired = 0;
+	int slen, thr, score1, score2, num1, num2, iFixStrategy, nPaired = 0;
 
 	for (score1 = 0, iter = read1.AlnCanVec.begin(); iter != read1.AlnCanVec.end(); iter++) if (iter->score > score1) score1 = iter->score;
 	for (score2 = 0, iter = read2.AlnCanVec.begin(); iter != read2.AlnCanVec.end(); iter++) if (iter->score > score2) score2 = iter->score;
@@ -95,7 +58,9 @@ int AlignmentRescue(uint32_t EstDist, ReadItem_t& read1, ReadItem_t& read2)
 			left_end = iter->FragPairVec[0].PosDiff;
 			right_end = iter->FragPairVec[0].PosDiff + EstDist + read2.rlen;
 			if (right_end > TwoGenomeSize) right_end = TwoGenomeSize;
-			if (ChrLocMap.lower_bound(left_end)->second != ChrLocMap.lower_bound(right_end)->second) continue;
+
+			mi1 = ChrLocMap.lower_bound(left_end); mi2 = ChrLocMap.lower_bound(right_end);
+			if (mi1->second != mi2->second) continue;
 
 			if ((slen = right_end - left_end) < read2.rlen) continue;
 			RefSeg = RefSequence + left_end; KmerVec2 = CreateKmerVecFromReadSeq(slen, RefSeg);

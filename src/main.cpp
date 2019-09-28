@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
 			{
 				ObserveBegPos = atoi(argv[++i]);
 				ObserveEndPos = atoi(argv[++i]);
-				fprintf(stderr, "obr[%lld - %lld]\n", ObserveBegPos, ObserveEndPos);
+				fprintf(stderr, "obr[%lld - %lld]\n", (long long)ObserveBegPos, (long long)ObserveEndPos);
 			}
 			else if (parameter == "-m") bUnique = false;
 			else if (parameter == "-d" || parameter == "-debug") bDebugMode = true;

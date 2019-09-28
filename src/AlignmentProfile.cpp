@@ -42,7 +42,6 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 {
 	int64_t gPos;
 	string IndSeq;
-	bool bChecked, bShow = false;
 	int i, j, frag_len, ext_len, TailIdx, rPos, num;
 	map<int64_t, map<string, uint16_t> >::iterator ind_iter, lower_iter, upper_iter;
 

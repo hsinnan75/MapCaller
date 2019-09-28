@@ -62,7 +62,7 @@ vector<KmerItem_t> CreateKmerVecFromReadSeq(int len, char* seq)
 
 	tail = 0; count = 0;
 
-	while (count < KmerSize && tail < len)
+	while (count < (uint32_t)KmerSize && tail < (uint32_t)len)
 	{
 		if (seq[tail++] != 'N') count++;
 		else count = 0;
@@ -72,7 +72,7 @@ vector<KmerItem_t> CreateKmerVecFromReadSeq(int len, char* seq)
 		WordPosition.pos = (head = tail - KmerSize); WordPosition.wid = CreateKmerID(seq, head);
 		vec.push_back(WordPosition);
 
-		for (head += 1; tail < len; head++, tail++)
+		for (head += 1; tail < (uint32_t)len; head++, tail++)
 		{
 			if (seq[tail] != 'N')
 			{
@@ -84,14 +84,14 @@ vector<KmerItem_t> CreateKmerVecFromReadSeq(int len, char* seq)
 			{
 				// find next kmer without 'N'
 				count = 0; tail++;
-				while (count < KmerSize && tail < len)
+				while (count < (uint32_t)KmerSize && tail < (uint32_t)len)
 				{
 					if (seq[tail++] != 'N') count++;
 					else count = 0;
 				}
-				if (count == KmerSize)
+				if (count == (uint32_t)KmerSize)
 				{
-					WordPosition.pos = (head = tail - KmerSize); WordPosition.wid = CreateKmerID(seq, head);
+					WordPosition.pos = (head = tail - (uint32_t)KmerSize); WordPosition.wid = CreateKmerID(seq, head);
 					vec.push_back(WordPosition);
 				}
 				else break;
@@ -102,7 +102,7 @@ vector<KmerItem_t> CreateKmerVecFromReadSeq(int len, char* seq)
 	return vec;
 }
 
-vector<KmerPair_t> IdentifyCommonKmers(int MaxShift, vector<KmerItem_t>& vec1, vector<KmerItem_t>& vec2)
+vector<KmerPair_t> IdentifyCommonKmers(uint32_t MaxShift, vector<KmerItem_t>& vec1, vector<KmerItem_t>& vec2)
 {
 	int i, num;
 	uint32_t wid;
@@ -144,7 +144,7 @@ vector<FragPair_t> GenerateSimplePairsFromCommonKmers(int thr, int64_t gPos, vec
 		//printf("KmerPair %d: %d PosDiff = %d\n", i+1, KmerPairVec[i].rPos, KmerPairVec[i].PosDiff);
 		for (PosDiff = KmerPairVec[i].PosDiff, n_pos = KmerPairVec[i].rPos + 1, j = i + 1; j < num; j++)
 		{
-			if (KmerPairVec[j].rPos != n_pos || KmerPairVec[j].PosDiff != PosDiff) break;
+			if (KmerPairVec[j].rPos != (uint32_t)n_pos || KmerPairVec[j].PosDiff != PosDiff) break;
 			//printf("KmerPair: %d PosDiff = %d\n", KmerPairVec[j].rPos, KmerPairVec[j].PosDiff);
 			n_pos++;
 		}

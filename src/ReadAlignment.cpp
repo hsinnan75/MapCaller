@@ -120,7 +120,7 @@ void RemoveEmptyFragPairs(vector<FragPair_t>& FragPairVec)
 bool CheckAlnCanCoverage(int rlen, vector<FragPair_t>& FragPairVec)
 {
 	bool bChecked = true;
-	int i, TotalCovLength = 0;
+	int TotalCovLength = 0;
 
 	for (vector<FragPair_t>::iterator iter = FragPairVec.begin(); iter != FragPairVec.end(); iter++)
 	{
@@ -157,7 +157,7 @@ void ProcessNormalPair(char* seq, FragPair_t& fp)
 {
 	//if (fp.rLen > 0 && fp.gLen > 0)
 	{
-		int i, n, clip_size, max_mismatch;
+		int n;
 
 		if (fp.rLen > 0)
 		{
@@ -238,7 +238,7 @@ bool CheckLocalAlignmentQuality(FragPair_t& fp)
 
 int EvaluateAlignmentScore(vector<FragPair_t>& FragPairVec)
 {
-	int i, len, score = 0;
+	int len, score = 0;
 	vector<FragPair_t>::iterator iter;
 
 	for (iter = FragPairVec.begin(); iter != FragPairVec.end(); iter++)
@@ -311,8 +311,8 @@ void RemoveTailingGaps(bool bFirstFragPair, FragPair_t& FragPair)
 bool ProduceReadAlignment(ReadItem_t& read)
 {
 	bool bHead, bTail;
+	int i, FragPairNum, TailIdx;
 	vector<AlnCan_t>::iterator iter;
-	int i, j, n, Rshrink, Gshrink, FragPairNum, TailIdx;
 
 	for (iter = read.AlnCanVec.begin(); iter != read.AlnCanVec.end(); iter++)
 	{

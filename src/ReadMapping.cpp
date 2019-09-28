@@ -24,7 +24,7 @@ int64_t iTotalReadNum = 0, iTotalMappingNum = 0, iTotalPairedNum = 0, iAlignedBa
 void ShowMappedRegion(vector<FragPair_t>& FragPairVec)
 {
 	int TailIdx = (int)FragPairVec.size() - 1;
-	printf("Coor=%d - %d\n", DetermineCoordinate(FragPairVec[0].gPos).gPos, DetermineCoordinate(FragPairVec[TailIdx].gPos + FragPairVec[TailIdx].gLen).gPos);
+	printf("Coor=%lld - %lld\n", (long long)DetermineCoordinate(FragPairVec[0].gPos).gPos, (long long)DetermineCoordinate(FragPairVec[TailIdx].gPos + FragPairVec[TailIdx].gLen).gPos);
 }
 
 void ShowFragPairCluster(vector<AlnCan_t>& AlnCanVec)
@@ -112,7 +112,7 @@ void OutputSamHeaders()
 
 	for (i = 0; i < iChromsomeNum; i++)
 	{
-		len = sprintf(buffer, "@SQ\tSN:%s\tLN:%lld\n", ChromosomeVec[i].name, ChromosomeVec[i].len);
+		len = sprintf(buffer, "@SQ\tSN:%s\tLN:%d\n", ChromosomeVec[i].name, ChromosomeVec[i].len);
 		if (bSAMFormat) fprintf(sam_out, "%s", buffer);
 		else kputsn(buffer, len, &str);
 	}
@@ -125,9 +125,9 @@ void OutputSamHeaders()
 
 vector<FragPair_t> IdentifySimplePairs(int rlen, uint8_t* EncodeSeq)
 {
+	int i, pos, stop_pos;
 	FragPair_t FragPair;
 	vector<FragPair_t> SPvec;
-	int i, pos, stop_pos, Ncount = 0;
 	bwtSearchResult_t bwtSearchResult;
 
 	FragPair.bSimple = true; pos = 0; stop_pos = rlen - MinSeedLength;
@@ -160,9 +160,9 @@ vector<FragPair_t> IdentifySimplePairs(int rlen, uint8_t* EncodeSeq)
 
 AlnCan_t IdentifyClosestFragmentPairs(int BegIdx, int EndIdx, vector<FragPair_t>& SimplePairVec)
 {
+	int i, j, s;
 	AlnCan_t AlnCan;
 	pair<int, int> Boudnary;
-	int i, j, q, s, NewBegIdx, NewEndIdx, num;
 
 	AlnCan.score = 0; i = BegIdx; s = SimplePairVec[BegIdx].rLen;
 	for (j = BegIdx + 1; j < EndIdx; j++)
@@ -255,7 +255,7 @@ int CheckPairedAlignmentDistance(int64_t EstiDistance, vector<AlnCan_t>& AlnCanV
 	vector<PairedReads_t> PairedIdxVec;
 	int i, j, num1, num2, paired_num = 0;
 	vector<FragPair_t>::iterator FragPairIter1, FragPairIter2;
-	int64_t myDist, myError, dist, PairedIdx, score, max_score;
+	int64_t myDist, max_score;
 
 	num1 = (int)AlnCanVec1.size(); num2 = (int)AlnCanVec2.size(); max_score = 0;
 
@@ -368,8 +368,7 @@ CoordinatePair_t GetPairedAlnCanDist(vector<AlnCan_t>& AlnCanVec1, vector<AlnCan
 
 CoordinatePair_t GenCoordinatePair(vector<AlnCan_t>& AlnCanVec1, vector<AlnCan_t>& AlnCanVec2)
 {
-	int64_t dist;
-	int i, j, num1, num2;
+	int num1, num2;
 	CoordinatePair_t CoorPair;
 	vector<AlnCan_t>::iterator iter;
 	vector<int64_t> gPosVec1, gPosVec2;
@@ -546,24 +545,6 @@ void *ReadMapping(void *arg)
 			iTotalReadNum += ReadNum; iTotalMappingNum += MappedNum; iTotalPairedNum += PairedNum; TotalPairedDistance += myTotalDistance, ReadLengthSum += myReadLengthSum;
 			if (iTotalPairedNum > 1000) avgDist = (int)(1.*TotalPairedDistance / iTotalPairedNum + .5);
 
-			//Coordinate_t coor1, coor2;
-			//extern Coordinate_t GetAlnCoordinate(bool orientation, vector<FragPair_t>& FragPairVec);
-			//for (i = 0, j = 1; i != ReadNum; i += 2, j += 2)
-			//{
-			//	if (CheckAlnNumber(ReadArr[i].AlnCanVec) == 1 && CheckAlnNumber(ReadArr[j].AlnCanVec) == 1)
-			//	{
-			//		coor1 = GetAlnCoordinate(ReadArr[i].AlnCanVec[ReadArr[i].AlnSummary.BestAlnCanIdx].orientation, ReadArr[i].AlnCanVec[ReadArr[i].AlnSummary.BestAlnCanIdx].FragPairVec);
-			//		coor2 = GetAlnCoordinate(ReadArr[j].AlnCanVec[ReadArr[j].AlnSummary.BestAlnCanIdx].orientation, ReadArr[j].AlnCanVec[ReadArr[j].AlnSummary.BestAlnCanIdx].FragPairVec);
-			//		if (coor1.ChromosomeIdx == 0 && coor2.ChromosomeIdx == 0)
-			//		{
-			//			fprintf(stdout, ">%s/1\n%s\n", ReadArr[i].header, ReadArr[i].seq);
-			//			char *seq = new char[ReadArr[j].rlen + 1];
-			//			GetComplementarySeq(ReadArr[j].rlen, ReadArr[j].seq, seq);
-			//			fprintf(stdout, ">%s/2\n%s\n", ReadArr[j].header, seq);
-			//			delete[] seq;
-			//		}
-			//	}
-			//}
 			if (bSAMoutput)
 			{
 				if (bSAMFormat)
@@ -703,8 +684,7 @@ void *CheckMappingCoverage(void *arg)
 
 void Mapping()
 {
-	char buf[1];
-	int i, iDiscordant, minDist, maxDist, *ThrIdArr;
+	int i, *ThrIdArr;
 	pthread_t *ThreadArr = new pthread_t[iThreadNum];
 
 	//iThreadNum = 1;

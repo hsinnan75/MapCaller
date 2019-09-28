@@ -4,7 +4,7 @@ MapCaller: An efficient and versatile approach for short-read mapping and varian
 Developers: Dr. Hsin-Nan Lin and Dr. Wen-Lian Hsu. Institute of Information Science, Academia Sinica, Taiwan.
 
 # Introduction
-MapCaller aligns every NGS short read against a reference genome and collects all the alignment information to deduce sequence variants. MapCaller adopts the mapping algorithm of KART to perform read alignment. It maintains a position frequency matrix to keep track of every nucleotide¡¦s frequency at each position in the reference genome, and it collects all insertion and deletion events which are found during the read mapping. Furthermore, MapCaller also learns all possible break points from discordant or partial read alignments. Finally, MapCaller identifies sequence variants based on all the above-mentioned information. The novelty of our algorithm derives from the integration of read mapping and the variation information gathering into a coherent system for genomic variant calling. Thus, the inputs to MapCaller is one or more NGS read file and an index file for the reference genome, and the output is a VCF file for the variant calling result.
+MapCaller aligns every NGS short read against a reference genome and collects all the alignment information to deduce sequence variants. MapCaller adopts the mapping algorithm of KART to perform read alignment. It maintains a position frequency matrix to keep track of every nucleotideÂ¡Â¦s frequency at each position in the reference genome, and it collects all insertion and deletion events which are found during the read mapping. Furthermore, MapCaller also learns all possible break points from discordant or partial read alignments. Finally, MapCaller identifies sequence variants based on all the above-mentioned information. The novelty of our algorithm derives from the integration of read mapping and the variation information gathering into a coherent system for genomic variant calling. Thus, the inputs to MapCaller is one or more NGS read file and an index file for the reference genome, and the output is a VCF file for the variant calling result.
 
 The benchmark data sets and the performance evaluation program could be found at http://bioapp.iis.sinica.edu.tw/~arith/MapCaller/
 
@@ -122,9 +122,10 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
   ```
 # Changes
-version 0.9.9.1: Adjust read depth threshold.
-version 0.9.9.2: Remove variants which appear in repetitive regions.
-version 0.9.9.3: Adjust read depth threshold for somatic mutation detection.
-version 0.9.9.4: Add variant filters
-version 0.9.9.5: Fix a bug on read count
-version 0.9.9.6: Fix a bug on read count
+
+* 0.9.9.1: Adjust read depth threshold.
+* 0.9.9.2: Remove variants which appear in repetitive regions.
+* 0.9.9.3: Adjust read depth threshold for somatic mutation detection.
+* 0.9.9.4: Add variant filters
+* 0.9.9.5: Fix a bug on read count
+* 0.9.9.6: Fix a bug on read count

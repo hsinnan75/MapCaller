@@ -4,14 +4,14 @@ all:		MapCaller bwt_index
 
 MapCaller: htslib
 		make -C src
-		mv src/$@ bin/
+		mkdir -p bin/ && mv src/$@ bin/
 
 htslib:
 		make -C src/htslib
 
 bwt_index:
 		make -C src/BWT_Index
-		mv src/BWT_Index/$@ bin/
+		mkdir -p bin/ && mv src/BWT_Index/$@ bin/
 
 clean:
 		rm -f MapCaller bwt_index

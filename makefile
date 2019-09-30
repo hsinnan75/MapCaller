@@ -3,19 +3,19 @@
 all:		MapCaller bwt_index
 
 MapCaller: htslib
-		make -C src
-		mkdir -p bin/ && mv src/$@ bin/
+		$(MAKE) -C src
+		mkdir -p bin/ && cp src/$@ bin/
 
 htslib:
-		make -C src/htslib
+		$(MAKE) -C src/htslib libhts.a
 
 bwt_index:
-		make -C src/BWT_Index
-		mkdir -p bin/ && mv src/BWT_Index/$@ bin/
+		$(MAKE) -C src/BWT_Index
+		mkdir -p bin/ && cp src/BWT_Index/$@ bin/
 
 clean:
 		rm -f MapCaller bwt_index
-		make clean -C src
-		make clean -C src/htslib
-		make clean -C src/BWT_Index
+		$(MAKE) clean -C src
+		$(MAKE) clean -C src/htslib
+		$(MAKE) clean -C src/BWT_Index
 

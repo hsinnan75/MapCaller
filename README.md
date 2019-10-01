@@ -124,14 +124,14 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
   ```
 # Changes
-version 0.9.9.1: Adjust read depth threshold.
-version 0.9.9.2: Remove variants which appear in repetitive regions.
-version 0.9.9.3: Adjust read depth threshold for somatic mutation detection.
-version 0.9.9.4: Add variant filters
-version 0.9.9.5: Fix a bug on read count
-version 0.9.9.6: Fix a bug on read count
-version 0.9.9.7: Fix typos and warnings.
-version 0.9.9.8: Fix a bug on VCF format output.
+- version 0.9.9.1: Adjust read depth threshold.
+- version 0.9.9.2: Remove variants which appear in repetitive regions.
+- version 0.9.9.3: Adjust read depth threshold for somatic mutation detection.
+- version 0.9.9.4: Add variant filters
+- version 0.9.9.5: Fix a bug on read count
+- version 0.9.9.6: Fix a bug on read count
+- version 0.9.9.7: Fix typos and warnings.
+- version 0.9.9.8: Fix a bug on VCF format output.
 
 # Acknowledgements
 We would like to thank Mr. Torsten Seemann for valuable comments.

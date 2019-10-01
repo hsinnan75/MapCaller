@@ -215,7 +215,7 @@ extern vector<CoordinatePair_t> DistantPairVec;
 extern vector<string> ReadFileNameVec1, ReadFileNameVec2;
 extern char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
 extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos, ObserveBegPos, ObserveEndPos;
-extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic;
+extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic, NW_ALG;
 extern int iThreadNum, iChromsomeNum, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleFreq, MinIndFreq, MinVarConfScore;
 
 extern vector<DiscordPair_t> InversionSiteVec, TranslocationSiteVec;

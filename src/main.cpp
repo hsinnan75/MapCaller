@@ -12,7 +12,7 @@ vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
 int iThreadNum, FragmentSize, MinAlleleFreq, MinIndFreq, MinVarConfScore;
-bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic, gzCompressed, FastQFormat;
+bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
 
 void ShowProgramUsage(const char* program)
 {
@@ -26,6 +26,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -ad INT       Minimal ALT allele count [%d]\n", MinAlleleFreq);
 	fprintf(stderr, "         -sam          SAM output filename [NULL]\n");
 	fprintf(stderr, "         -bam          BAM output filename [NULL]\n");
+	fprintf(stderr, "         -alg STR      gapped alignment algorithm (option: nw|ksw2)\n");
 	fprintf(stderr, "         -vcf          VCF output filename [%s]\n", VcfFileName);
 	fprintf(stderr, "         -m            output multiple alignments\n");
 	fprintf(stderr, "         -somatic      detect somatic mutations [false]\n");
@@ -118,6 +119,7 @@ int main(int argc, char* argv[])
 	bDebugMode = false;
 	bUnique = true;
 	bFilter = false;
+	NW_ALG = true;
 	FastQFormat = true;
 	bSAMoutput = false;
 	bSAMFormat = true;
@@ -188,6 +190,12 @@ int main(int argc, char* argv[])
 				bSAMoutput = true;
 				bSAMFormat = false;
 				SamFileName = argv[++i];
+			}
+			else if ((parameter == "-alg") && i + 1 < argc)
+			{
+				str = argv[++i];
+				if (str == "ksw2") NW_ALG = false;
+				else NW_ALG = true; //nw
 			}
 			else if (parameter == "-freq" && i + 1 < argc) FrequencyThr = atof(argv[++i]);
 			else if ((parameter == "-vcf") && i + 1 < argc) VcfFileName = argv[++i];

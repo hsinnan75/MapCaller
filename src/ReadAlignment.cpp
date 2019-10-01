@@ -185,13 +185,9 @@ void ProcessNormalPair(char* seq, FragPair_t& fp)
 		}
 		if (fp.rLen > 0 && fp.gLen > 0 && (fp.rLen != fp.gLen || ((n = CalFragPairMismatches(fp.rLen, fp.aln1, fp.aln2)) > 1 && n >= (int)(fp.rLen*0.2))))
 		{
-			nw_alignment(fp.rLen, fp.aln1, fp.gLen, fp.aln2);
-			//ksw2_alignment(fp.rLen, fp.aln1, fp.gLen, fp.aln2);
-			//if (bDebugMode)
-			//{
-			//	ShowFragmentPair(seq, fp);
-			//	printf("Alignment for normal pair:\n%s\n\%s\n\n", fp.aln1.c_str(), fp.aln2.c_str());
-			//}
+			if (NW_ALG) nw_alignment(fp.rLen, fp.aln1, fp.gLen, fp.aln2);
+			else ksw2_alignment(fp.rLen, fp.aln1, fp.gLen, fp.aln2);
+			//if (bDebugMode) ShowFragmentPair(seq, fp), printf("Alignment for normal pair:\n%s\n\%s\n\n", fp.aln1.c_str(), fp.aln2.c_str());
 		}
 	}
 }

@@ -104,6 +104,8 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
 -bam STR BAM output [optional, default: no mapping output]
 
+-alg STR gapped alignment algorithm [optional, nw|ksw2, default: nw]
+
 -vcf STR VCF output [output.vcf]
 
 -filter Apply variant filters (under test) [false]

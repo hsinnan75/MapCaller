@@ -199,7 +199,7 @@ void ShowMetaInfo()
 	fprintf(outFile, "##CommandLine=<%s>\n", CmdLine.c_str());
 	fprintf(outFile, "##INFO=<ID=AD,Number=1,Type=Integer,Description=\"Allel depth\">\n");
 	fprintf(outFile, "##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total depth\">\n");
-	fprintf(outFile, "##INFO=<ID=AF,Number=.,Type=Float,Description=\"Allele frequency\">\n");
+	fprintf(outFile, "##INFO=<ID=AF,Number=1,Type=Float,Description=\"Allele frequency\">\n");
 	fprintf(outFile, "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n");
 	fprintf(outFile, "##FILTER=<ID=q10,Description=\"Confidence score below 10\">\n");
 	if (bFilter) fprintf(outFile, "##FILTER=<ID=bad_haplotype,Description=\"Variants with variable frequencies on same haplotype\">\n");

@@ -204,7 +204,7 @@ void ShowMetaInfo()
 	fprintf(outFile, "##FILTER=<ID=q10,Description=\"Confidence score below 10\">\n");
 	if (bFilter) fprintf(outFile, "##FILTER=<ID=bad_haplotype,Description=\"Variants with variable frequencies on same haplotype\">\n");
 	if (bFilter) fprintf(outFile, "##FILTER=<ID=str_contraction,Description=\"Variant appears in repetitive region\">\n");
-	fprintf(outFile, "##INFO=<ID=TYPE,Type=String,Description=\"The type of allele, either SUBSTITUTE, INSERT, DELETE, or BND.\">\n");
+	fprintf(outFile, "##INFO=<ID=TYPE,Number=1,Type=String,Description=\"The type of allele, either SUBSTITUTE, INSERT, DELETE, or BND.\">\n");
 	for (int i = 0; i < iChromsomeNum; i++) fprintf(outFile, "##Contig=<ID=%s,length=%d>\n", ChromosomeVec[i].name, ChromosomeVec[i].len);
 	fprintf(outFile, "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO\n");
 }
@@ -476,13 +476,13 @@ void GenVariantCallingFile()
 		{
 			if (VariantVec[i].NS < 5 && CheckNearbyVariant(i, num, 10)) continue;
 			VarNumVec[var_INS]++; AlleleFreq = 1.0*VariantVec[i].NS / VariantVec[i].DP;
-			fprintf(outFile, "%s	%d	.	%c	%c%s	%d	%s	DP=%d;AD=%d;AF=%.3f;TYPE=INSERT\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], RefSequence[gPos], VariantVec[i].ALTstr.c_str(), VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].NS, AlleleFreq);
+			fprintf(outFile, "%s	%d	.	%c	%c%s	%d	%s	DP=%d;AD=%d;AF=%.3f;GT=%s;TYPE=INSERT\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], RefSequence[gPos], VariantVec[i].ALTstr.c_str(), VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].NS, AlleleFreq, (VariantVec[i].GenoType ? "0|1" : "1|1"));
 		}
 		else if (VariantVec[i].VarType == var_DEL)
 		{
 			if (VariantVec[i].NS < 5 && CheckNearbyVariant(i, num, 10)) continue;
 			VarNumVec[var_DEL]++; AlleleFreq = 1.0*VariantVec[i].NS / VariantVec[i].DP;
-			fprintf(outFile, "%s	%d	.	%c%s	%c	%d	%s	DP=%d;AD=%d;AF=%.3f;TYPE=DELETE\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], VariantVec[i].ALTstr.c_str(), RefSequence[gPos], VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].NS, AlleleFreq);
+			fprintf(outFile, "%s	%d	.	%c%s	%c	%d	%s	DP=%d;AD=%d;AF=%.3f;GT=%s;TYPE=DELETE\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], VariantVec[i].ALTstr.c_str(), RefSequence[gPos], VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].NS, AlleleFreq, (VariantVec[i].GenoType ? "0|1" : "1|1"));
 		}
 		else if (VariantVec[i].VarType == var_TNL)
 		{
@@ -547,6 +547,7 @@ void *IdentifyVariants(void *arg)
 			{
 				Variant.gPos = gPos; Variant.VarType = var_INS; Variant.DP = BlockDepthArr[(int)(gPos / BlockSize)]; Variant.NS = ins_freq;
 				if (Variant.DP < Variant.NS) Variant.DP = Variant.NS; Variant.ALTstr = ins_str;
+				if (Variant.NS >(int)(Variant.DP*0.8)) Variant.GenoType = 0; else Variant.GenoType = 1;
 				if ((Variant.qscore = (int)(30.0 * ins_freq / Variant.DP)) > 30) Variant.qscore = 30;
 				/*if (Variant.qscore >= MinVarConfScore)*/
 				MyVariantVec.push_back(Variant);
@@ -555,6 +556,7 @@ void *IdentifyVariants(void *arg)
 			{
 				Variant.gPos = gPos - 1; Variant.VarType = var_DEL; Variant.DP = BlockDepthArr[(int)(gPos / BlockSize)]; Variant.NS = del_freq;
 				if (Variant.DP < Variant.NS) Variant.DP = Variant.NS; Variant.ALTstr = del_str;
+				if (Variant.NS > (int)(Variant.DP*0.8)) Variant.GenoType = 0; else Variant.GenoType = 1;
 				if ((Variant.qscore = (int)(30.0 * del_freq / Variant.DP)) > 30) Variant.qscore = 30;
 				/*if (Variant.qscore >= MinVarConfScore)*/
 				MyVariantVec.push_back(Variant);

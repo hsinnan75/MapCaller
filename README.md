@@ -131,6 +131,7 @@ version 0.9.9.4: Add variant filters
 version 0.9.9.5: Fix a bug on read count
 version 0.9.9.6: Fix a bug on read count
 version 0.9.9.7: Fix typos and warnings.
+version 0.9.9.8: Fix a bug on VCF format output.
 
 # Acknowledgements
 We would like to thank Mr. Torsten Seemann for valuable comments.

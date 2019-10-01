@@ -30,7 +30,7 @@ You may run 'run_test.sh' to test MapCaller with a toy example.
 
 # Get updates
   ```
-  $ ./MapCaller update
+  $ bin/MapCaller update
   ```
 or
   ```
@@ -42,7 +42,7 @@ or
 # Instructions
 
   ```
-  $ ./MapCaller [options]
+  $ bin/MapCaller [options]
   ```
 
 # Usage
@@ -50,7 +50,7 @@ or
 To index a reference genome, it requires the target genome file (in fasta format) and the prefix of the index files (including the directory path).
 
   ```
-  $ ./bwt_index ref_file[ex.ecoli.fa] index_prefix[ex. Ecoli]
+  $ bin/bwt_index ref_file[ex.ecoli.fa] index_prefix[ex. Ecoli]
   ```
 The above command is to index the genome file Ecoli.fa and store the index files begining with ecoli.
 
@@ -62,12 +62,12 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
  case 1: standard vcf output / sam output (optional) / bam output (optional)
   ```
- $ ./MapCaller -i ecoli -f ReadFile1.fa -f2 ReadFile2.fa -vcf out.vcf [-sam out.sam][-bam out.bam]
+ $ bin/MapCaller -i ecoli -f ReadFile1.fa -f2 ReadFile2.fa -vcf out.vcf [-sam out.sam][-bam out.bam]
   ```
 
  case 2: multiple input 
   ```
- $ ./MapCaller -i ecoli -f ReadFileA_1.fq ReadFileB_1.fq ReadFileC_1.fq -f2 ReadFileA_2.fq ReadFileB_2.fq ReadFileC_2.fq -vcf out.vcf
+ $ bin/MapCaller -i ecoli -f ReadFileA_1.fq ReadFileB_1.fq ReadFileC_1.fq -f2 ReadFileA_2.fq ReadFileB_2.fq ReadFileC_2.fq -vcf out.vcf
   ```
 
 # File formats
@@ -124,14 +124,17 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
   ```
 # Changes
-- version 0.9.9.1: Adjust read depth threshold.
-- version 0.9.9.2: Remove variants which appear in repetitive regions.
-- version 0.9.9.3: Adjust read depth threshold for somatic mutation detection.
-- version 0.9.9.4: Add variant filters
-- version 0.9.9.5: Fix a bug on read count
-- version 0.9.9.6: Fix a bug on read count
-- version 0.9.9.7: Fix typos and warnings.
-- version 0.9.9.8: Fix a bug on VCF format output.
+- version 0.9.9.1: Adjusted read depth threshold.
+- version 0.9.9.2: Removed variants which appear in repetitive regions.
+- version 0.9.9.3: Adjusted read depth threshold for somatic mutation detection.
+- version 0.9.9.4: Added variant filters.
+- version 0.9.9.5: Fixed a bug on read count.
+- version 0.9.9.6: Fixed a bug on read count.
+- version 0.9.9.7: Fixed typos and warnings.
+- version 0.9.9.8: Used ksw2 algorithm for gapped alignments and fixed a bug on VCF format output.
 
 # Acknowledgements
 We would like to thank Mr. Torsten Seemann for valuable comments.
+
+# Note
+The source code of the homemade genome sequence variation simulator is available at src/sv_simulator/.

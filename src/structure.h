@@ -286,3 +286,6 @@ extern vector<FragPair_t> GenerateSimplePairsFromCommonKmers(int thr, int64_t gP
 
 // nw_alignment.cpp
 extern void nw_alignment(int m, string& s1, int n, string& s2);
+
+// ksw2_alignment.cpp
+extern void ksw2_alignment(int m, string& s1, int n, string& s2);

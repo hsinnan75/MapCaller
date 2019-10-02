@@ -148,6 +148,13 @@ bool CheckDiploidFrequency(int cov, vector<pair<char, int> >& vec)
 	else return false;
 }
 
+bool CheckTriploidFrequency(int cov, vector<pair<char, int> >& vec)
+{
+	int sum = vec[0].second + vec[1].second + vec[2].second;
+	if (sum >= (int)(cov*0.9)) return true;
+	else return false;
+}
+
 map<int64_t, bool> LoadObservedPos()
 {
 	int64_t p;
@@ -547,7 +554,7 @@ void *IdentifyVariants(void *arg)
 			{
 				Variant.gPos = gPos; Variant.VarType = var_INS; Variant.DP = BlockDepthArr[(int)(gPos / BlockSize)]; Variant.NS = ins_freq;
 				if (Variant.DP < Variant.NS) Variant.DP = Variant.NS; Variant.ALTstr = ins_str;
-				if (Variant.NS >(int)(Variant.DP*0.8)) Variant.GenoType = 0; else Variant.GenoType = 1;
+				if (Variant.NS >(int)(Variant.DP*0.65)) Variant.GenoType = 0; else Variant.GenoType = 1;
 				if ((Variant.qscore = (int)(30.0 * ins_freq / Variant.DP)) > 30) Variant.qscore = 30;
 				/*if (Variant.qscore >= MinVarConfScore)*/
 				MyVariantVec.push_back(Variant);
@@ -556,7 +563,7 @@ void *IdentifyVariants(void *arg)
 			{
 				Variant.gPos = gPos - 1; Variant.VarType = var_DEL; Variant.DP = BlockDepthArr[(int)(gPos / BlockSize)]; Variant.NS = del_freq;
 				if (Variant.DP < Variant.NS) Variant.DP = Variant.NS; Variant.ALTstr = del_str;
-				if (Variant.NS > (int)(Variant.DP*0.8)) Variant.GenoType = 0; else Variant.GenoType = 1;
+				if (Variant.NS > (int)(Variant.DP*0.65)) Variant.GenoType = 0; else Variant.GenoType = 1;
 				if ((Variant.qscore = (int)(30.0 * del_freq / Variant.DP)) > 30) Variant.qscore = 30;
 				/*if (Variant.qscore >= MinVarConfScore)*/
 				MyVariantVec.push_back(Variant);
@@ -584,12 +591,24 @@ void *IdentifyVariants(void *arg)
 					MyVariantVec.push_back(Variant);
 					
 				}
-				else if (vec.size() == 2 && CheckDiploidFrequency(cov, vec))
+				else if (iPloidy >= 2 && vec.size() == 2 && CheckDiploidFrequency(cov, vec))
 				{
 					Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.DP = cov; Variant.NS = vec[0].second + vec[1].second;
 					Variant.GenoType = 1;
 					//pthread_mutex_lock(&Lock);ShowVariationProfile(gPos - 5, gPos + 5); pthread_mutex_unlock(&Lock);
-					Variant.ALTstr.resize(3); Variant.ALTstr[0] = vec[0].first; Variant.ALTstr[1] = ',';  Variant.ALTstr[1] = vec[1].first;
+					Variant.ALTstr.resize(3); Variant.ALTstr[0] = vec[0].first; Variant.ALTstr[1] = ',';  Variant.ALTstr[2] = vec[1].first;
+					Variant.qscore = bSomatic ? (int)(30 * Variant.NS / (cov*0.05)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)));
+					if (Variant.qscore > 30) Variant.qscore = 30;
+
+					MyVariantVec.push_back(Variant);
+				}
+				else if (iPloidy >= 3 && vec.size() == 3 && CheckTriploidFrequency(cov, vec))
+				{
+					Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.DP = cov; Variant.NS = vec[0].second + vec[1].second + vec[2].second;
+					Variant.GenoType = 1;
+					//pthread_mutex_lock(&Lock);ShowVariationProfile(gPos - 5, gPos + 5); pthread_mutex_unlock(&Lock);
+					Variant.ALTstr.resize(5); Variant.ALTstr[1] = Variant.ALTstr[3] = ',';
+					Variant.ALTstr[0] = vec[0].first; Variant.ALTstr[2] = vec[1].first; Variant.ALTstr[4] = vec[2].first;
 					Variant.qscore = bSomatic ? (int)(30 * Variant.NS / (cov*0.05)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)));
 					if (Variant.qscore > 30) Variant.qscore = 30;
 

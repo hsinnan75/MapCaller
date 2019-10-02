@@ -2,7 +2,7 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.8";
+const char* VersionStr = "0.9.9.9";
 
 string CmdLine;
 float FrequencyThr;
@@ -11,7 +11,7 @@ MappingRecord_t* MappingRecordArr = NULL;
 vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
-int iThreadNum, FragmentSize, MinAlleleFreq, MinIndFreq, MinVarConfScore;
+int iThreadNum, iPloidy, FragmentSize, MinAlleleFreq, MinIndFreq, MinVarConfScore;
 bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
 
 void ShowProgramUsage(const char* program)
@@ -28,6 +28,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -bam          BAM output filename [NULL]\n");
 	fprintf(stderr, "         -alg STR      gapped alignment algorithm (option: nw|ksw2)\n");
 	fprintf(stderr, "         -vcf          VCF output filename [%s]\n", VcfFileName);
+	fprintf(stderr, "         -ploidy INT   number of sets of chromosomes in a cell[%d]\n", iPloidy);
 	fprintf(stderr, "         -m            output multiple alignments\n");
 	fprintf(stderr, "         -somatic      detect somatic mutations [false]\n");
 	fprintf(stderr, "         -no_vcf       No VCF output [false]\n");
@@ -113,8 +114,8 @@ int main(int argc, char* argv[])
 	int i;
 	string parameter, str;
 
+	iPloidy = 2;
 	iThreadNum = 16;
-
 	bPairEnd = false;
 	bDebugMode = false;
 	bUnique = true;
@@ -179,6 +180,7 @@ int main(int argc, char* argv[])
 			else if (parameter == "-size" && i + 1 < argc) FragmentSize = atoi(argv[++i]);
 			else if (parameter == "-ad" && i + 1 < argc) MinAlleleFreq = atoi(argv[++i]);
 			else if (parameter == "-ind" && i + 1 < argc) MinIndFreq = atoi(argv[++i]);
+			else if (parameter == "-ploidy"  && i + 1 < argc) iPloidy = atoi(argv[++i]);
 			else if ((parameter == "-sam") && i + 1 < argc)
 			{
 				bSAMoutput = true;

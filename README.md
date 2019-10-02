@@ -108,6 +108,8 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
 -vcf STR VCF output [output.vcf]
 
+-ploidy INT number of sets of chromosomes in a cell [optional, default:2]
+
 -filter Apply variant filters (under test) [false]
 
 -no_vcf No VCF output [false]
@@ -134,6 +136,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - version 0.9.9.6: Fixed a bug on read count.
 - version 0.9.9.7: Fixed typos and warnings.
 - version 0.9.9.8: Used ksw2 algorithm for gapped alignments and fixed a bug on VCF format output.
+- version 0.9.9.9: Added a new argument(-ploidy) for setting different ploidy.
 
 # Acknowledgements
 We would like to thank Mr. Torsten Seemann for valuable comments.

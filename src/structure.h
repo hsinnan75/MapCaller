@@ -216,7 +216,7 @@ extern vector<string> ReadFileNameVec1, ReadFileNameVec2;
 extern char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
 extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic, NW_ALG;
-extern int iThreadNum, iChromsomeNum, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleFreq, MinIndFreq, MinVarConfScore;
+extern int iThreadNum, iPloidy, iChromsomeNum, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleFreq, MinIndFreq, MinVarConfScore;
 
 extern vector<DiscordPair_t> InversionSiteVec, TranslocationSiteVec;
 extern map<int64_t, map<string, uint16_t> > InsertSeqMap, DeleteSeqMap;

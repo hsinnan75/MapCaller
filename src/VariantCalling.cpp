@@ -583,6 +583,7 @@ void *IdentifyVariants(void *arg)
 				{
 					Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.DP = cov; Variant.NS = vec[0].second;
 					if (vec[0].second >= (cov - freq_thr)) Variant.GenoType = 0; else Variant.GenoType = 1;
+					if (iPloidy == 1 && Variant.GenoType == 1) continue;
 					//pthread_mutex_lock(&Lock); ShowVariationProfile(gPos - 5, gPos + 5); pthread_mutex_unlock(&Lock);
 					Variant.ALTstr = vec[0].first;
 					Variant.qscore = bSomatic ? (int)(30 * Variant.NS / (cov*0.05)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)));

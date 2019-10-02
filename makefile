@@ -14,7 +14,7 @@ bwt_index:
 		mkdir -p bin/ && cp -f src/BWT_Index/$@ bin/
 
 clean:
-		rm -f MapCaller bwt_index
+		rm -f bin/MapCaller bin/bwt_index
 		$(MAKE) clean -C src
 		$(MAKE) clean -C src/htslib
 		$(MAKE) clean -C src/BWT_Index

@@ -575,7 +575,6 @@ void *ReadMapping(void *arg)
 					if (ReadArr[i].AlnSummary.score == 0) continue;
 					if ((n = CheckAlnNumber(ReadArr[i].AlnCanVec)) == 1) UpdateProfile(ReadArr + i, ReadArr[i].AlnCanVec);
 					else UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
-					//else if (n > 1 && bSomatic) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
 				}
 				pthread_mutex_unlock(&ProfileLock);
 			}
@@ -623,7 +622,6 @@ void *ReadMapping(void *arg)
 					if (ReadArr[i].AlnSummary.score == 0) continue;
 					if ((n = CheckAlnNumber(ReadArr[i].AlnCanVec)) == 1) UpdateProfile(ReadArr + i, ReadArr[i].AlnCanVec);
 					else UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
-					//else if (n > 1 && bSomatic) UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
 				}
 				pthread_mutex_unlock(&ProfileLock);
 			}
@@ -771,10 +769,7 @@ void Mapping()
 	}
 	else avgDist = avgReadLength = 0;
 
-	//for (int64_t gPos = 0; gPos < 100000000; gPos+=10)
-	//{
-	//	ShowProfileColumn(gPos);
-	//}
+	//for (int64_t gPos = 0; gPos < 100000000; gPos+=10) ShowProfileColumn(gPos);
 	//if (ObserveBegPos != -1 && ObserveEndPos != -1)
 	//{
 	//	for (map<int64_t, map<string, uint16_t> >::iterator iter = InsertSeqMap.begin(); iter != InsertSeqMap.end(); iter++)

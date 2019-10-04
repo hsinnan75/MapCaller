@@ -156,6 +156,7 @@ typedef struct
 	uint16_t C;
 	uint16_t G;
 	uint16_t T;
+	uint8_t readCount;
 	uint16_t multi_hit;
 } MappingRecord_t;
 
@@ -204,6 +205,7 @@ extern bwt_t *Refbwt;
 extern string CmdLine;
 extern bwaidx_t *RefIdx;
 extern uint32_t avgDist;
+extern int8_t iMaxDuplicate;
 extern const char* VersionStr;
 extern vector<string> ReadVec;
 extern time_t StartProcessTime;

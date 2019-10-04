@@ -317,7 +317,6 @@ bool ProduceReadAlignment(ReadItem_t& read)
 
 		sort(iter->FragPairVec.begin(), iter->FragPairVec.end(), CompByReadPos);
 		if (RemoveOverlaps(iter->FragPairVec)) RemoveNullFragPairs(iter->FragPairVec);
-
 		IdentifyNormalPairs(read.rlen, iter->FragPairVec);
 		if (CheckAlignmentValidity(iter->FragPairVec) == false)
 		{
@@ -420,22 +419,22 @@ bool ProduceReadAlignment(ReadItem_t& read)
 	}
 	//if (read.AlnSummary.score == 0) ShowFragPairCluster(read.AlnCanVec);
 	for (iter = read.AlnCanVec.begin(); iter != read.AlnCanVec.end(); iter++) if (iter->score < read.AlnSummary.score) iter->score = 0;
-	if (ObserveBegPos != -1)
-	{
-		for (iter = read.AlnCanVec.begin(); iter != read.AlnCanVec.end(); iter++)
-		{
-			//Display alignments
-			if (iter->score == 0) continue;
-			Coordinate_t coor = GetAlnCoordinate(iter->FragPairVec.begin()->gPos < GenomeSize ? true : false, iter->FragPairVec);
-			if (coor.ChromosomeIdx == 0 && coor.gPos >= ObserveBegPos && coor.gPos + read.rlen < ObserveEndPos)
-			{
-				//Display alignments
-				pthread_mutex_lock(&Lock);
-				printf("read: %s, score=%d (%d/%d) len=%d, PairedIdx=%d\n\n", read.header, iter->score, read.AlnSummary.score, read.AlnSummary.sub_score, read.rlen, iter->PairedAlnCanIdx);
-				ShowSimplePairInfo(iter->FragPairVec);
-				pthread_mutex_unlock(&Lock);
-			}
-		}
-	}
+	//if (ObserveBegPos != -1)
+	//{
+	//	for (iter = read.AlnCanVec.begin(); iter != read.AlnCanVec.end(); iter++)
+	//	{
+	//		//Display alignments
+	//		if (iter->score == 0) continue;
+	//		Coordinate_t coor = GetAlnCoordinate(iter->FragPairVec.begin()->gPos < GenomeSize ? true : false, iter->FragPairVec);
+	//		if (coor.ChromosomeIdx == 0 && coor.gPos >= ObserveBegPos && coor.gPos + read.rlen < ObserveEndPos)
+	//		{
+	//			//Display alignments
+	//			pthread_mutex_lock(&Lock);
+	//			printf("read: %s, score=%d (%d/%d) len=%d, PairedIdx=%d\n\n", read.header, iter->score, read.AlnSummary.score, read.AlnSummary.sub_score, read.rlen, iter->PairedAlnCanIdx);
+	//			ShowSimplePairInfo(iter->FragPairVec);
+	//			pthread_mutex_unlock(&Lock);
+	//		}
+	//	}
+	//}
 	return (read.AlnSummary.score > 0);
 }

@@ -108,6 +108,8 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
 -vcf STR VCF output [output.vcf]
 
+-dup INT Maximal PCR duplicates [optional, 1-100, default: 5]
+
 -ploidy INT number of sets of chromosomes in a cell [optional, default:2]
 
 -filter Apply variant filters (under test) [false]
@@ -137,7 +139,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - version 0.9.9.7: Fixed typos and warnings.
 - version 0.9.9.8: Used ksw2 algorithm for gapped alignments and fixed a bug on VCF format output.
 - version 0.9.9.9: Added a new argument(-ploidy) for setting different ploidy.
-
+- version 0.9.9.a: Fixed a bug on read mapping && Added an option (-dup) to filter out PCR-duplicates.
 # Acknowledgements
 We would like to thank Mr. Torsten Seemann for valuable comments.
 

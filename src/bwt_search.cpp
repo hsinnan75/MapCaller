@@ -149,7 +149,7 @@ bwtSearchResult_t BWT_Search(uint8_t* seq, int start, int stop)
 	ik.x[1] = Refbwt->L2[3 - p] + 1;
 	ik.x[2] = Refbwt->L2[p + 1] - Refbwt->L2[p];
 
-	bwtSearchResult.freq = 0;
+	bwtSearchResult.freq = bwtSearchResult.len = 0; bwtSearchResult.LocArr = NULL;
 	for (pos = start + 1; pos < stop; pos++)
 	{
 		if (seq[pos] > 3) break;// ambiguous base

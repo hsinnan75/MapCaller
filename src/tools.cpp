@@ -133,6 +133,7 @@ bool CheckAlignmentValidity(vector<FragPair_t>& FragPairVec)
 {
 	map<int64_t, int>::iterator iter1, iter2;
 
+	if (FragPairVec.begin()->gPos < 0 || (FragPairVec.rbegin()->gPos + FragPairVec.rbegin()->gLen)> TwoGenomeSize) return false;
 	iter1 = ChrLocMap.lower_bound(FragPairVec.begin()->gPos);
 	iter2 = ChrLocMap.lower_bound(FragPairVec.rbegin()->gPos + FragPairVec.rbegin()->gLen - 1);
 

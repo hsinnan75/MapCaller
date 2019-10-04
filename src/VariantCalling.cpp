@@ -535,8 +535,6 @@ void *IdentifyVariants(void *arg)
 	gPos = (tid == 0 ? 0 : (GenomeSize / iThreadNum)*tid);
 	end = (tid == iThreadNum - 1 ? GenomeSize : (GenomeSize / iThreadNum)*(tid + 1));
 
-	//map<int64_t, bool>::iterator it; map<int64_t, bool> obs_map;
-	//if (bDebugMode) obs_map = LoadObservedPos();
 	for (; gPos < end; gPos++)
 	{
 		if ((ref_base = nst_nt4_table[(unsigned short)RefSequence[gPos]]) != 4)
@@ -594,8 +592,7 @@ void *IdentifyVariants(void *arg)
 				}
 				else if (iPloidy >= 2 && vec.size() == 2 && CheckDiploidFrequency(cov, vec))
 				{
-					Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.DP = cov; Variant.NS = vec[0].second + vec[1].second;
-					Variant.GenoType = 1;
+					Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.GenoType = 1; Variant.DP = cov; Variant.NS = vec[0].second + vec[1].second;
 					//pthread_mutex_lock(&Lock);ShowVariationProfile(gPos - 5, gPos + 5); pthread_mutex_unlock(&Lock);
 					Variant.ALTstr.resize(3); Variant.ALTstr[0] = vec[0].first; Variant.ALTstr[1] = ',';  Variant.ALTstr[2] = vec[1].first;
 					Variant.qscore = bSomatic ? (int)(30 * Variant.NS / (cov*0.05)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)));
@@ -605,8 +602,7 @@ void *IdentifyVariants(void *arg)
 				}
 				else if (iPloidy >= 3 && vec.size() == 3 && CheckTriploidFrequency(cov, vec))
 				{
-					Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.DP = cov; Variant.NS = vec[0].second + vec[1].second + vec[2].second;
-					Variant.GenoType = 1;
+					Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.GenoType = 1; Variant.DP = cov; Variant.NS = vec[0].second + vec[1].second + vec[2].second;
 					//pthread_mutex_lock(&Lock);ShowVariationProfile(gPos - 5, gPos + 5); pthread_mutex_unlock(&Lock);
 					Variant.ALTstr.resize(5); Variant.ALTstr[1] = Variant.ALTstr[3] = ',';
 					Variant.ALTstr[0] = vec[0].first; Variant.ALTstr[2] = vec[1].first; Variant.ALTstr[4] = vec[2].first;

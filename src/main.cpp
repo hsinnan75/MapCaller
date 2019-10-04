@@ -2,10 +2,11 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.9";
+const char* VersionStr = "0.9.9.a";
 
 string CmdLine;
 float FrequencyThr;
+int8_t iMaxDuplicate;
 time_t StartProcessTime;
 MappingRecord_t* MappingRecordArr = NULL;
 vector<string> ReadFileNameVec1, ReadFileNameVec2;
@@ -24,6 +25,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -t INT        number of threads [%d]\n", iThreadNum);
 	fprintf(stderr, "         -size         Sequencing fragment size [%d]\n", FragmentSize);
 	fprintf(stderr, "         -ad INT       Minimal ALT allele count [%d]\n", MinAlleleFreq);
+	fprintf(stderr, "         -dup INT      Maximal PCR duplicates [%d]\n", iMaxDuplicate);
 	fprintf(stderr, "         -sam          SAM output filename [NULL]\n");
 	fprintf(stderr, "         -bam          BAM output filename [NULL]\n");
 	fprintf(stderr, "         -alg STR      gapped alignment algorithm (option: nw|ksw2)\n");
@@ -129,6 +131,7 @@ int main(int argc, char* argv[])
 	gzCompressed = false;
 
 	MinIndFreq = 5;
+	iMaxDuplicate = 5;
 	FragmentSize = 500;
 	MinAlleleFreq = 10;
 	FrequencyThr = 0.2;
@@ -174,6 +177,14 @@ int main(int argc, char* argv[])
 				{
 					fprintf(stderr, "Warning! The thread number should be positive!\n");
 					iThreadNum = 4;
+				}
+			}
+			else if (parameter == "-dup" && i + 1 < argc)
+			{
+				if (atoi(argv[++i]) <= 100) iMaxDuplicate = (int8_t)atoi(argv[i]);
+				else
+				{
+					fprintf(stderr, "Warning! The PCR-duplicate range is [1-100]! Current setting=%d\n", iMaxDuplicate);
 				}
 			}
 			else if (parameter == "-filter") bFilter = true;

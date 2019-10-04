@@ -119,25 +119,27 @@ int64_t GetAlignmentBoundary(int64_t gPos)
 	return iter->first;
 }
 
-bool CheckFragValidity(FragPair_t FragPair)
-{
-	map<int64_t, int>::iterator iter1, iter2;
-
-	iter1 = ChrLocMap.lower_bound(FragPair.gPos);
-	iter2 = ChrLocMap.lower_bound(FragPair.gPos + FragPair.gLen - 1);
-
-	return (iter1->first == iter2->first);
-}
+//bool CheckFragValidity(FragPair_t FragPair)
+//{
+//	map<int64_t, int>::iterator iter1, iter2;
+//
+//	iter1 = ChrLocMap.lower_bound(FragPair.gPos);
+//	iter2 = ChrLocMap.lower_bound(FragPair.gPos + FragPair.gLen - 1);
+//
+//	return (iter1->first == iter2->first);
+//}
 
 bool CheckAlignmentValidity(vector<FragPair_t>& FragPairVec)
 {
-	map<int64_t, int>::iterator iter1, iter2;
-
 	if (FragPairVec.begin()->gPos < 0 || (FragPairVec.rbegin()->gPos + FragPairVec.rbegin()->gLen)> TwoGenomeSize) return false;
-	iter1 = ChrLocMap.lower_bound(FragPairVec.begin()->gPos);
-	iter2 = ChrLocMap.lower_bound(FragPairVec.rbegin()->gPos + FragPairVec.rbegin()->gLen - 1);
-
-	return (iter1->first == iter2->first);
+	else
+	{
+		map<int64_t, int>::iterator iter1, iter2;
+		iter1 = ChrLocMap.lower_bound(FragPairVec.begin()->gPos);
+		iter2 = ChrLocMap.lower_bound(FragPairVec.rbegin()->gPos + FragPairVec.rbegin()->gLen - 1);
+		if (iter1 != ChrLocMap.end() && iter2 != ChrLocMap.end() && iter1->first == iter2->first) return true;
+		else return false;
+	}
 }
 
 Coordinate_t DetermineCoordinate(int64_t gPos)

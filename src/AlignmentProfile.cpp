@@ -73,10 +73,12 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 		//if (bSomatic && CheckMismatch(iter->FragPairVec) > 2) continue;
 		//if (bSomatic && iter->PairedAlnCanIdx == -1) continue;
 
-		if (iter->orientation) gPos = iter->FragPairVec[0].gPos;
-		else gPos = TwoGenomeSize - 1 - iter->FragPairVec[0].gPos;
-		if (++MappingRecordArr[gPos].readCount > iMaxDuplicate) continue;
-
+		if (iMaxDuplicate > 0)
+		{
+			if (iter->orientation) gPos = iter->FragPairVec[0].gPos;
+			else gPos = TwoGenomeSize - 1 - iter->FragPairVec[0].gPos;
+			if (++MappingRecordArr[gPos].readCount > iMaxDuplicate) continue;
+		}
 		if (iter->orientation) //iter->FragPairVec[0].gPos < GenomeSize
 		{
 			for (i = 0; i < num; i++)

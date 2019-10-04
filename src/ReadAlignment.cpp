@@ -2,8 +2,6 @@
 #define MinSeqIdy 0.5
 #define MinAlnBlcokSize 5
 
-static pthread_mutex_t Lock;
-
 float CalFragAlnSeqIdy(string& aln1, string& aln2)
 {
 	int i, len = (int)aln1.length(), n = 0, mis = 0;

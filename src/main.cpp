@@ -2,7 +2,7 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.a";
+const char* VersionStr = "0.9.9.b";
 
 string CmdLine;
 float FrequencyThr;
@@ -12,8 +12,8 @@ MappingRecord_t* MappingRecordArr = NULL;
 vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
-int iThreadNum, iPloidy, FragmentSize, MinAlleleFreq, MinIndFreq, MinVarConfScore;
-bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
+int iThreadNum, iPloidy, FragmentSize, MinAlleleDepth, MinIndFreq, MinVarConfScore;
+bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bGVCF, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
 
 void ShowProgramUsage(const char* program)
 {
@@ -24,12 +24,14 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -f2           files with #2 mates reads (format:fa, fq, fq.gz)\n");
 	fprintf(stderr, "         -t INT        number of threads [%d]\n", iThreadNum);
 	fprintf(stderr, "         -size         Sequencing fragment size [%d]\n", FragmentSize);
-	fprintf(stderr, "         -ad INT       Minimal ALT allele count [%d]\n", MinAlleleFreq);
+	fprintf(stderr, "         -ad INT       Minimal ALT allele count [%d]\n", MinAlleleDepth);
 	fprintf(stderr, "         -dup INT      Maximal PCR duplicates [%d]\n", iMaxDuplicate);
+	//fprintf(stderr, "         -freq FLOAT   Minimal ALT allele frequency [%.2f]\n", FrequencyThr);
 	fprintf(stderr, "         -sam          SAM output filename [NULL]\n");
 	fprintf(stderr, "         -bam          BAM output filename [NULL]\n");
 	fprintf(stderr, "         -alg STR      gapped alignment algorithm (option: nw|ksw2)\n");
 	fprintf(stderr, "         -vcf          VCF output filename [%s]\n", VcfFileName);
+	fprintf(stderr, "         -gvcf         GVCF mode [false]\n");
 	fprintf(stderr, "         -ploidy INT   number of sets of chromosomes in a cell[%d]\n", iPloidy);
 	fprintf(stderr, "         -m            output multiple alignments\n");
 	fprintf(stderr, "         -somatic      detect somatic mutations [false]\n");
@@ -116,6 +118,7 @@ int main(int argc, char* argv[])
 	int i;
 	string parameter, str;
 
+	bGVCF = false;
 	iPloidy = 2;
 	iThreadNum = 16;
 	bPairEnd = false;
@@ -133,7 +136,7 @@ int main(int argc, char* argv[])
 	MinIndFreq = 5;
 	iMaxDuplicate = 5;
 	FragmentSize = 500;
-	MinAlleleFreq = 10;
+	MinAlleleDepth = 10;
 	FrequencyThr = 0.2;
 	MinVarConfScore = 10;
 	ObservGenomicPos = -1;
@@ -184,12 +187,12 @@ int main(int argc, char* argv[])
 				if (atoi(argv[++i]) <= 100) iMaxDuplicate = (int8_t)atoi(argv[i]);
 				else
 				{
-					fprintf(stderr, "Warning! The PCR-duplicate range is [1-100]! Current setting=%d\n", iMaxDuplicate);
+					fprintf(stderr, "Warning! The PCR-duplicate range is [0-100]! 0:no limit\n");
 				}
 			}
 			else if (parameter == "-filter") bFilter = true;
 			else if (parameter == "-size" && i + 1 < argc) FragmentSize = atoi(argv[++i]);
-			else if (parameter == "-ad" && i + 1 < argc) MinAlleleFreq = atoi(argv[++i]);
+			else if (parameter == "-ad" && i + 1 < argc) MinAlleleDepth = atoi(argv[++i]);
 			else if (parameter == "-ind" && i + 1 < argc) MinIndFreq = atoi(argv[++i]);
 			else if (parameter == "-ploidy"  && i + 1 < argc) iPloidy = atoi(argv[++i]);
 			else if ((parameter == "-sam") && i + 1 < argc)
@@ -210,8 +213,9 @@ int main(int argc, char* argv[])
 				if (str == "ksw2") NW_ALG = false;
 				else NW_ALG = true; //nw
 			}
-			else if (parameter == "-freq" && i + 1 < argc) FrequencyThr = atof(argv[++i]);
-			else if ((parameter == "-vcf") && i + 1 < argc) VcfFileName = argv[++i];
+			//else if (parameter == "-freq" && i + 1 < argc) FrequencyThr = atof(argv[++i]);
+			else if (parameter == "-vcf" && i + 1 < argc) VcfFileName = argv[++i];
+			else if (parameter == "-gvcf") bGVCF = true;
 			else if (parameter == "-no_vcf") bVCFoutput = false;
 			else if (parameter == "-somatic") bSomatic = true;
 			else if (parameter == "-pair" || parameter == "-p") bPairEnd = true;
@@ -220,7 +224,7 @@ int main(int argc, char* argv[])
 			{
 				ObserveBegPos = atoi(argv[++i]);
 				ObserveEndPos = atoi(argv[++i]);
-				fprintf(stderr, "obr[%lld - %lld]\n", (long long)ObserveBegPos, (long long)ObserveEndPos);
+				fprintf(stderr, "obr[%lld - %lld]\n", (long long) ObserveBegPos, (long long)ObserveEndPos);
 			}
 			else if (parameter == "-m") bUnique = false;
 			else if (parameter == "-d" || parameter == "-debug") bDebugMode = true;

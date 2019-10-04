@@ -217,8 +217,8 @@ extern vector<CoordinatePair_t> DistantPairVec;
 extern vector<string> ReadFileNameVec1, ReadFileNameVec2;
 extern char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
 extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos, ObserveBegPos, ObserveEndPos;
-extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bSomatic, NW_ALG;
-extern int iThreadNum, iPloidy, iChromsomeNum, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleFreq, MinIndFreq, MinVarConfScore;
+extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bGVCF, bSomatic, NW_ALG;
+extern int iThreadNum, iPloidy, iChromsomeNum, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleDepth, MinIndFreq, MinVarConfScore;
 
 extern vector<DiscordPair_t> InversionSiteVec, TranslocationSiteVec;
 extern map<int64_t, map<string, uint16_t> > InsertSeqMap, DeleteSeqMap;
@@ -259,7 +259,7 @@ extern void GeneratePairedSamStream(ReadItem_t& read1, ReadItem_t& read2, vector
 extern void ShowProfileColumn(int64_t gPos);
 extern void ShowSeedLocationInfo(int64_t MyPos);
 extern int64_t GetAlignmentBoundary(int64_t gPos);
-extern bool CheckFragValidity(FragPair_t FragPair);
+//extern bool CheckFragValidity(FragPair_t FragPair);
 extern void SelfComplementarySeq(int len, char* rseq);
 extern Coordinate_t DetermineCoordinate(int64_t gPos);
 extern int GetProfileColumnSize(MappingRecord_t& Profile);

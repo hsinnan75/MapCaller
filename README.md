@@ -116,6 +116,8 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
 -no_vcf No VCF output [false]
 
+-gvcf GVCF mode [false]
+
 -size Sequencing fragment size [default: 500, MapCaller can predict the fragment size automatically]
 
 -ad INT Minimal ALT allele count [3]
@@ -140,6 +142,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - version 0.9.9.8: Used ksw2 algorithm for gapped alignments and fixed a bug on VCF format output.
 - version 0.9.9.9: Added a new argument(-ploidy) for setting different ploidy.
 - version 0.9.9.a: Fixed a bug on read mapping && Added an option (-dup) to filter out PCR-duplicates.
+- version 0.9.9.b: Added GVCF format (-gvcf).
 # Acknowledgements
 We would like to thank Mr. Torsten Seemann for valuable comments.
 

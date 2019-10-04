@@ -87,7 +87,8 @@ int AlignmentRescue(uint32_t EstDist, ReadItem_t& read1, ReadItem_t& read2)
 			left_end = iter->FragPairVec[0].PosDiff - EstDist;
 			right_end = iter->FragPairVec[0].PosDiff + read1.rlen;
 			if (right_end > TwoGenomeSize) right_end = TwoGenomeSize;
-			if (ChrLocMap.lower_bound(left_end)->second != ChrLocMap.lower_bound(right_end)->second) continue;
+			mi1 = ChrLocMap.lower_bound(left_end); mi2 = ChrLocMap.lower_bound(right_end);
+			if (mi1->second != mi2->second) continue;
 			if ((slen = right_end - left_end) < read1.rlen) continue;
 			RefSeg = RefSequence + left_end; KmerVec2 = CreateKmerVecFromReadSeq(slen, RefSeg);
 

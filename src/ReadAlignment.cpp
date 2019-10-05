@@ -96,7 +96,7 @@ void IdentifyNormalPairs(int rlen, vector<FragPair_t>& FragPairVec)
 		FragPairVec.insert(FragPairVec.begin(), FragPair);
 	}
 	num = (int)FragPairVec.size();
-	if ((FragPairVec[num - 1].rPos + FragPairVec[num - 1].rLen) < rlen)
+	if (num > 0 && (FragPairVec[num - 1].rPos + FragPairVec[num - 1].rLen) < rlen)
 	{
 		FragPair.rPos = FragPairVec[num - 1].rPos + FragPairVec[num - 1].rLen;
 		FragPair.gPos = FragPairVec[num - 1].gPos + FragPairVec[num - 1].gLen;

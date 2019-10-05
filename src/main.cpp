@@ -2,18 +2,18 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.b";
+const char* VersionStr = "0.9.9.c";
 
 string CmdLine;
 float FrequencyThr;
-int8_t iMaxDuplicate;
+uint8_t iMaxDuplicate;
 time_t StartProcessTime;
 MappingRecord_t* MappingRecordArr = NULL;
 vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
 int iThreadNum, iPloidy, FragmentSize, MinAlleleDepth, MinIndFreq, MinVarConfScore;
-bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bGVCF, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
+bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bGVCF, bMonomorphic, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
 
 void ShowProgramUsage(const char* program)
 {
@@ -32,6 +32,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -alg STR      gapped alignment algorithm (option: nw|ksw2)\n");
 	fprintf(stderr, "         -vcf          VCF output filename [%s]\n", VcfFileName);
 	fprintf(stderr, "         -gvcf         GVCF mode [false]\n");
+	fprintf(stderr, "         -monomorphic  Report all loci which do not have any potential alternates.");
 	fprintf(stderr, "         -ploidy INT   number of sets of chromosomes in a cell[%d]\n", iPloidy);
 	fprintf(stderr, "         -m            output multiple alignments\n");
 	fprintf(stderr, "         -somatic      detect somatic mutations [false]\n");
@@ -132,6 +133,7 @@ int main(int argc, char* argv[])
 	bSomatic = false;
 	bVCFoutput = true;
 	gzCompressed = false;
+	bMonomorphic = false;
 
 	MinIndFreq = 5;
 	iMaxDuplicate = 5;
@@ -184,11 +186,8 @@ int main(int argc, char* argv[])
 			}
 			else if (parameter == "-dup" && i + 1 < argc)
 			{
-				if (atoi(argv[++i]) <= 100) iMaxDuplicate = (int8_t)atoi(argv[i]);
-				else
-				{
-					fprintf(stderr, "Warning! The PCR-duplicate range is [0-100]! 0:no limit\n");
-				}
+				if (atoi(argv[++i]) <= 255) iMaxDuplicate = (int8_t)atoi(argv[i]);
+				else fprintf(stderr, "Warning! The PCR-duplicate range is [1-255]!\n");
 			}
 			else if (parameter == "-filter") bFilter = true;
 			else if (parameter == "-size" && i + 1 < argc) FragmentSize = atoi(argv[++i]);
@@ -216,6 +215,7 @@ int main(int argc, char* argv[])
 			//else if (parameter == "-freq" && i + 1 < argc) FrequencyThr = atof(argv[++i]);
 			else if (parameter == "-vcf" && i + 1 < argc) VcfFileName = argv[++i];
 			else if (parameter == "-gvcf") bGVCF = true;
+			else if (parameter == "-monomorphic") bMonomorphic = true;
 			else if (parameter == "-no_vcf") bVCFoutput = false;
 			else if (parameter == "-somatic") bSomatic = true;
 			else if (parameter == "-pair" || parameter == "-p") bPairEnd = true;
@@ -240,6 +240,8 @@ int main(int argc, char* argv[])
 				exit(0);
 			}
 		}
+		if (bGVCF && bMonomorphic) bGVCF = false;
+		if (iMaxDuplicate <= 0) iMaxDuplicate = 10;
 		//fprintf(stderr, "Read1:\n"); for (vector<string>::iterator iter = ReadFileNameVec1.begin(); iter != ReadFileNameVec1.end(); iter++) fprintf(stderr, "\t%s\n", (char*)iter->c_str());
 		//fprintf(stderr, "Read2:\n"); for (vector<string>::iterator iter = ReadFileNameVec2.begin(); iter != ReadFileNameVec2.end(); iter++) fprintf(stderr, "\t%s\n", (char*)iter->c_str());
 		if (ReadFileNameVec1.size() == 0)

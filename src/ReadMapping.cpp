@@ -680,6 +680,24 @@ void *CheckMappingCoverage(void *arg)
 	return (void*)(1);
 }
 
+void ReportDuplicationRate()
+{
+	int64_t gPos, n, total_count;
+
+	n = total_count = 0;
+
+	for (gPos = 0; gPos < GenomeSize; gPos++)
+	{
+		if (MappingRecordArr[gPos].readCount > 0)
+		{
+			n++;
+			total_count += MappingRecordArr[gPos].readCount;
+		}
+	}
+	total_count -= n;
+	fprintf(stderr, "\tDuplication rate=%4.2f%%\n", 100 * (1.0*total_count / n));
+}
+
 void Mapping()
 {
 	int i, *ThrIdArr;
@@ -741,7 +759,7 @@ void Mapping()
 	}
 	fprintf(stderr, "\rAll the %lld %s reads have been processed in %lld seconds.\n", (long long)iTotalReadNum, (bPairEnd ? "paired-end" : "single-end"), (long long)(time(NULL) - StartProcessTime));
 	if (iTotalReadNum > 0) fprintf(stderr, "%12lld (%6.2f%%) reads are mapped to the reference genome.\n", (long long)iTotalMappingNum, (int)(10000 * (1.0*iTotalMappingNum / iTotalReadNum) + 0.00005) / 100.0);
-
+	if (iTotalReadNum > 0 && iTotalPairedNum > 0) fprintf(stderr, "%12lld (%6.2f%%) reads are mapped in pairs.\n", (long long)(iTotalPairedNum << 1), (int)(10000 * (1.0*(iTotalPairedNum << 1) / iTotalReadNum) + 0.00005) / 100.0);
 	if (bSAMoutput)
 	{
 		if (bSAMFormat) fclose(sam_out);
@@ -753,19 +771,16 @@ void Mapping()
 		for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);
 
 		avgCov = (int)(1.0*iTotalCoverage / iAlignedBase + .5); if (avgCov < 0) avgCov = 0;
-		fprintf(stderr, "\tEst. AvgCoverage = %d\n", avgCov);
+		fprintf(stderr, "\tEstimated AvgCoverage = %d\n", avgCov);
 	}
 	else avgCov = 0;
-
-	delete[] ThrIdArr; delete[] ThreadArr;
-
+	if (iTotalReadNum > 0) ReportDuplicationRate();
 	if (iTotalReadNum > 0 && iTotalPairedNum > 0)
 	{
 		avgDist = (int)(1.*TotalPairedDistance / iTotalPairedNum + .5);
 		avgReadLength = (int)(1.*ReadLengthSum / iTotalPairedNum + .5);
 		FragmentSize = avgDist + avgReadLength;
-		fprintf(stderr, "%12lld (%6.2f%%) reads are mapped in pairs.\n", (long long)(iTotalPairedNum << 1), (int)(10000 * (1.0*(iTotalPairedNum << 1) / iTotalReadNum) + 0.00005) / 100.0);
-		fprintf(stderr, "\tEst. fragment size = %d, insert size = %d\n", FragmentSize, avgDist - avgReadLength);
+		fprintf(stderr, "\tEstimated fragment size = %d, insert size = %d\n", FragmentSize, avgDist - avgReadLength);
 	}
 	else avgDist = avgReadLength = 0;
 
@@ -789,4 +804,5 @@ void Mapping()
 	//		}
 	//	}
 	//}
+	delete[] ThrIdArr; delete[] ThreadArr;
 }

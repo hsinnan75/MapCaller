@@ -205,7 +205,7 @@ extern bwt_t *Refbwt;
 extern string CmdLine;
 extern bwaidx_t *RefIdx;
 extern uint32_t avgDist;
-extern int8_t iMaxDuplicate;
+extern uint8_t iMaxDuplicate;
 extern const char* VersionStr;
 extern vector<string> ReadVec;
 extern time_t StartProcessTime;
@@ -217,7 +217,7 @@ extern vector<CoordinatePair_t> DistantPairVec;
 extern vector<string> ReadFileNameVec1, ReadFileNameVec2;
 extern char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
 extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos, ObserveBegPos, ObserveEndPos;
-extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bGVCF, bSomatic, NW_ALG;
+extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bGVCF, bMonomorphic, bSomatic, NW_ALG;
 extern int iThreadNum, iPloidy, iChromsomeNum, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleDepth, MinIndFreq, MinVarConfScore;
 
 extern vector<DiscordPair_t> InversionSiteVec, TranslocationSiteVec;

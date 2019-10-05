@@ -32,7 +32,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -alg STR      gapped alignment algorithm (option: nw|ksw2)\n");
 	fprintf(stderr, "         -vcf          VCF output filename [%s]\n", VcfFileName);
 	fprintf(stderr, "         -gvcf         GVCF mode [false]\n");
-	fprintf(stderr, "         -monomorphic  Report all loci which do not have any potential alternates.");
+	fprintf(stderr, "         -monomorphic  Report all loci which do not have any potential alternates.\n");
 	fprintf(stderr, "         -ploidy INT   number of sets of chromosomes in a cell[%d]\n", iPloidy);
 	fprintf(stderr, "         -m            output multiple alignments\n");
 	fprintf(stderr, "         -somatic      detect somatic mutations [false]\n");

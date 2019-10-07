@@ -4,6 +4,7 @@
 #define BlockSize 100
 #define BreakPointFreqThr 3
 #define INV_TNL_ThrRatio 0.5
+#define Indel_Homo_Thr 0.65
 #define var_SUB 0 // substitution
 #define var_INS 1 // insertion
 #define var_DEL 2 // deletion
@@ -580,16 +581,16 @@ void *IdentifyVariants(void *arg)
 			{
 				Variant.gPos = gPos; Variant.VarType = var_INS; Variant.DP = BlockDepthArr[(int)(gPos / BlockSize)]; Variant.NS = ins_freq;
 				if (Variant.DP < Variant.NS) Variant.DP = Variant.NS; Variant.ALTstr = ins_str;
-				if (Variant.NS >(int)(Variant.DP*0.65)) Variant.GenoType = 0; else Variant.GenoType = 1;
+				if (Variant.NS >(int)(Variant.DP*Indel_Homo_Thr)) Variant.GenoType = 0; else Variant.GenoType = 1;
 				if ((Variant.qscore = (int)(30.0 * ins_freq / Variant.DP)) > 30) Variant.qscore = 30;
 				/*if (Variant.qscore >= MinVarConfScore)*/
 				bNormal = false; MyVariantVec.push_back(Variant);
 			}
 			if (del_freq >= del_thr)
 			{
-				Variant.gPos = gPos - 1; Variant.VarType = var_DEL; Variant.DP = BlockDepthArr[(int)(gPos / BlockSize)]; Variant.NS = del_freq;
+				Variant.gPos = gPos; Variant.VarType = var_DEL; Variant.DP = BlockDepthArr[(int)(gPos / BlockSize)]; Variant.NS = del_freq;
 				if (Variant.DP < Variant.NS) Variant.DP = Variant.NS; Variant.ALTstr = del_str;
-				if (Variant.NS > (int)(Variant.DP*0.65)) Variant.GenoType = 0; else Variant.GenoType = 1;
+				if (Variant.NS > (int)(Variant.DP*Indel_Homo_Thr)) Variant.GenoType = 0; else Variant.GenoType = 1;
 				if ((Variant.qscore = (int)(30.0 * del_freq / Variant.DP)) > 30) Variant.qscore = 30;
 				/*if (Variant.qscore >= MinVarConfScore)*/
 				bNormal = false; MyVariantVec.push_back(Variant);

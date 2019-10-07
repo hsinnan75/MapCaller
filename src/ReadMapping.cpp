@@ -774,7 +774,7 @@ void Mapping()
 		fprintf(stderr, "\tEstimated AvgCoverage = %d\n", avgCov);
 	}
 	else avgCov = 0;
-	if (iTotalReadNum > 0) ReportDuplicationRate();
+	if (bVCFoutput) ReportDuplicationRate();
 	if (iTotalReadNum > 0 && iTotalPairedNum > 0)
 	{
 		avgDist = (int)(1.*TotalPairedDistance / iTotalPairedNum + .5);

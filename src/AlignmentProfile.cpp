@@ -42,29 +42,30 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 {
 	int64_t gPos;
 	string IndSeq;
-	int i, j, frag_len, ext_len, TailIdx, rPos, num;
+	int i, j, frag_len, ext_len, rPos, num;
 	map<int64_t, map<string, uint16_t> >::iterator ind_iter, lower_iter, upper_iter;
 
 	for (vector<AlnCan_t>::iterator iter = AlnCanVec.begin(); iter != AlnCanVec.end(); iter++)
 	{
 		if (iter->score == 0) continue;
 
-		num = iter->FragPairVec.size(); TailIdx = num - 1;
-		if (iter->FragPairVec[0].rLen == 0 && iter->FragPairVec[0].gLen == 0)
+		num = iter->FragPairVec.size();
+		if (iter->FragPairVec.begin()->rLen == 0 && iter->FragPairVec.begin()->gLen == 0)
 		{
-			if (iter->FragPairVec[1].rPos > MinBreakPointSize)
+			//if (iter->FragPairVec[1].rPos > MinBreakPointSize)
+			if (iter->FragPairVec.begin()->rPos > MinBreakPointSize)
 			{
-				gPos = iter->FragPairVec[0].gPos;
+				gPos = iter->FragPairVec.begin()->gPos;
 				if (gPos < GenomeSize) BreakPointMap[gPos]++;
 				else BreakPointMap[(TwoGenomeSize - 1 - gPos)]++;
 			}
 			continue;
 		}
-		if (iter->FragPairVec[TailIdx].rLen == 0 && iter->FragPairVec[TailIdx].gLen == 0)
+		if (iter->FragPairVec.rbegin()->rLen == 0 && iter->FragPairVec.rbegin()->gLen == 0)
 		{
-			if ((read->rlen - iter->FragPairVec[TailIdx].rPos) > MinBreakPointSize)
+			if ((read->rlen - iter->FragPairVec.rbegin()->rPos) > MinBreakPointSize)
 			{
-				gPos = iter->FragPairVec[TailIdx].gPos;
+				gPos = iter->FragPairVec.rbegin()->gPos;
 				if (gPos < GenomeSize) BreakPointMap[gPos]++;
 				else BreakPointMap[TwoGenomeSize - 1 - gPos]++;
 			}
@@ -73,8 +74,8 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 		//if (bSomatic && CheckMismatch(iter->FragPairVec) > 2) continue;
 		//if (bSomatic && iter->PairedAlnCanIdx == -1) continue;
 
-		if (iter->orientation) gPos = iter->FragPairVec[0].gPos;
-		else gPos = TwoGenomeSize - 1 - iter->FragPairVec[0].gPos;
+		if (iter->orientation) gPos = iter->FragPairVec.begin()->gPos;
+		else gPos = TwoGenomeSize - 1 - iter->FragPairVec.begin()->gPos;
 		if (MappingRecordArr[gPos].readCount < iMaxDuplicate) MappingRecordArr[gPos].readCount++;
 		else continue;
 
@@ -103,7 +104,7 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 				}
 				else if (iter->FragPairVec[i].rLen == 0) // del
 				{
-					DeleteSeqMap[gPos][iter->FragPairVec[i].aln2]++;
+					DeleteSeqMap[gPos-1][iter->FragPairVec[i].aln2]++;
 				}
 				else
 				{
@@ -120,7 +121,7 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 						{
 							ext_len = 1; while (iter->FragPairVec[i].aln1[j + ext_len] == '-') ext_len++;
 							IndSeq = iter->FragPairVec[i].aln2.substr(j, ext_len);
-							DeleteSeqMap[gPos][IndSeq]++;
+							DeleteSeqMap[gPos-1][IndSeq]++;
 							j += ext_len; gPos += ext_len;
 						}
 						else
@@ -177,7 +178,7 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 						{
 							ext_len = 1; while (iter->FragPairVec[i].aln2[j + ext_len] == '-') ext_len++;
 							IndSeq = iter->FragPairVec[i].aln1.substr(j, ext_len);
-							InsertSeqMap[gPos - 1][IndSeq]++;
+							InsertSeqMap[gPos][IndSeq]++;
 							j += ext_len; rPos += ext_len;
 						}
 						else if (iter->FragPairVec[i].aln1[j] == '-') // del

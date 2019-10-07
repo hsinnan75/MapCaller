@@ -511,11 +511,11 @@ void GenVariantCallingFile()
 		{
 			if (i + 1 < num) gPos = DetermineCoordinate(VariantVec[i + 1].gPos).gPos - 1;
 			else gPos = ChromosomeVec[coor.ChromosomeIdx].len;
-			fprintf(outFile, "%s	%d	.	%c	<*>	0	.	END=%d;DP=%d;MIN_DP=%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos - 1], (int)gPos, VariantVec[i].DP, VariantVec[i].NS);
+			fprintf(outFile, "%s	%d	.	%c	<*>	0	.	END=%d;DP=%d;MIN_DP=%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)gPos, VariantVec[i].DP, VariantVec[i].NS);
 		}
 		else if (VariantVec[i].VarType == var_MON)
 		{
-			fprintf(outFile, "%s	%d	.	%c	.	0	.	DP=%d;NS=%d;DUP=%d;GT=0|0\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos - 1], VariantVec[i].DP, VariantVec[i].NS, MappingRecordArr[gPos].readCount);
+			fprintf(outFile, "%s	%d	.	%c	.	0	.	DP=%d;NS=%d;DUP=%d;GT=0|0\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], VariantVec[i].DP, VariantVec[i].NS, MappingRecordArr[gPos].readCount);
 		}
 	}
 	std::fclose(outFile);
@@ -566,7 +566,7 @@ void *IdentifyVariants(void *arg)
 
 	for (; gPos < end; gPos++)
 	{
-		if ((ref_base = nst_nt4_table[(unsigned short)RefSequence[gPos]]) != 4)
+		if ((ref_base = nst_nt4_table[(unsigned short)RefSequence[gPos]]) < 4)
 		{
 			bNormal = true; cov = GetProfileColumnSize(MappingRecordArr[gPos]);
 			//if (bSomatic && (MappingRecordArr[gPos].multi_hit > (int)(cov*0.05))) continue;

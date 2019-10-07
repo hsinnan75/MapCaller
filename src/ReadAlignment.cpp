@@ -427,6 +427,9 @@ bool ProduceReadAlignment(ReadItem_t& read)
 	//		{
 	//			//Display alignments
 	//			//pthread_mutex_lock(&Lock);
+	//			if (iter->orientation) printf("StartPos=%lld\n", iter->FragPairVec.begin()->gPos);
+	//			else printf("StartPos=%lld\n", TwoGenomeSize - (iter->FragPairVec.begin()->gPos + iter->FragPairVec.begin()->gLen));
+
 	//			printf("read: %s, score=%d (%d/%d) len=%d, PairedIdx=%d\n\n", read.header, iter->score, read.AlnSummary.score, read.AlnSummary.sub_score, read.rlen, iter->PairedAlnCanIdx);
 	//			ShowSimplePairInfo(iter->FragPairVec);
 	//			//pthread_mutex_unlock(&Lock);

@@ -566,7 +566,7 @@ void *IdentifyVariants(void *arg)
 
 	for (; gPos < end; gPos++)
 	{
-		if ((ref_base = nst_nt4_table[(unsigned short)RefSequence[gPos]]) < 4)
+		if ((ref_base = nst_nt4_table[(unsigned short)RefSequence[gPos]]) != 4)
 		{
 			bNormal = true; cov = GetProfileColumnSize(MappingRecordArr[gPos]);
 			//if (bSomatic && (MappingRecordArr[gPos].multi_hit > (int)(cov*0.05))) continue;

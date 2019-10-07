@@ -75,7 +75,7 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 		//if (bSomatic && iter->PairedAlnCanIdx == -1) continue;
 
 		if (iter->orientation) gPos = iter->FragPairVec.begin()->gPos;
-		else gPos = TwoGenomeSize - 1 - iter->FragPairVec.begin()->gPos;
+		else gPos = TwoGenomeSize - (iter->FragPairVec.begin()->gPos + iter->FragPairVec.begin()->gLen);
 		if (MappingRecordArr[gPos].readCount < iMaxDuplicate) MappingRecordArr[gPos].readCount++;
 		else continue;
 

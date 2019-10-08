@@ -144,8 +144,8 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - version 0.9.9.a: Fixed a bug on read mapping && Added an option (-dup) to filter out PCR-duplicates.
 - version 0.9.9.b: Added GVCF format (-gvcf).
 - version 0.9.9.c: Added a new argument(-monomorphic) to report all loci which do not have any potential alternates.
-+ * version 0.9.9.d: Fixed bugs on checking reference nucloetides and reporting deletion events.
-+ * version 0.9.9.e: Fixed bugs on reporting monomorphic regions and reported unmapped regions (potential deletions).
+- version 0.9.9.d: Fixed bugs on checking reference nucloetides and reporting deletion events.
+- version 0.9.9.e: Fixed bugs on reporting monomorphic regions and reported unmapped regions (potential deletions).
 
 # Acknowledgements
 We would like to thank Mr. Torsten Seemann for valuable comments.

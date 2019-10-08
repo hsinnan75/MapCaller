@@ -210,9 +210,9 @@ void ShowMetaInfo()
 	fprintf(outFile, "##reference=%s\n", IndexFileName);
 	fprintf(outFile, "##source=MapCaller %s\n", VersionStr);
 	fprintf(outFile, "##command_line=\"%s\"\n", CmdLine.c_str());
-	fprintf(outFile, "##INFO=<ID=AD,Number=1,Type=Integer,Description=\"Allel depth\">\n");
-	fprintf(outFile, "##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total depth\">\n");
-	fprintf(outFile, "##INFO=<ID=AF,Number=1,Type=Float,Description=\"Allele frequency\">\n");
+	fprintf(outFile, "##INFO=<ID=AD,Number=1,Type=Integer,Description=\"Alternate allele depth\">\n");
+	fprintf(outFile, "##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Read depth\">\n");
+	fprintf(outFile, "##INFO=<ID=AF,Number=1,Type=Float,Description=\"Alternate allele depth\">\n");
 	fprintf(outFile, "##INFO=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n");
 	fprintf(outFile, "##INFO=<ID=DUP,Number=1,Type=Integer,Description=\"Number of reads with start coordinate at this position.\">\n");
 	fprintf(outFile, "##INFO=<ID=END,Number=1,Type=Integer,Description=\"Last position(inclusive) of the reported block\"\n");

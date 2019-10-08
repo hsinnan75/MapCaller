@@ -527,8 +527,8 @@ void GenVariantCallingFile()
 		}
 		else if (VariantVec[i].VarType == var_NOR)
 		{
-			if (i + 1 < iTotalVarNum) gPosEnd = DetermineCoordinate(VariantVec[i + 1].gPos).gPos - 1;
-			else gPosEnd = ChromosomeVec[coor.ChromosomeIdx].FowardLocation + ChromosomeVec[coor.ChromosomeIdx].len - 1;
+			gPosEnd = ChromosomeVec[coor.ChromosomeIdx].FowardLocation + ChromosomeVec[coor.ChromosomeIdx].len - 1;
+			if (i + 1 < iTotalVarNum && VariantVec[i + 1].gPos < gPosEnd) gPosEnd = VariantVec[i + 1].gPos - 1;
 			fprintf(outFile, "%s	%d	.	%c	<*>	0	.	END=%d;DP=%d;MIN_DP=%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)DetermineCoordinate(gPosEnd).gPos, VariantVec[i].DP, VariantVec[i].NS);
 		}
 		else if (VariantVec[i].VarType == var_MON)

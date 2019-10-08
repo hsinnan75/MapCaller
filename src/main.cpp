@@ -2,7 +2,7 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.e";
+const char* VersionStr = "0.9.9.15";
 
 string CmdLine;
 float FrequencyThr;
@@ -33,7 +33,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -vcf          VCF output filename [%s]\n", VcfFileName);
 	fprintf(stderr, "         -gvcf         GVCF mode [false]\n");
 	fprintf(stderr, "         -monomorphic  Report all loci which do not have any potential alternates.\n");
-	fprintf(stderr, "         -ploidy INT   number of sets of chromosomes in a cell[%d]\n", iPloidy);
+	fprintf(stderr, "         -ploidy INT   number of sets of chromosomes in a cell (1:monoploid, 2:diploid) [%d]\n", iPloidy);
 	fprintf(stderr, "         -m            output multiple alignments\n");
 	fprintf(stderr, "         -somatic      detect somatic mutations [false]\n");
 	fprintf(stderr, "         -no_vcf       No VCF output [false]\n");
@@ -193,7 +193,14 @@ int main(int argc, char* argv[])
 			else if (parameter == "-size" && i + 1 < argc) FragmentSize = atoi(argv[++i]);
 			else if (parameter == "-ad" && i + 1 < argc) MinAlleleDepth = atoi(argv[++i]);
 			else if (parameter == "-ind" && i + 1 < argc) MinIndFreq = atoi(argv[++i]);
-			else if (parameter == "-ploidy"  && i + 1 < argc) iPloidy = atoi(argv[++i]);
+			else if (parameter == "-ploidy"  && i + 1 < argc)
+			{
+				if ((iPloidy = atoi(argv[++i])) > 2)
+				{
+					iPloidy = 2;
+					fprintf(stderr, "Warning! MapCaller only supports monoploid and diploid!\n");
+				}
+			}
 			else if ((parameter == "-sam") && i + 1 < argc)
 			{
 				bSAMoutput = true;

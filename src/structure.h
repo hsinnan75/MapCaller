@@ -186,7 +186,7 @@ typedef struct
 	uint16_t DP; // total depth
 	int64_t gPos;
 	string ALTstr;
-	bool GenoType; //0:homo, 1:heter
+	uint8_t GenoType;
 	uint8_t qscore;
 	uint8_t VarType;
 } Variant_t;

@@ -146,6 +146,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - 0.9.9.c: Added a new argument(-monomorphic) to report all loci which do not have any potential alternates.
 - 0.9.9.d: Fixed bugs on checking reference nucloetides and reporting deletion events.
 - 0.9.9.e: Fixed bugs on reporting monomorphic regions and reported unmapped regions (potential deletions).
+- 0.9.9.15: Fixed errors on VCF headers.
 
 # Acknowledgements
 We would like to thank Mr. Torsten Seemann for valuable comments.

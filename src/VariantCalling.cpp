@@ -219,7 +219,7 @@ void ShowMetaInfo()
 	if (bGVCF) fprintf(outFile, "##INFO=<ID=MIN_DP,Number=1,Type=Integer,Description=\"Minimum depth in gVCF output block.\">\n");
 	if (bGVCF) fprintf(outFile, "##INFO=<ID=END,Number=1,Type=Integer,Description=\"Last position(inclusive) in gVCF output record.\">\n");
 	fprintf(outFile, "##FILTER=<ID=PASS,Description=\"All filters passed\">\n");
-	fprintf(outFile, "##FILTER=<ID=UnMapped, Description=\"Region without any read alignment.\"\n");
+	fprintf(outFile, "##FILTER=<ID=Gaps, Description=\"Region without any read alignment.\"\n");
 	fprintf(outFile, "##FILTER=<ID=q10,Description=\"Confidence score below 10\">\n");
 	if (bFilter) fprintf(outFile, "##FILTER=<ID=bad_haplotype,Description=\"Variants with variable frequencies on same haplotype\">\n");
 	if (bFilter) fprintf(outFile, "##FILTER=<ID=str_contraction,Description=\"Variant appears in repetitive region\">\n");
@@ -530,7 +530,7 @@ void GenVariantCallingFile()
 		{
 			gPosEnd = ChromosomeVec[coor.ChromosomeIdx].FowardLocation + ChromosomeVec[coor.ChromosomeIdx].len - 1;
 			if (i + 1 < iTotalVarNum && VariantVec[i + 1].VarType == var_UMR) gPosEnd = VariantVec[++i].gPos;
-			fprintf(outFile, "%s	%d	.	%c	<*>	0	UnMapped	END=%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)DetermineCoordinate(gPosEnd).gPos);
+			fprintf(outFile, "%s	%d	.	%c	<*>	0	Gaps	END=%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)DetermineCoordinate(gPosEnd).gPos);
 		}
 		else if (VariantVec[i].VarType == var_NOR)
 		{

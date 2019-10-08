@@ -4,11 +4,25 @@ MapCaller: An efficient and versatile approach for short-read mapping and varian
 Developers: Dr. Hsin-Nan Lin and Dr. Wen-Lian Hsu. Institute of Information Science, Academia Sinica, Taiwan.
 
 # Introduction
-MapCaller aligns every NGS short read against a reference genome and collects all the alignment information to deduce sequence variants. MapCaller adopts the mapping algorithm of KART to perform read alignment. It maintains a position frequency matrix to keep track of every nucleotide¡¦s frequency at each position in the reference genome, and it collects all insertion and deletion events which are found during the read mapping. Furthermore, MapCaller also learns all possible break points from discordant or partial read alignments. Finally, MapCaller identifies sequence variants based on all the above-mentioned information. The novelty of our algorithm derives from the integration of read mapping and the variation information gathering into a coherent system for genomic variant calling. Thus, the inputs to MapCaller is one or more NGS read file and an index file for the reference genome, and the output is a VCF file for the variant calling result.
+MapCaller aligns every NGS short read against a reference genome and collects all the alignment information to deduce sequence variants. MapCaller adopts the mapping algorithm of KART to perform read alignment. It maintains a position frequency matrix to keep track of every nucleotideÂ¡Â¦s frequency at each position in the reference genome, and it collects all insertion and deletion events which are found during the read mapping. Furthermore, MapCaller also learns all possible break points from discordant or partial read alignments. Finally, MapCaller identifies sequence variants based on all the above-mentioned information. The novelty of our algorithm derives from the integration of read mapping and the variation information gathering into a coherent system for genomic variant calling. Thus, the inputs to MapCaller is one or more NGS read file and an index file for the reference genome, and the output is a VCF file for the variant calling result.
 
 For more information, please refer to our manuscript (https://www.biorxiv.org/content/10.1101/783605v2)
 
 The benchmark data sets and the performance evaluation program could be found at http://bioapp.iis.sinica.edu.tw/~arith/MapCaller/
+
+# Installation
+
+## Conda
+Install [Bioconda](https://bioconda.github.io/user/install.html) then type:
+```
+$ conda install -c conda-forge -c bioconda -c defaults mapcaller
+```
+
+## Homebrew
+Install [HomeBrew](http://brew.sh/) (MacOS) or [LinuxBrew](http://linuxbrew.sh/) (Linux) then type:
+```
+$ brew install brewsci/bio/mapcaller
+```
 
 # Download
 
@@ -19,14 +33,14 @@ Please use the command
 to download the package of MapCaller.
 
 # Dependencies
-
-To compile MapCaller, it requires libboost-all-dev, libbz2-dev, and liblzma-dev pre-installed in your system.
+To compile MapCaller, it requires `libboost-all-dev`, `libbz2-dev`, and `liblzma-dev` pre-installed in your system.
 
 # Compiling
-To compile MapCaller and the index tool, please just type 'make' to compile MapCaller and bwt_index. If the compilation or the program fails, please contact me (arith@iis.sinica.edu.tw), Thanks.
+To compile MapCaller and the index tool, please just type `make` to compile MapCaller and bwt_index. If the compilation or the program fails, please contact me (arith@iis.sinica.edu.tw) or report it at the
+[Issue Tracker](https://github.com/hsinnan75/MapCaller/issues).
 
 # Test
-You may run 'run_test.sh' to test MapCaller with a toy example.
+You may run `run_test.sh` to test MapCaller with a toy example.
 
 # Get updates
   ```
@@ -149,7 +163,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - 0.9.9.15: Fixed errors on VCF headers.
 
 # Acknowledgements
-We would like to thank Mr. Torsten Seemann for valuable comments.
+We would like to thank [A/Prof. Torsten Seemann](https://github.com/tseemann) for valuable comments.
 
 # Note
 The source code of the homemade genome sequence variation simulator is available at src/sv_simulator/.

@@ -23,9 +23,9 @@ typedef struct
 	uint16_t rigt_score;
 } BreakPoint_t;
 
-int BlockNum;
 FILE *outFile;
 int* BlockDepthArr;
+int BlockNum, iTotalVarNum;
 static pthread_mutex_t Lock;
 vector<Variant_t> VariantVec;
 vector<BreakPoint_t> BreakPointCanVec;
@@ -217,7 +217,7 @@ void ShowMetaInfo()
 	fprintf(outFile, "##FILTER=<ID=q10,Description=\"Confidence score below 10\">\n");
 	if (bFilter) fprintf(outFile, "##FILTER=<ID=bad_haplotype,Description=\"Variants with variable frequencies on same haplotype\">\n");
 	if (bFilter) fprintf(outFile, "##FILTER=<ID=str_contraction,Description=\"Variant appears in repetitive region\">\n");
-	fprintf(outFile, "##INFO=<ID=TYPE,Number=1,Type=String,Description=\"The type of allele, either SUBSTITUTE, INSERT, DELETE, or BND.\">\n");
+	fprintf(outFile, "##INFO=<ID=TYPE,Number=1,Type=String,Description=\"The type of allele, either SUBSTITUTE, INSERT, DELETE, BND, or UnMapped.\">\n");
 	for (int i = 0; i < iChromsomeNum; i++) fprintf(outFile, "##Contig=<ID=%s,length=%d>\n", ChromosomeVec[i].name, ChromosomeVec[i].len);
 	fprintf(outFile, "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO\n");
 }
@@ -396,14 +396,14 @@ void IdentifyInversions()
 	if (INVnum > 0) inplace_merge(VariantVec.begin(), VariantVec.end() - INVnum, VariantVec.end(), CompByVarPos);
 }
 
-bool CheckNearbyVariant(int i, int num, int dist)
+bool CheckNearbyVariant(int i, int dist)
 {
 	bool bRet = false;
 	if (i == 0)
 	{
 		if (VariantVec[i + 1].gPos - VariantVec[i].gPos <= dist) bRet = true;
 	}
-	else if (i == num - 1)
+	else if (i == iTotalVarNum - 1)
 	{
 		if (VariantVec[i].gPos - VariantVec[i - 1].gPos <= dist) bRet = true;
 	}
@@ -414,12 +414,12 @@ bool CheckNearbyVariant(int i, int num, int dist)
 	return bRet;
 }
 
-bool CheckBadHaplotype(int i, int num, int dist)
+bool CheckBadHaplotype(int i, int dist)
 {
 	int j, diff;
 	bool bRet = false;
 
-	for (j = i + 1; j < num; j++)
+	for (j = i + 1; j < iTotalVarNum; j++)
 	{
 		if (VariantVec[j].gPos - VariantVec[i].gPos > dist) break;
 		if (VariantVec[j].VarType == 0)
@@ -456,44 +456,56 @@ void ShowNeighboringProfile(int64_t gPos, Coordinate_t coor)
 	printf("\n\n");
 }
 
+string DetermineFileter(int VarIdx)
+{
+	string filter_str="";
+
+	if (VariantVec[VarIdx].qscore < 10) filter_str += "q10;";
+	else if (VariantVec[VarIdx].VarType == var_SUB && VariantVec[VarIdx].NS < 10 && CheckNearbyVariant(VarIdx, 10)) filter_str += "q10;";
+	else if ((VariantVec[VarIdx].VarType == var_INS || VariantVec[VarIdx].VarType == var_DEL) && VariantVec[VarIdx].NS < 5 && CheckNearbyVariant(VarIdx, 10)) filter_str += "q10;";
+	if (bFilter)
+	{
+		if (MappingRecordArr[VariantVec[VarIdx].gPos].multi_hit > (int)(GetProfileColumnSize(MappingRecordArr[VariantVec[VarIdx].gPos])*0.05)) filter_str += "str_contraction;";
+		if (CheckBadHaplotype(VarIdx, 100)) filter_str += "bad_haplotype;";
+	}
+	if (filter_str == "") filter_str = "PASS";
+	else filter_str.resize(filter_str.length() - 1);
+
+	return filter_str;
+}
+
 void GenVariantCallingFile()
 {
-	int i, num;
-	int64_t gPos;
+	int i;
 	float AlleleFreq;
 	Coordinate_t coor;
 	string filter_str;
+	int64_t gPos, gPosEnd;
 	vector<int> VarNumVec(256);
 	map<string, uint16_t>::iterator IndSeqMapIter;
 
 	outFile = fopen(VcfFileName, "w"); ShowMetaInfo();
 
 	//sort(VariantVec.begin(), VariantVec.end(), CompByVarPos);
-	for (num = (int)VariantVec.size(), i = 0; i < num; i++)
+	for (i = 0; i < iTotalVarNum; i++)
 	{
 		gPos = VariantVec[i].gPos; coor = DetermineCoordinate(gPos);
 
-		filter_str.clear();
-		if (VariantVec[i].Filter.q10) filter_str += "q10;";
-		if (bFilter && VariantVec[i].Filter.str_contraction) filter_str += "str_contraction;";
-		if (bFilter && VariantVec[i].Filter.bad_haplotype) filter_str += "bad_haplotype;";
-		if (filter_str == "") filter_str = "PASS"; else filter_str.resize(filter_str.length() - 1);
+		if(VariantVec[i].VarType < 3) filter_str = DetermineFileter(i);
+		else filter_str = ".";
 
 		if (VariantVec[i].VarType == var_SUB)
 		{
-			if (VariantVec[i].NS < 10 && CheckNearbyVariant(i, num, 10)) continue;
 			VarNumVec[var_SUB]++;
 			fprintf(outFile, "%s	%d	.	%c	%s	%d	%s	DP=%d;AD=%d;DUP=%d;AF=%.3f;GT=%s;TYPE=SUBSTITUTE\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[VariantVec[i].gPos], VariantVec[i].ALTstr.c_str(), VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].NS, MappingRecordArr[gPos].readCount, 1.0*VariantVec[i].NS / VariantVec[i].DP, (VariantVec[i].GenoType ? "0|1" : "1|1"));
 		}
 		else if (VariantVec[i].VarType == var_INS)
 		{
-			if (VariantVec[i].NS < 5 && CheckNearbyVariant(i, num, 10)) continue;
 			VarNumVec[var_INS]++; AlleleFreq = 1.0*VariantVec[i].NS / VariantVec[i].DP;
 			fprintf(outFile, "%s	%d	.	%c	%c%s	%d	%s	DP=%d;AD=%d;DUP=%d;AF=%.3f;GT=%s;TYPE=INSERT\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], RefSequence[gPos], VariantVec[i].ALTstr.c_str(), VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].NS, MappingRecordArr[gPos].readCount, AlleleFreq, (VariantVec[i].GenoType ? "0|1" : "1|1"));
 		}
 		else if (VariantVec[i].VarType == var_DEL)
 		{
-			if (VariantVec[i].NS < 5 && CheckNearbyVariant(i, num, 10)) continue;
 			VarNumVec[var_DEL]++; AlleleFreq = 1.0*VariantVec[i].NS / VariantVec[i].DP;
 			fprintf(outFile, "%s	%d	.	%c%s	%c	%d	%s	DP=%d;AD=%d;DUP=%d;AF=%.3f;GT=%s;TYPE=DELETE\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], VariantVec[i].ALTstr.c_str(), RefSequence[gPos], VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].NS, MappingRecordArr[gPos].readCount, AlleleFreq, (VariantVec[i].GenoType ? "0|1" : "1|1"));
 		}
@@ -507,11 +519,17 @@ void GenVariantCallingFile()
 			VarNumVec[var_INV]++;
 			fprintf(outFile, "%s	%d	.	%c	<INVERSION>	30	PASS	DP=%d;NS=%d;TYPE=BND\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos - 1], VariantVec[i].DP, VariantVec[i].NS);
 		}
+		else if (VariantVec[i].VarType == var_UMR)
+		{
+			gPosEnd = ChromosomeVec[coor.ChromosomeIdx].FowardLocation + ChromosomeVec[coor.ChromosomeIdx].len - 1;
+			if (i + 1 < iTotalVarNum && VariantVec[i + 1].VarType == var_UMR) gPosEnd = VariantVec[++i].gPos;
+			fprintf(outFile, "%s	%d	.	%c	<*>	0	.	END=%d;TYPE=UnMapped\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)DetermineCoordinate(gPosEnd).gPos);
+		}
 		else if (VariantVec[i].VarType == var_NOR)
 		{
-			if (i + 1 < num) gPos = DetermineCoordinate(VariantVec[i + 1].gPos).gPos - 1;
-			else gPos = ChromosomeVec[coor.ChromosomeIdx].len;
-			fprintf(outFile, "%s	%d	.	%c	<*>	0	.	END=%d;DP=%d;MIN_DP=%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)gPos, VariantVec[i].DP, VariantVec[i].NS);
+			if (i + 1 < iTotalVarNum) gPosEnd = DetermineCoordinate(VariantVec[i + 1].gPos).gPos - 1;
+			else gPosEnd = ChromosomeVec[coor.ChromosomeIdx].FowardLocation + ChromosomeVec[coor.ChromosomeIdx].len - 1;
+			fprintf(outFile, "%s	%d	.	%c	<*>	0	.	END=%d;DP=%d;MIN_DP=%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)DetermineCoordinate(gPosEnd).gPos, VariantVec[i].DP, VariantVec[i].NS);
 		}
 		else if (VariantVec[i].VarType == var_MON)
 		{
@@ -559,107 +577,113 @@ void *IdentifyVariants(void *arg)
 	vector<pair<char, int> > vec;
 	vector<Variant_t> MyVariantVec;
 	map<int64_t, map<string, uint16_t> >::iterator IndMapIter;
-	int n, cov, cov_thr, freq_thr, ins_thr, del_thr, ins_freq, del_freq, tid = *((int*)arg);
+	int n, gap, cov, cov_thr, freq_thr, ins_thr, del_thr, ins_freq, del_freq, tid = *((int*)arg);
 
 	gPos = (tid == 0 ? 0 : (GenomeSize / iThreadNum)*tid);
 	end = (tid == iThreadNum - 1 ? GenomeSize : (GenomeSize / iThreadNum)*(tid + 1));
 
+	gap = 0;
 	for (; gPos < end; gPos++)
 	{
-		if ((ref_base = nst_nt4_table[(unsigned short)RefSequence[gPos]]) != 4)
+		cov = GetProfileColumnSize(MappingRecordArr[gPos]);
+		bNormal = true; ref_base = nst_nt4_table[(unsigned short)RefSequence[gPos]];
+		//if (bSomatic && (MappingRecordArr[gPos].multi_hit > (int)(cov*0.05))) continue;
+		if ((cov_thr = BlockDepthArr[(int)(gPos / BlockSize)] >> 1) < MinAlleleDepth) cov_thr = MinAlleleDepth;
+		if (bSomatic && cov_thr > MinAlleleDepth) cov_thr = MinAlleleDepth;
+
+		if ((ins_thr = (int)(cov_thr*0.25)) < MinIndFreq) ins_thr = MinIndFreq;
+		if ((del_thr = (int)(cov_thr*0.35)) < MinIndFreq) del_thr = MinIndFreq;
+		ins_freq = GetAreaIndFrequency(gPos, InsertSeqMap, ins_str); del_freq = GetAreaIndFrequency(gPos, DeleteSeqMap, del_str);
+
+		if (ins_freq >= ins_thr)
 		{
-			bNormal = true; cov = GetProfileColumnSize(MappingRecordArr[gPos]);
-			//if (bSomatic && (MappingRecordArr[gPos].multi_hit > (int)(cov*0.05))) continue;
-			if ((cov_thr = BlockDepthArr[(int)(gPos / BlockSize)] >> 1) < MinAlleleDepth) cov_thr = MinAlleleDepth;
-			if (bSomatic && cov_thr > MinAlleleDepth) cov_thr = MinAlleleDepth;
+			Variant.gPos = gPos; Variant.VarType = var_INS; Variant.DP = BlockDepthArr[(int)(gPos / BlockSize)]; Variant.NS = ins_freq;
+			if (Variant.DP < Variant.NS) Variant.DP = Variant.NS; Variant.ALTstr = ins_str;
+			if (Variant.NS >(int)(Variant.DP*Indel_Homo_Thr)) Variant.GenoType = 0; else Variant.GenoType = 1;
+			if ((Variant.qscore = (int)(30.0 * ins_freq / Variant.DP)) > 30) Variant.qscore = 30;
+			bNormal = false; MyVariantVec.push_back(Variant);
+		}
+		if (del_freq >= del_thr)
+		{
+			Variant.gPos = gPos; Variant.VarType = var_DEL; Variant.DP = BlockDepthArr[(int)(gPos / BlockSize)]; Variant.NS = del_freq;
+			if (Variant.DP < Variant.NS) Variant.DP = Variant.NS; Variant.ALTstr = del_str;
+			if (Variant.NS > (int)(Variant.DP*Indel_Homo_Thr)) Variant.GenoType = 0; else Variant.GenoType = 1;
+			if ((Variant.qscore = (int)(30.0 * del_freq / Variant.DP)) > 30) Variant.qscore = 30;
+			bNormal = false; MyVariantVec.push_back(Variant);
+		}
+		//SUB
+		if (cov >= cov_thr)
+		{
+			vec.clear(); freq_thr = (int)ceil(cov*(bSomatic ? 0.01 : FrequencyThr));
+			if (freq_thr < MinAlleleDepth) freq_thr = MinAlleleDepth;
 
-			if ((ins_thr = (int)(cov_thr*0.25)) < MinIndFreq) ins_thr = MinIndFreq;
-			if ((del_thr = (int)(cov_thr*0.35)) < MinIndFreq) del_thr = MinIndFreq;
-			ins_freq = GetAreaIndFrequency(gPos, InsertSeqMap, ins_str); del_freq = GetAreaIndFrequency(gPos, DeleteSeqMap, del_str);
-
-			if (ins_freq >= ins_thr)
-			{
-				Variant.gPos = gPos; Variant.VarType = var_INS; Variant.DP = BlockDepthArr[(int)(gPos / BlockSize)]; Variant.NS = ins_freq;
-				if (Variant.DP < Variant.NS) Variant.DP = Variant.NS; Variant.ALTstr = ins_str;
-				if (Variant.NS >(int)(Variant.DP*Indel_Homo_Thr)) Variant.GenoType = 0; else Variant.GenoType = 1;
-				if ((Variant.qscore = (int)(30.0 * ins_freq / Variant.DP)) > 30) Variant.qscore = 30;
-				/*if (Variant.qscore >= MinVarConfScore)*/
-				bNormal = false; MyVariantVec.push_back(Variant);
-			}
-			if (del_freq >= del_thr)
-			{
-				Variant.gPos = gPos; Variant.VarType = var_DEL; Variant.DP = BlockDepthArr[(int)(gPos / BlockSize)]; Variant.NS = del_freq;
-				if (Variant.DP < Variant.NS) Variant.DP = Variant.NS; Variant.ALTstr = del_str;
-				if (Variant.NS > (int)(Variant.DP*Indel_Homo_Thr)) Variant.GenoType = 0; else Variant.GenoType = 1;
-				if ((Variant.qscore = (int)(30.0 * del_freq / Variant.DP)) > 30) Variant.qscore = 30;
-				/*if (Variant.qscore >= MinVarConfScore)*/
-				bNormal = false; MyVariantVec.push_back(Variant);
-			}
-			//SUB
-			if (cov >= cov_thr)
-			{
-				vec.clear(); freq_thr = (int)ceil(cov*(bSomatic ? 0.01 : FrequencyThr));
-				if (freq_thr < MinAlleleDepth) freq_thr = MinAlleleDepth;
-
-				if (ref_base != 0 && MappingRecordArr[gPos].A >= freq_thr) vec.push_back(make_pair('A', MappingRecordArr[gPos].A));
-				if (ref_base != 1 && MappingRecordArr[gPos].C >= freq_thr) vec.push_back(make_pair('C', MappingRecordArr[gPos].C));
-				if (ref_base != 2 && MappingRecordArr[gPos].G >= freq_thr) vec.push_back(make_pair('G', MappingRecordArr[gPos].G));
-				if (ref_base != 3 && MappingRecordArr[gPos].T >= freq_thr) vec.push_back(make_pair('T', MappingRecordArr[gPos].T));
+			if (ref_base != 0 && MappingRecordArr[gPos].A >= freq_thr) vec.push_back(make_pair('A', MappingRecordArr[gPos].A));
+			if (ref_base != 1 && MappingRecordArr[gPos].C >= freq_thr) vec.push_back(make_pair('C', MappingRecordArr[gPos].C));
+			if (ref_base != 2 && MappingRecordArr[gPos].G >= freq_thr) vec.push_back(make_pair('G', MappingRecordArr[gPos].G));
+			if (ref_base != 3 && MappingRecordArr[gPos].T >= freq_thr) vec.push_back(make_pair('T', MappingRecordArr[gPos].T));
 				
-				if (vec.size() == 1)
+			if (vec.size() == 1)
+			{
+				Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.DP = (uint16_t)cov; Variant.NS = (uint16_t)vec[0].second;
+				if (vec[0].second >= (cov - freq_thr)) Variant.GenoType = 0; else Variant.GenoType = 1;
+				if ((iPloidy == 1 && Variant.GenoType == 0) || iPloidy == 2)
 				{
-					Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.DP = (uint16_t)cov; Variant.NS = (uint16_t)vec[0].second;
-					if (vec[0].second >= (cov - freq_thr)) Variant.GenoType = 0; else Variant.GenoType = 1;
-					if (iPloidy == 1 && Variant.GenoType == 1) continue;
-					//pthread_mutex_lock(&Lock); ShowVariationProfile(gPos - 5, gPos + 5); pthread_mutex_unlock(&Lock);
 					Variant.ALTstr = vec[0].first;
-					Variant.qscore = bSomatic ? (int)(30 * Variant.NS / (cov*0.05)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)));
-					if (Variant.qscore > 30) Variant.qscore = 30;
-
-					bNormal = false; MyVariantVec.push_back(Variant);
-					
-				}
-				else if (iPloidy >= 2 && vec.size() == 2 && CheckDiploidFrequency(cov, vec))
-				{
-					Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.GenoType = 1; Variant.DP = (uint16_t)cov; Variant.NS = (uint16_t)(vec[0].second + vec[1].second);
-					//pthread_mutex_lock(&Lock);ShowVariationProfile(gPos - 5, gPos + 5); pthread_mutex_unlock(&Lock);
-					Variant.ALTstr.resize(3); Variant.ALTstr[0] = vec[0].first; Variant.ALTstr[1] = ',';  Variant.ALTstr[2] = vec[1].first;
-					Variant.qscore = bSomatic ? (int)(30 * Variant.NS / (cov*0.05)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)));
-					if (Variant.qscore > 30) Variant.qscore = 30;
-
-					bNormal = false; MyVariantVec.push_back(Variant);
-				}
-				else if (iPloidy >= 3 && vec.size() == 3 && CheckTriploidFrequency(cov, vec))
-				{
-					Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.GenoType = 1; Variant.DP = (uint16_t)cov; Variant.NS = (uint16_t)(vec[0].second + vec[1].second + vec[2].second);
-					//pthread_mutex_lock(&Lock);ShowVariationProfile(gPos - 5, gPos + 5); pthread_mutex_unlock(&Lock);
-					Variant.ALTstr.resize(5); Variant.ALTstr[1] = Variant.ALTstr[3] = ',';
-					Variant.ALTstr[0] = vec[0].first; Variant.ALTstr[2] = vec[1].first; Variant.ALTstr[4] = vec[2].first;
-					Variant.qscore = bSomatic ? (int)(30 * Variant.NS / (cov*0.05)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)));
-					if (Variant.qscore > 30) Variant.qscore = 30;
-
+					if ((Variant.qscore = bSomatic ? (int)(30 * Variant.NS / (cov*0.05)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)))) > 30) Variant.qscore = 30;
 					bNormal = false; MyVariantVec.push_back(Variant);
 				}
 			}
-			if (bGVCF && bNormal && cov > 0)
+			else if (iPloidy >= 2 && vec.size() == 2 && CheckDiploidFrequency(cov, vec))
 			{
-				if (MyVariantVec.size() == 0 || MyVariantVec.rbegin()->VarType != var_NOR)
-				{
-					Variant.qscore = 0; Variant.gPos = gPos; Variant.VarType = var_NOR; Variant.DP = Variant.NS = cov; Variant.ALTstr.clear();
-					
-					MyVariantVec.push_back(Variant);
-				}
-				else
-				{
-					if (MyVariantVec.rbegin()->NS > cov) MyVariantVec.rbegin()->NS = (uint16_t)cov;
-				}
+				Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.GenoType = 1; Variant.DP = (uint16_t)cov; Variant.NS = (uint16_t)(vec[0].second + vec[1].second);
+				//pthread_mutex_lock(&Lock);ShowVariationProfile(gPos - 5, gPos + 5); pthread_mutex_unlock(&Lock);
+				Variant.ALTstr.resize(3); Variant.ALTstr[0] = vec[0].first; Variant.ALTstr[1] = ',';  Variant.ALTstr[2] = vec[1].first;
+				if((Variant.qscore = bSomatic ? (int)(30 * Variant.NS / (cov*0.05)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)))) > 30) Variant.qscore = 30;
+				bNormal = false; MyVariantVec.push_back(Variant);
 			}
-			if (bMonomorphic && bNormal && cov > 0)
+			else if (iPloidy >= 3 && vec.size() == 3 && CheckTriploidFrequency(cov, vec))
 			{
-				Variant.qscore = 0; Variant.gPos = gPos; Variant.VarType = var_MON; Variant.DP = cov; Variant.ALTstr.clear(); 
-				Variant.NS = GetRefCount(ref_base, gPos);
+				Variant.gPos = gPos; Variant.VarType = var_SUB; Variant.GenoType = 1; Variant.DP = (uint16_t)cov; Variant.NS = (uint16_t)(vec[0].second + vec[1].second + vec[2].second);
+				//pthread_mutex_lock(&Lock);ShowVariationProfile(gPos - 5, gPos + 5); pthread_mutex_unlock(&Lock);
+				Variant.ALTstr.resize(5); Variant.ALTstr[1] = Variant.ALTstr[3] = ',';
+				Variant.ALTstr[0] = vec[0].first; Variant.ALTstr[2] = vec[1].first; Variant.ALTstr[4] = vec[2].first;
+				if ((Variant.qscore = bSomatic ? (int)(30 * Variant.NS / (cov*0.05)) : (int)(10 * (1.0* Variant.NS / (cov*FrequencyThr)))) > 30) Variant.qscore = 30;
+				bNormal = false; MyVariantVec.push_back(Variant);
+			}
+		}
+		if (bNormal && cov == 0)
+		{
+			if (gap == 0)
+			{
+				//printf("gPos_begin=%lld\n", (long long)gPos);
+				Variant.qscore = 0; Variant.gPos = gPos; Variant.VarType = var_UMR; Variant.DP = Variant.NS = 0; Variant.ALTstr.clear();
 				MyVariantVec.push_back(Variant);
 			}
+			gap++;
+		}
+		if (cov > 0 && gap > 0)
+		{
+			//printf("gPos_end=%lld\n", (long long)gPos-1);
+			gap = 0; Variant.qscore = 0; Variant.gPos = gPos - 1; Variant.VarType = var_UMR; Variant.DP = Variant.NS = 0; Variant.ALTstr.clear();
+			MyVariantVec.push_back(Variant);
+		}
+		if (bGVCF && bNormal && cov > 0)
+		{
+			if (MyVariantVec.size() == 0 || MyVariantVec.rbegin()->VarType != var_NOR)
+			{
+				Variant.qscore = 0; Variant.gPos = gPos; Variant.VarType = var_NOR; Variant.DP = Variant.NS = cov; Variant.ALTstr.clear();
+				MyVariantVec.push_back(Variant);
+			}
+			else
+			{
+				if (MyVariantVec.rbegin()->NS > cov) MyVariantVec.rbegin()->NS = (uint16_t)cov;
+			}
+		}
+		if (bMonomorphic && bNormal && cov > 0)
+		{
+			Variant.qscore = 0; Variant.gPos = gPos; Variant.VarType = var_MON; Variant.DP = cov; Variant.ALTstr.clear(); 
+			Variant.NS = GetRefCount(ref_base, gPos);
+			MyVariantVec.push_back(Variant);
 		}
 	}
 	if ((n = (int)MyVariantVec.size()) > 0)
@@ -668,26 +692,6 @@ void *IdentifyVariants(void *arg)
 		pthread_mutex_lock(&Lock);
 		copy(MyVariantVec.begin(), MyVariantVec.end(), back_inserter(VariantVec)); inplace_merge(VariantVec.begin(), VariantVec.end() - n, VariantVec.end(), CompByVarPos);
 		pthread_mutex_unlock(&Lock);
-	}
-	return (void*)(1);
-}
-
-void *VariantFiltering(void *arg)
-{
-	int64_t gPos;
-	int i, num, tid = *((int*)arg);
-
-	num = (int)VariantVec.size();
-	for (i = tid; i < num; i += iThreadNum)
-	{
-		if (bGVCF && VariantVec[i].VarType == var_NOR) continue;
-
-		gPos = VariantVec[i].gPos;
-		//VariantVec[i].Filter.bad_haplotype = VariantVec[i].Filter.clustered_event = VariantVec[i].Filter.str_contraction = false;
-		VariantVec[i].Filter.q10 = VariantVec[i].qscore < 10 ? true : false;
-		if (bFilter) VariantVec[i].Filter.str_contraction = MappingRecordArr[gPos].multi_hit > (int)(GetProfileColumnSize(MappingRecordArr[gPos])*0.05) ? true : false;
-		//if (bFilter) VariantVec[i].Filter.clustered_event = CheckNearbyVariant(i, num, 100);
-		if (bFilter) VariantVec[i].Filter.bad_haplotype = CheckBadHaplotype(i, num, 100);
 	}
 	return (void*)(1);
 }
@@ -724,14 +728,13 @@ void VariantCalling()
 	for (i = 0; i < iThreadNum; i++) pthread_create(&ThreadArr[i], NULL, IdentifyVariants, &ThrIDarr[i]);
 	for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);
 	if (bGVCF) RemoveConsecutiveGenomicVariant();
-	// Apply filters
-	for (i = 0; i < iThreadNum; i++) pthread_create(&ThreadArr[i], NULL, VariantFiltering, &ThrIDarr[i]);
-	for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);
 
 	// Identify structural variants
 	IdentifyBreakPointCandidates();
 	if (BreakPointCanVec.size() > 0 && InversionSiteVec.size() > 0) IdentifyInversions();
 	if (BreakPointCanVec.size() > 0 && TranslocationSiteVec.size() > 0) IdentifyTranslocations();
+
+	iTotalVarNum = (int)VariantVec.size();
 	fprintf(stderr, "\tWrite all the predicted sample variations to file [%s]...\n", VcfFileName); GenVariantCallingFile();
 
 	fprintf(stderr, "variant calling has been done in %lld seconds.\n", (long long)(time(NULL) - t));

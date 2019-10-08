@@ -2,7 +2,7 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.d";
+const char* VersionStr = "0.9.9.e";
 
 string CmdLine;
 float FrequencyThr;

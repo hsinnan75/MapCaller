@@ -182,14 +182,6 @@ typedef struct
 
 typedef struct
 {
-	bool q10;
-	bool bad_haplotype;
-	bool clustered_event;
-	bool str_contraction;
-} Filter_t;
-
-typedef struct
-{
 	uint16_t NS; // AD (allel depth)
 	uint16_t DP; // total depth
 	int64_t gPos;
@@ -197,7 +189,6 @@ typedef struct
 	bool GenoType; //0:homo, 1:heter
 	uint8_t qscore;
 	uint8_t VarType;
-	Filter_t Filter;
 } Variant_t;
 
 // Global variables

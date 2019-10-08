@@ -132,20 +132,20 @@ To perform variant calling, MapCaller requires the the index files of the refere
 
   ```
 # Changes
-- version 0.9.9.1: Adjusted read depth threshold.
-- version 0.9.9.2: Removed variants which appear in repetitive regions.
-- version 0.9.9.3: Adjusted read depth threshold for somatic mutation detection.
-- version 0.9.9.4: Added variant filters.
-- version 0.9.9.5: Fixed a bug on read count.
-- version 0.9.9.6: Fixed a bug on read count.
-- version 0.9.9.7: Fixed typos and warnings.
-- version 0.9.9.8: Used ksw2 algorithm for gapped alignments and fixed a bug on VCF format output.
-- version 0.9.9.9: Added a new argument(-ploidy) for setting different ploidy.
-- version 0.9.9.a: Fixed a bug on read mapping && Added an option (-dup) to filter out PCR-duplicates.
-- version 0.9.9.b: Added GVCF format (-gvcf).
-- version 0.9.9.c: Added a new argument(-monomorphic) to report all loci which do not have any potential alternates.
-- version 0.9.9.d: Fixed bugs on checking reference nucloetides and reporting deletion events.
-- version 0.9.9.e: Fixed bugs on reporting monomorphic regions and reported unmapped regions (potential deletions).
+- 0.9.9.1: Adjusted read depth threshold.
+- 0.9.9.2: Removed variants which appear in repetitive regions.
+- 0.9.9.3: Adjusted read depth threshold for somatic mutation detection.
+- 0.9.9.4: Added variant filters.
+- 0.9.9.5: Fixed a bug on read count.
+- 0.9.9.6: Fixed a bug on read count.
+- 0.9.9.7: Fixed typos and warnings.
+- 0.9.9.8: Used ksw2 algorithm for gapped alignments and fixed a bug on VCF format output.
+- 0.9.9.9: Added a new argument(-ploidy) for setting different ploidy.
+- 0.9.9.a: Fixed a bug on read mapping && Added an option (-dup) to filter out PCR-duplicates.
+- 0.9.9.b: Added GVCF format (-gvcf).
+- 0.9.9.c: Added a new argument(-monomorphic) to report all loci which do not have any potential alternates.
+- 0.9.9.d: Fixed bugs on checking reference nucloetides and reporting deletion events.
+- 0.9.9.e: Fixed bugs on reporting monomorphic regions and reported unmapped regions (potential deletions).
 
 # Acknowledgements
 We would like to thank Mr. Torsten Seemann for valuable comments.

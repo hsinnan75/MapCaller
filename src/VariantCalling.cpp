@@ -675,13 +675,16 @@ void *IdentifyVariants(void *arg)
 		}
 		if (bNormal && cov == 0)
 		{
-			if (gap == 0)
+			if (MyVariantVec.size() == 0 || MyVariantVec.rbegin()->VarType != var_DEL)
 			{
-				//printf("gPos_begin=%lld\n", (long long)gPos);
-				Variant.qscore = 0; Variant.gPos = gPos; Variant.VarType = var_UMR; Variant.DP = Variant.NS = 0; Variant.ALTstr.clear();
-				MyVariantVec.push_back(Variant);
+				if (gap == 0)
+				{
+					//printf("gPos_begin=%lld\n", (long long)gPos);
+					Variant.qscore = 0; Variant.gPos = gPos; Variant.VarType = var_UMR; Variant.DP = Variant.NS = 0; Variant.ALTstr.clear();
+					MyVariantVec.push_back(Variant);
+				}
+				gap++;
 			}
-			gap++;
 		}
 		if (cov > 0 && gap > 0)
 		{
@@ -745,7 +748,7 @@ void VariantCalling()
 	BlockDepthArr = new int[BlockNum]();
 	for (i = 0; i < iThreadNum; i++) pthread_create(&ThreadArr[i], NULL, CalBlockReadDepth, &ThrIDarr[i]);
 	for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);
-	fprintf(stderr, "Identify all variants...\n"); fflush(stderr);
+	fprintf(stderr, "Identify all variants (min_alt_allele_depth=%d)...\n", MinAlleleDepth); fflush(stderr);
 	//iThreadNum = 1;
 	for (i = 0; i < iThreadNum; i++) pthread_create(&ThreadArr[i], NULL, IdentifyVariants, &ThrIDarr[i]);
 	for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);

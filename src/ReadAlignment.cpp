@@ -400,7 +400,8 @@ bool ProduceReadAlignment(ReadItem_t& read)
 		{
 			iter->score = EvaluateAlignmentScore(iter->FragPairVec);
 			if (iter->score == 0) continue;
-			if (iter->score < (int)(read.rlen*0.95) && FindMisMatchNumber(iter->FragPairVec) > (int)(read.rlen*0.05)) iter->score = 0;
+			//if (iter->score < (int)(read.rlen*0.95) && FindMisMatchNumber(iter->FragPairVec) > (int)(read.rlen*0.05)) iter->score = 0;
+			if (FindMisMatchNumber(iter->FragPairVec) > MaxMisMatches) iter->score = 0;
 			else
 			{
 				iter->orientation = (iter->FragPairVec[0].gPos < GenomeSize ? true : false);
@@ -416,25 +417,22 @@ bool ProduceReadAlignment(ReadItem_t& read)
 		}
 	}
 	for (iter = read.AlnCanVec.begin(); iter != read.AlnCanVec.end(); iter++) if (iter->score < read.AlnSummary.score) iter->score = 0;
-	//if (ObserveBegPos != -1)
-	//{
-	//	for (iter = read.AlnCanVec.begin(); iter != read.AlnCanVec.end(); iter++)
-	//	{
-	//		//Display alignments
-	//		if (iter->score == 0) continue;
-	//		Coordinate_t coor = GetAlnCoordinate(iter->FragPairVec.begin()->gPos < GenomeSize ? true : false, iter->FragPairVec);
-	//		if (coor.ChromosomeIdx == 0 && coor.gPos >= ObserveBegPos && coor.gPos + read.rlen < ObserveEndPos)
-	//		{
-	//			//Display alignments
-	//			//pthread_mutex_lock(&Lock);
-	//			if (iter->orientation) printf("StartPos=%lld\n", iter->FragPairVec.begin()->gPos);
-	//			else printf("StartPos=%lld\n", TwoGenomeSize - (iter->FragPairVec.begin()->gPos + iter->FragPairVec.begin()->gLen));
-
-	//			printf("read: %s, score=%d (%d/%d) len=%d, PairedIdx=%d\n\n", read.header, iter->score, read.AlnSummary.score, read.AlnSummary.sub_score, read.rlen, iter->PairedAlnCanIdx);
-	//			ShowSimplePairInfo(iter->FragPairVec);
-	//			//pthread_mutex_unlock(&Lock);
-	//		}
-	//	}
-	//}
+	if (ObserveBegPos != -1)
+	{
+		for (iter = read.AlnCanVec.begin(); iter != read.AlnCanVec.end(); iter++)
+		{
+			//Display alignments
+			if (iter->score == 0) continue;
+			Coordinate_t coor = GetAlnCoordinate(iter->FragPairVec.begin()->gPos < GenomeSize ? true : false, iter->FragPairVec);
+			if (coor.ChromosomeIdx == 0 && coor.gPos >= ObserveBegPos && coor.gPos + read.rlen < ObserveEndPos)
+			{
+				//Display alignments
+				//pthread_mutex_lock(&Lock);
+				printf("read: %s, score=%d (%d/%d) len=%d, PairedIdx=%d\n\n", read.header, iter->score, read.AlnSummary.score, read.AlnSummary.sub_score, read.rlen, iter->PairedAlnCanIdx);
+				ShowSimplePairInfo(iter->FragPairVec);
+				//pthread_mutex_unlock(&Lock);
+			}
+		}
+	}
 	return (read.AlnSummary.score > 0);
 }

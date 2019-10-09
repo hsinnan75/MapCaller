@@ -2,7 +2,7 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.15";
+const char* VersionStr = "0.9.9.16";
 
 string CmdLine;
 float FrequencyThr;
@@ -12,7 +12,7 @@ MappingRecord_t* MappingRecordArr = NULL;
 vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
-int iThreadNum, iPloidy, FragmentSize, MinAlleleDepth, MinIndFreq, MinVarConfScore;
+int iThreadNum, iPloidy, FragmentSize, MaxMisMatches, MinAlleleDepth, MinIndFreq, MinVarConfScore;
 bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bGVCF, bMonomorphic, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
 
 void ShowProgramUsage(const char* program)
@@ -26,7 +26,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -size         Sequencing fragment size [%d]\n", FragmentSize);
 	fprintf(stderr, "         -ad INT       Minimal ALT allele count [%d]\n", MinAlleleDepth);
 	fprintf(stderr, "         -dup INT      Maximal PCR duplicates [%d]\n", iMaxDuplicate);
-	//fprintf(stderr, "         -freq FLOAT   Minimal ALT allele frequency [%.2f]\n", FrequencyThr);
+	fprintf(stderr, "         -maxmm INT    Maximal mismatches in read alignment [%d]\n", MaxMisMatches);
 	fprintf(stderr, "         -sam          SAM output filename [NULL]\n");
 	fprintf(stderr, "         -bam          BAM output filename [NULL]\n");
 	fprintf(stderr, "         -alg STR      gapped alignment algorithm (option: nw|ksw2)\n");
@@ -136,16 +136,15 @@ int main(int argc, char* argv[])
 	bMonomorphic = false;
 
 	MinIndFreq = 5;
+	MaxMisMatches = 5;
 	iMaxDuplicate = 5;
 	FragmentSize = 500;
-	MinAlleleDepth = 10;
+	MinAlleleDepth = 5;
 	FrequencyThr = 0.2;
 	MinVarConfScore = 10;
-	ObservGenomicPos = -1;
-	ObserveBegPos = -1;
-	ObserveEndPos = -1;
 	VcfFileName = (char*)"output.vcf";
 	RefSequence = IndexFileName = SamFileName = NULL;
+	ObservGenomicPos = ObserveBegPos = ObserveEndPos = -1;
 
 	if (argc == 1 || strcmp(argv[1], "-h") == 0) ShowProgramUsage(argv[0]);
 	else if (strcmp(argv[1], "update") == 0)
@@ -219,7 +218,7 @@ int main(int argc, char* argv[])
 				if (str == "ksw2") NW_ALG = false;
 				else NW_ALG = true; //nw
 			}
-			//else if (parameter == "-freq" && i + 1 < argc) FrequencyThr = atof(argv[++i]);
+			else if (parameter == "-maxmm" && i + 1 < argc) MaxMisMatches = atof(argv[++i]);
 			else if (parameter == "-vcf" && i + 1 < argc) VcfFileName = argv[++i];
 			else if (parameter == "-gvcf") bGVCF = true;
 			else if (parameter == "-monomorphic") bMonomorphic = true;

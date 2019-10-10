@@ -586,6 +586,7 @@ void *ReadMapping(void *arg)
 			{
 				SimplePairVec = IdentifySimplePairs(ReadArr[i].rlen, ReadArr[i].EncodeSeq);
 				ReadArr[i].AlnCanVec = SimplePairClustering(ReadArr[i].rlen, SimplePairVec);
+				ReadArr[i].AlnSummary = AlnSummary;
 				//ShowFragPairCluster(ReadArr[i].AlnCanVec);
 				RemoveRedundantAlnCan(ReadArr[i].AlnCanVec); 
 				if (ProduceReadAlignment(ReadArr[i])) MappedNum++;

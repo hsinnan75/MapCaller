@@ -2,7 +2,7 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.17";
+const char* VersionStr = "0.9.9.18";
 
 string CmdLine;
 float FrequencyThr;
@@ -12,7 +12,7 @@ MappingRecord_t* MappingRecordArr = NULL;
 vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
-int iThreadNum, iPloidy, FragmentSize, MaxMisMatches, MinAlleleDepth, MinIndFreq, MinVarConfScore;
+int iThreadNum, iPloidy, FragmentSize, MaxMisMatches, MaxClipSize, MinAlleleDepth, MinIndFreq, MinVarConfScore, MinUnmappedSize;
 bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bGVCF, bMonomorphic, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
 
 void ShowProgramUsage(const char* program)
@@ -23,16 +23,18 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -f            files with #1 mates reads (format:fa, fq, fq.gz)\n");
 	fprintf(stderr, "         -f2           files with #2 mates reads (format:fa, fq, fq.gz)\n");
 	fprintf(stderr, "         -t INT        number of threads [%d]\n", iThreadNum);
-	fprintf(stderr, "         -size         Sequencing fragment size [%d]\n", FragmentSize);
-	fprintf(stderr, "         -ad INT       Minimal ALT allele count [%d]\n", MinAlleleDepth);
-	fprintf(stderr, "         -dup INT      Maximal PCR duplicates [%d]\n", iMaxDuplicate);
-	fprintf(stderr, "         -maxmm INT    Maximal mismatches in read alignment [%d]\n", MaxMisMatches);
+	fprintf(stderr, "         -size         sequencing fragment size [%d]\n", FragmentSize);
+	fprintf(stderr, "         -ad INT       minimal ALT allele count [%d]\n", MinAlleleDepth);
+	fprintf(stderr, "         -dup INT      maximal PCR duplicates [%d]\n", iMaxDuplicate);
+	fprintf(stderr, "         -maxmm INT    maximal mismatches in read alignment [%d]\n", MaxMisMatches);
+	fprintf(stderr, "         -maxclip INT  maximal clip size at either ends [%d]\n", MaxClipSize);
 	fprintf(stderr, "         -sam          SAM output filename [NULL]\n");
 	fprintf(stderr, "         -bam          BAM output filename [NULL]\n");
 	fprintf(stderr, "         -alg STR      gapped alignment algorithm (option: nw|ksw2)\n");
 	fprintf(stderr, "         -vcf          VCF output filename [%s]\n", VcfFileName);
 	fprintf(stderr, "         -gvcf         GVCF mode [false]\n");
-	fprintf(stderr, "         -monomorphic  Report all loci which do not have any potential alternates.\n");
+	fprintf(stderr, "         -monomorphic  report all loci which do not have any potential alternates.\n");
+	fprintf(stderr, "         -min_gap INT  the minimal gap(unmapped) size to be reported [%d].\n", MinUnmappedSize);
 	fprintf(stderr, "         -ploidy INT   number of sets of chromosomes in a cell (1:monoploid, 2:diploid) [%d]\n", iPloidy);
 	fprintf(stderr, "         -m            output multiple alignments\n");
 	fprintf(stderr, "         -somatic      detect somatic mutations [false]\n");
@@ -136,12 +138,14 @@ int main(int argc, char* argv[])
 	bMonomorphic = false;
 
 	MinIndFreq = 5;
+	MaxClipSize = 5;
 	MaxMisMatches = 5;
 	iMaxDuplicate = 5;
 	FragmentSize = 500;
 	MinAlleleDepth = 5;
 	FrequencyThr = 0.2;
 	MinVarConfScore = 10;
+	MinUnmappedSize = 50;
 	VcfFileName = (char*)"output.vcf";
 	RefSequence = IndexFileName = SamFileName = NULL;
 	ObservGenomicPos = ObserveBegPos = ObserveEndPos = -1;
@@ -218,7 +222,9 @@ int main(int argc, char* argv[])
 				if (str == "ksw2") NW_ALG = false;
 				else NW_ALG = true; //nw
 			}
-			else if (parameter == "-maxmm" && i + 1 < argc) MaxMisMatches = atof(argv[++i]);
+			else if (parameter == "-maxmm" && i + 1 < argc) MaxMisMatches = atoi(argv[++i]);
+			else if (parameter == "-maxclip" && i + 1 < argc) MaxClipSize = atoi(argv[++i]);
+			else if (parameter == "-min_gap" && i + 1 < argc) MinUnmappedSize = atoi(argv[++i]);
 			else if (parameter == "-vcf" && i + 1 < argc) VcfFileName = argv[++i];
 			else if (parameter == "-gvcf") bGVCF = true;
 			else if (parameter == "-monomorphic") bMonomorphic = true;

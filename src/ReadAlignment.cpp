@@ -367,6 +367,8 @@ bool ProduceReadAlignment(ReadItem_t& read)
 						//printf("read:%s\n", read.header); ShowSimplePairInfo(iter->FragPairVec);
 						bTail = false;
 						iter->FragPairVec[i].rLen = iter->FragPairVec[i].gLen = 0;
+						iter->FragPairVec[i].rPos = iter->FragPairVec[i - 1].rPos + iter->FragPairVec[i - 1].rLen;
+						iter->FragPairVec[i].gPos = iter->FragPairVec[i - 1].gPos + iter->FragPairVec[i - 1].gLen;
 						iter->FragPairVec[i].aln1.clear(); iter->FragPairVec[i].aln2.clear();
 					}
 				}
@@ -398,10 +400,12 @@ bool ProduceReadAlignment(ReadItem_t& read)
 		else if (!bHead && !bTail) iter->score = 0;
 		else
 		{
+			//printf("%d %d\n", iter->FragPairVec.begin()->rPos, iter->FragPairVec.rbegin()->rPos + iter->FragPairVec.rbegin()->rLen);
 			iter->score = EvaluateAlignmentScore(iter->FragPairVec);
 			if (iter->score == 0) continue;
 			//if (iter->score < (int)(read.rlen*0.95) && FindMisMatchNumber(iter->FragPairVec) > (int)(read.rlen*0.05)) iter->score = 0;
 			if (FindMisMatchNumber(iter->FragPairVec) > MaxMisMatches) iter->score = 0;
+			else if (iter->FragPairVec.begin()->rPos > MaxClipSize || (read.rlen - (iter->FragPairVec.rbegin()->rPos + iter->FragPairVec.rbegin()->rLen)) > MaxClipSize) iter->score = 0;
 			else
 			{
 				iter->orientation = (iter->FragPairVec[0].gPos < GenomeSize ? true : false);

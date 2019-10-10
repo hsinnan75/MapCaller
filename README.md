@@ -163,6 +163,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - 0.9.9.15: Fixed errors on VCF headers.
 - 0.9.9.16: Added a new argument (-maxmm) for setting maximal mismatches in read alignment.
 - 0.9.9.17: Updated VCF flags and format.
+- 0.9.9.18: Fixed bugs && Added a new argument (-maxclip) for setting maximal clip size in read alignment.
 
 # Acknowledgements
 We would like to thank [A/Prof. Torsten Seemann](https://github.com/tseemann) for valuable comments.

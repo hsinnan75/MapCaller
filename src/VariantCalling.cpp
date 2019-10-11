@@ -638,7 +638,7 @@ void *IdentifyVariants(void *arg)
 		if (del_freq >= del_thr)
 		{
 			Variant.gPos = gPos; Variant.VarType = var_DEL; Variant.DP = BlockDepthArr[(int)(gPos / BlockSize)]; Variant.AD = del_freq;
-			if (Variant.DP < Variant.AD) Variant.DP = Variant.AD; Variant.ALTstr = del_str;
+			if (Variant.DP < Variant.AD) Variant.DP = Variant.AD; Variant.ALTstr = del_str; Variant.ALTstr.resize((n = (int)del_str.length())); //strncpy((char*)Variant.ALTstr.c_str(), RefSequence + gPos + 1, n);
 			Variant.GenoType = DetermineGenotype(cov, Variant.AD, 1);
 			if ((Variant.qscore = (int)(30.0 * del_freq / Variant.DP)) > 30) Variant.qscore = 30;
 			bNormal = false; MyVariantVec.push_back(Variant);

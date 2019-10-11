@@ -101,10 +101,14 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 				else if (iter->FragPairVec[i].gLen == 0) // ins
 				{
 					InsertSeqMap[gPos - 1][iter->FragPairVec[i].aln1]++;
+					//printf("%lld: %s\n", gPos - 1, iter->FragPairVec[i].aln1.c_str());
+					//ShowSimplePairInfo(iter->FragPairVec);
 				}
 				else if (iter->FragPairVec[i].rLen == 0) // del
 				{
 					DeleteSeqMap[gPos-1][iter->FragPairVec[i].aln2]++;
+					//printf("%lld: %s\n", (long long)(gPos - 1), iter->FragPairVec[i].aln2.c_str());
+					//ShowSimplePairInfo(iter->FragPairVec);
 				}
 				else
 				{
@@ -115,6 +119,8 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 							ext_len = 1; while (iter->FragPairVec[i].aln2[j + ext_len] == '-') ext_len++;
 							IndSeq = iter->FragPairVec[i].aln1.substr(j, ext_len);
 							InsertSeqMap[gPos - 1][IndSeq]++;
+							//printf("%lld: %s\n", gPos - 1, IndSeq.c_str());
+							//ShowSimplePairInfo(iter->FragPairVec);
 							j += ext_len; rPos += ext_len;
 						}
 						else if (iter->FragPairVec[i].aln1[j] == '-') // del
@@ -122,6 +128,8 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 							ext_len = 1; while (iter->FragPairVec[i].aln1[j + ext_len] == '-') ext_len++;
 							IndSeq = iter->FragPairVec[i].aln2.substr(j, ext_len);
 							DeleteSeqMap[gPos-1][IndSeq]++;
+							//printf("%lld: %s\n", (long long)(gPos - 1), IndSeq.c_str());
+							//ShowSimplePairInfo(iter->FragPairVec);
 							j += ext_len; gPos += ext_len;
 						}
 						else
@@ -159,33 +167,40 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 				}
 				else if (iter->FragPairVec[i].gLen == 0) // ins
 				{
-					gPos = TwoGenomeSize - 1 - iter->FragPairVec[i].gPos;
-					InsertSeqMap[gPos][iter->FragPairVec[i].aln1]++;
+					gPos = TwoGenomeSize - iter->FragPairVec[i].gPos;
+					InsertSeqMap[gPos - 1][iter->FragPairVec[i].aln1]++;
+					//printf("%lld: %s\n", gPos - 1, iter->FragPairVec[i].aln1.c_str());
+					//ShowSimplePairInfo(iter->FragPairVec);
 				}
 				else if (iter->FragPairVec[i].rLen == 0) // del
 				{
 					gPos = (TwoGenomeSize - iter->FragPairVec[i].gPos - iter->FragPairVec[i].gLen);
-					DeleteSeqMap[gPos][iter->FragPairVec[i].aln2]++;
+					DeleteSeqMap[gPos - 1][iter->FragPairVec[i].aln2]++;
+					//printf("%lld: %s\n", (long long)(gPos - 1), iter->FragPairVec[i].aln2.c_str());
+					//ShowSimplePairInfo(iter->FragPairVec);
 				}
 				else
 				{
 					rPos = read->rlen - (iter->FragPairVec[i].rPos + iter->FragPairVec[i].rLen);
 					gPos = TwoGenomeSize - (iter->FragPairVec[i].gPos + iter->FragPairVec[i].gLen);
-
 					for (frag_len = (int)iter->FragPairVec[i].aln1.length(), j = 0; j < frag_len;)
 					{
 						if (iter->FragPairVec[i].aln2[j] == '-') // ins
 						{
 							ext_len = 1; while (iter->FragPairVec[i].aln2[j + ext_len] == '-') ext_len++;
 							IndSeq = iter->FragPairVec[i].aln1.substr(j, ext_len);
-							InsertSeqMap[gPos][IndSeq]++;
+							InsertSeqMap[gPos - 1][IndSeq]++;
+							//printf("%lld: %s\n", (long long)(gPos - 1), IndSeq.c_str());
+							//ShowSimplePairInfo(iter->FragPairVec);
 							j += ext_len; rPos += ext_len;
 						}
 						else if (iter->FragPairVec[i].aln1[j] == '-') // del
 						{
 							ext_len = 1; while (iter->FragPairVec[i].aln1[j + ext_len] == '-') ext_len++;
 							IndSeq = iter->FragPairVec[i].aln2.substr(j, ext_len);
-							DeleteSeqMap[gPos][IndSeq]++;
+							DeleteSeqMap[gPos - 1][IndSeq]++;
+							//printf("%lld: %s\n", (long long)(gPos - 1), IndSeq.c_str());
+							//ShowSimplePairInfo(iter->FragPairVec);
 							j += ext_len; gPos += ext_len;
 						}
 						else

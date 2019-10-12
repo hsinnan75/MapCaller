@@ -59,7 +59,7 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 				if (gPos < GenomeSize) BreakPointMap[gPos]++;
 				else BreakPointMap[(TwoGenomeSize - 1 - gPos)]++;
 			}
-			continue;
+			if (iter->FragPairVec.begin()->rPos > MaxClipSize) continue;
 		}
 		if (iter->FragPairVec.rbegin()->rLen == 0 && iter->FragPairVec.rbegin()->gLen == 0)
 		{
@@ -69,8 +69,9 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 				if (gPos < GenomeSize) BreakPointMap[gPos]++;
 				else BreakPointMap[TwoGenomeSize - 1 - gPos]++;
 			}
-			continue;
+			if ((read->rlen - iter->FragPairVec.rbegin()->rPos) > MaxClipSize) continue;
 		}
+		//if (iter->FragPairVec.begin()->rPos > MaxClipSize || (read->rlen - iter->FragPairVec.rbegin()->rPos - iter->FragPairVec.rbegin()->rLen) > MaxClipSize) continue;
 		//if (bSomatic && CheckMismatch(iter->FragPairVec) > 2) continue;
 		//if (bSomatic && iter->PairedAlnCanIdx == -1) continue;
 

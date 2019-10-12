@@ -323,10 +323,8 @@ bool ProduceReadAlignment(ReadItem_t& read)
 		}
 		//if (CheckAlnCanCoverage(read.rlen, iter->FragPairVec) == false)
 		//{
-		//	pthread_mutex_lock(&Lock);
 		//	printf("read: %s\n", read.header);
 		//	ShowSimplePairInfo(iter->FragPairVec);
-		//	pthread_mutex_unlock(&Lock);
 		//	iter->score = 0;
 		//	continue;
 		//}
@@ -335,7 +333,6 @@ bool ProduceReadAlignment(ReadItem_t& read)
 		//	printf("Process aln_can#%d: score=%d\n", iter - read.AlnCanVec.begin() + 1, iter->score);
 		//	ShowSimplePairInfo(iter->FragPairVec);
 		//}
-		//bQualityCheck = read.rlen < 150 ? true : false;
 		bHead = bTail = true; FragPairNum = (int)iter->FragPairVec.size(), TailIdx = FragPairNum - 1;
 		for (i = 0; i < FragPairNum; i++)
 		{
@@ -347,7 +344,7 @@ bool ProduceReadAlignment(ReadItem_t& read)
 					if(iter->FragPairVec[i].gPos < GenomeSize) RemoveHeadingGaps(true, iter->FragPairVec[i]);
 					else RemoveTailingGaps(true, iter->FragPairVec[i]);
 
-					if ((int)iter->FragPairVec[i].aln1.length() >= MaxClipSize && CheckLocalAlignmentQuality(iter->FragPairVec[i]) == false)
+					if ((int)iter->FragPairVec[i].aln1.length() >= MinAlnBlcokSize && CheckLocalAlignmentQuality(iter->FragPairVec[i]) == false)
 					{
 						//printf("read:%s\n", read.header); ShowSimplePairInfo(iter->FragPairVec);
 						bHead = false;
@@ -362,7 +359,7 @@ bool ProduceReadAlignment(ReadItem_t& read)
 					if (iter->FragPairVec[i].gPos < GenomeSize) RemoveTailingGaps(false, iter->FragPairVec[i]);
 					else RemoveHeadingGaps(false, iter->FragPairVec[i]);
 
-					if ((int)iter->FragPairVec[i].aln1.length() >= MaxClipSize && CheckLocalAlignmentQuality(iter->FragPairVec[i]) == false)
+					if ((int)iter->FragPairVec[i].aln1.length() >= MinAlnBlcokSize && CheckLocalAlignmentQuality(iter->FragPairVec[i]) == false)
 					{
 						//printf("read:%s\n", read.header); ShowSimplePairInfo(iter->FragPairVec);
 						bTail = false;
@@ -405,7 +402,6 @@ bool ProduceReadAlignment(ReadItem_t& read)
 			if (iter->score == 0) continue;
 			//if (iter->score < (int)(read.rlen*0.95) && FindMisMatchNumber(iter->FragPairVec) > (int)(read.rlen*0.05)) iter->score = 0;
 			if (FindMisMatchNumber(iter->FragPairVec) > MaxMisMatches) iter->score = 0;
-			//if (iter->FragPairVec.begin()->rPos > MaxClipSize || (read.rlen - (iter->FragPairVec.rbegin()->rPos + iter->FragPairVec.rbegin()->rLen)) > MaxClipSize) iter->score = 0;
 			else
 			{
 				iter->orientation = (iter->FragPairVec[0].gPos < GenomeSize ? true : false);

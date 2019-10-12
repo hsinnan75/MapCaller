@@ -347,7 +347,7 @@ bool ProduceReadAlignment(ReadItem_t& read)
 					if(iter->FragPairVec[i].gPos < GenomeSize) RemoveHeadingGaps(true, iter->FragPairVec[i]);
 					else RemoveTailingGaps(true, iter->FragPairVec[i]);
 
-					if (iter->FragPairVec[i].aln1.length() >= MinAlnBlcokSize && CheckLocalAlignmentQuality(iter->FragPairVec[i]) == false)
+					if ((int)iter->FragPairVec[i].aln1.length() >= MaxClipSize && CheckLocalAlignmentQuality(iter->FragPairVec[i]) == false)
 					{
 						//printf("read:%s\n", read.header); ShowSimplePairInfo(iter->FragPairVec);
 						bHead = false;
@@ -362,7 +362,7 @@ bool ProduceReadAlignment(ReadItem_t& read)
 					if (iter->FragPairVec[i].gPos < GenomeSize) RemoveTailingGaps(false, iter->FragPairVec[i]);
 					else RemoveHeadingGaps(false, iter->FragPairVec[i]);
 
-					if (iter->FragPairVec[i].aln1.length() >= MinAlnBlcokSize && CheckLocalAlignmentQuality(iter->FragPairVec[i]) == false)
+					if ((int)iter->FragPairVec[i].aln1.length() >= MaxClipSize && CheckLocalAlignmentQuality(iter->FragPairVec[i]) == false)
 					{
 						//printf("read:%s\n", read.header); ShowSimplePairInfo(iter->FragPairVec);
 						bTail = false;
@@ -405,7 +405,7 @@ bool ProduceReadAlignment(ReadItem_t& read)
 			if (iter->score == 0) continue;
 			//if (iter->score < (int)(read.rlen*0.95) && FindMisMatchNumber(iter->FragPairVec) > (int)(read.rlen*0.05)) iter->score = 0;
 			if (FindMisMatchNumber(iter->FragPairVec) > MaxMisMatches) iter->score = 0;
-			else if (iter->FragPairVec.begin()->rPos > MaxClipSize || (read.rlen - (iter->FragPairVec.rbegin()->rPos + iter->FragPairVec.rbegin()->rLen)) > MaxClipSize) iter->score = 0;
+			//if (iter->FragPairVec.begin()->rPos > MaxClipSize || (read.rlen - (iter->FragPairVec.rbegin()->rPos + iter->FragPairVec.rbegin()->rLen)) > MaxClipSize) iter->score = 0;
 			else
 			{
 				iter->orientation = (iter->FragPairVec[0].gPos < GenomeSize ? true : false);

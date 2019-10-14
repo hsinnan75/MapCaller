@@ -92,10 +92,10 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 					{
 						switch (read->seq[rPos])
 						{
-						case 'A': if (MappingRecordArr[gPos].A < MaxAlleleCount) MappingRecordArr[gPos].A++; break;
-						case 'C': if (MappingRecordArr[gPos].C < MaxAlleleCount) MappingRecordArr[gPos].C++; break;
-						case 'G': if (MappingRecordArr[gPos].G < MaxAlleleCount) MappingRecordArr[gPos].G++; break;
-						case 'T': if (MappingRecordArr[gPos].T < MaxAlleleCount) MappingRecordArr[gPos].T++; break;
+						case 'A': MappingRecordArr[gPos].A++; break;
+						case 'C': MappingRecordArr[gPos].C++; break;
+						case 'G': MappingRecordArr[gPos].G++; break;
+						case 'T': MappingRecordArr[gPos].T++; break;
 						}
 					}
 				}
@@ -137,10 +137,10 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 						{
 							switch (iter->FragPairVec[i].aln1[j])
 							{
-							case 'A': if (MappingRecordArr[gPos].A < MaxAlleleCount) MappingRecordArr[gPos].A++; break;
-							case 'C': if (MappingRecordArr[gPos].C < MaxAlleleCount) MappingRecordArr[gPos].C++; break;
-							case 'G': if (MappingRecordArr[gPos].G < MaxAlleleCount) MappingRecordArr[gPos].G++; break;
-							case 'T': if (MappingRecordArr[gPos].T < MaxAlleleCount) MappingRecordArr[gPos].T++; break;
+							case 'A': MappingRecordArr[gPos].A++; break;
+							case 'C': MappingRecordArr[gPos].C++; break;
+							case 'G': MappingRecordArr[gPos].G++; break;
+							case 'T': MappingRecordArr[gPos].T++; break;
 							}
 							j++; rPos++; gPos++;
 						}
@@ -159,10 +159,10 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 					{
 						switch (read->seq[rPos])
 						{
-						case 'A': if (MappingRecordArr[gPos].T < MaxAlleleCount) MappingRecordArr[gPos].T++; break;
-						case 'C': if (MappingRecordArr[gPos].G < MaxAlleleCount) MappingRecordArr[gPos].G++; break;
-						case 'G': if (MappingRecordArr[gPos].C < MaxAlleleCount) MappingRecordArr[gPos].C++; break;
-						case 'T': if (MappingRecordArr[gPos].A < MaxAlleleCount) MappingRecordArr[gPos].A++; break;
+						case 'A': MappingRecordArr[gPos].T++; break;
+						case 'C': MappingRecordArr[gPos].G++; break;
+						case 'G': MappingRecordArr[gPos].C++; break;
+						case 'T': MappingRecordArr[gPos].A++; break;
 						}
 					}
 				}
@@ -208,10 +208,10 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 						{
 							switch (iter->FragPairVec[i].aln1[j])
 							{
-							case 'A': if (MappingRecordArr[gPos].A < MaxAlleleCount) MappingRecordArr[gPos].A++; break;
-							case 'C': if (MappingRecordArr[gPos].C < MaxAlleleCount) MappingRecordArr[gPos].C++; break;
-							case 'G': if (MappingRecordArr[gPos].G < MaxAlleleCount) MappingRecordArr[gPos].G++; break;
-							case 'T': if (MappingRecordArr[gPos].T < MaxAlleleCount) MappingRecordArr[gPos].T++; break;
+							case 'A': MappingRecordArr[gPos].A++; break;
+							case 'C': MappingRecordArr[gPos].C++; break;
+							case 'G': MappingRecordArr[gPos].G++; break;
+							case 'T': MappingRecordArr[gPos].T++; break;
 							}
 							j++; rPos++; gPos++;
 						}

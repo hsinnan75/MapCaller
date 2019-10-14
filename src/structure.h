@@ -153,13 +153,13 @@ typedef struct
 
 typedef struct
 {
-	//uint16_t A;
-	//uint16_t C;
-	//uint16_t G;
-	//uint16_t T;
-	//uint8_t readCount;
-	//uint8_t multi_hit;
-	uint64_t A : 12, C : 12, G : 12, T : 12, multi_hit : 12, readCount : 4;
+	uint16_t A;
+	uint16_t C;
+	uint16_t G;
+	uint16_t T;
+	uint8_t readCount;
+	uint8_t multi_hit;
+	//uint64_t A : 12, C : 12, G : 12, T : 12, multi_hit : 12, readCount : 4;
 } MappingRecord_t;
 
 typedef struct

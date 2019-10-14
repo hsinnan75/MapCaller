@@ -759,7 +759,7 @@ void Mapping()
 		}
 	}
 	fprintf(stderr, "\rAll the %lld %s reads have been processed in %lld seconds.\n", (long long)iTotalReadNum, (bPairEnd ? "paired-end" : "single-end"), (long long)(time(NULL) - StartProcessTime));
-	if (iTotalReadNum > 0) fprintf(stderr, "%12lld (%6.2f%%) reads are mapped to the reference genome.\n", (long long)iTotalMappingNum, (int)(10000 * (1.0*iTotalMappingNum / iTotalReadNum) + 0.00005) / 100.0);
+	if (iTotalReadNum > 0) fprintf(stderr, "%12lld (%6.2f%%) reads are mapped properly.\n", (long long)iTotalMappingNum, (int)(10000 * (1.0*iTotalMappingNum / iTotalReadNum) + 0.00005) / 100.0);
 	if (iTotalReadNum > 0 && iTotalPairedNum > 0) fprintf(stderr, "%12lld (%6.2f%%) reads are mapped in pairs.\n", (long long)(iTotalPairedNum << 1), (int)(10000 * (1.0*(iTotalPairedNum << 1) / iTotalReadNum) + 0.00005) / 100.0);
 	if (bSAMoutput)
 	{
@@ -774,7 +774,6 @@ void Mapping()
 		avgCov = (int)(1.0*iTotalCoverage / iAlignedBase + .5); if (avgCov < 0) avgCov = 0;
 		fprintf(stderr, "\tEstimated AvgCoverage = %d\n", avgCov);
 	}
-	else avgCov = 0;
 	if (bVCFoutput) ReportDuplicationRate();
 	if (iTotalReadNum > 0 && iTotalPairedNum > 0)
 	{

@@ -165,6 +165,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - 0.9.9.17: Updated VCF flags and format.
 - 0.9.9.18: Fixed bugs && Added a new argument (-maxclip) for setting maximal clip size in read alignment.
 - 0.9.9.19: Fixed a bug on the determination of deletion locus.
+- 0.9.9.20: Reported CNV (N>=2) regions with the flag "DUP" (experimental).
 
 # Acknowledgements
 We would like to thank [A/Prof. Torsten Seemann](https://github.com/tseemann) for valuable comments.

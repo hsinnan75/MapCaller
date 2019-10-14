@@ -23,6 +23,7 @@
 #define MaxPosDiff 30
 #define MinSeedLength 16
 #define ReadChunkSize 4000
+#define MaxAlleleCount 4095
 
 using namespace std;
 
@@ -152,12 +153,13 @@ typedef struct
 
 typedef struct
 {
-	uint16_t A;
-	uint16_t C;
-	uint16_t G;
-	uint16_t T;
-	uint8_t readCount;
-	uint16_t multi_hit;
+	//uint16_t A;
+	//uint16_t C;
+	//uint16_t G;
+	//uint16_t T;
+	//uint8_t readCount;
+	//uint8_t multi_hit;
+	uint64_t A : 12, C : 12, G : 12, T : 12, multi_hit : 12, readCount : 4;
 } MappingRecord_t;
 
 typedef struct
@@ -209,7 +211,7 @@ extern vector<string> ReadFileNameVec1, ReadFileNameVec2;
 extern char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
 extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bGVCF, bMonomorphic, bSomatic, NW_ALG;
-extern int iThreadNum, iPloidy, iChromsomeNum, MaxMisMatches, MaxClipSize, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleDepth, MinIndFreq, MinUnmappedSize, MinVarConfScore;
+extern int iThreadNum, iPloidy, iChromsomeNum, MaxMisMatches, MaxClipSize, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleDepth, MinIndFreq, MinCNVsize, MinUnmappedSize, MinVarConfScore;
 
 extern vector<DiscordPair_t> InversionSiteVec, TranslocationSiteVec;
 extern map<int64_t, map<string, uint16_t> > InsertSeqMap, DeleteSeqMap;

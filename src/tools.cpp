@@ -184,7 +184,7 @@ int GetProfileColumnSize(MappingRecord_t& Profile)
 void ShowProfileColumn(int64_t gPos)
 {
 	int cov = GetProfileColumnSize(MappingRecordArr[gPos]) + MappingRecordArr[gPos].multi_hit;
-	printf("%lld[%c]: cov=%d [A=%d C=%d G=%d T=%d] dup=%d\n", (long long)gPos, RefSequence[gPos], cov, MappingRecordArr[gPos].A, MappingRecordArr[gPos].C, MappingRecordArr[gPos].G, MappingRecordArr[gPos].T, MappingRecordArr[gPos].multi_hit);
+	printf("%lld[%c]: cov=%d [A=%d C=%d G=%d T=%d] dup=%d\n", (long long)gPos, RefSequence[gPos], cov, (int)MappingRecordArr[gPos].A, (int)MappingRecordArr[gPos].C, (int)MappingRecordArr[gPos].G, (int)MappingRecordArr[gPos].T, (int)MappingRecordArr[gPos].multi_hit);
 }
 
 void ShowVariationProfile(int64_t begin_pos, int64_t end_pos)

@@ -220,7 +220,8 @@ void ShowMetaInfo()
 	fprintf(outFile, "##INFO=<ID=TYPE,Number=1,Type=String,Description=\"The type of allele, either snv, ins, del, or BP(breakpoint).\">\n");
 	if (bGVCF) fprintf(outFile, "##INFO=<ID=MIN_DP,Number=1,Type=Integer,Description=\"Minimum depth in gVCF output block.\">\n");
 	fprintf(outFile, "##FILTER=<ID=PASS,Description=\"All filters passed\">\n");
-	fprintf(outFile, "##FILTER=<ID=Gaps,Description=\"Region without any read alignment(>=50bp).\"\n");
+	fprintf(outFile, "##FILTER=<ID=DUP,Description=\"Duplicated regions(>=%dbp).\"\n", MinCNVsize);
+	fprintf(outFile, "##FILTER=<ID=Gaps,Description=\"Region without any read alignment(>=%dbp).\"\n", MinUnmappedSize);
 	fprintf(outFile, "##FILTER=<ID=q10,Description=\"Confidence score below 10\">\n");
 	if (bFilter) fprintf(outFile, "##FILTER=<ID=bad_haplotype,Description=\"Variants with variable frequencies on same haplotype\">\n");
 	if (bFilter) fprintf(outFile, "##FILTER=<ID=str_contraction,Description=\"Variant appears in repetitive region\">\n");
@@ -459,7 +460,7 @@ void ShowNeighboringProfile(int64_t gPos, Coordinate_t coor)
 		if (i == 0) printf("*");
 		p = gPos + i;
 		coor = DetermineCoordinate(p);
-		printf("%s-%lld\t\t%d\t%d\t%d\t%d\tR=%d\tdepth=%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (long long)coor.gPos, MappingRecordArr[p].A, MappingRecordArr[p].C, MappingRecordArr[p].G, MappingRecordArr[p].T, MappingRecordArr[p].multi_hit, GetProfileColumnSize(MappingRecordArr[p]));
+		printf("%s-%lld\t\t%d\t%d\t%d\t%d\tR=%d\tdepth=%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (long long)coor.gPos, (int)MappingRecordArr[p].A, (int)MappingRecordArr[p].C, (int)MappingRecordArr[p].G, (int)MappingRecordArr[p].T, (int)MappingRecordArr[p].multi_hit, GetProfileColumnSize(MappingRecordArr[p]));
 	}
 	printf("\n\n");
 }
@@ -506,17 +507,17 @@ void GenVariantCallingFile()
 		if (VariantVec[i].VarType == var_SUB)
 		{
 			VarNumVec[var_SUB]++;
-			fprintf(outFile, "%s	%d	.	%c	%s	%d	%s	DP=%d;AD=%d;RC=%d;AF=%.3f;NTFREQ=%d,%d,%d,%d;GT=%s;TYPE=snv\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[VariantVec[i].gPos], VariantVec[i].ALTstr.c_str(), VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].AD, MappingRecordArr[gPos].readCount, 1.0*VariantVec[i].AD / VariantVec[i].DP, MappingRecordArr[gPos].A, MappingRecordArr[gPos].C, MappingRecordArr[gPos].G, MappingRecordArr[gPos].T, GenotypeLabel[VariantVec[i].GenoType]);
+			fprintf(outFile, "%s	%d	.	%c	%s	%d	%s	DP=%d;AD=%d;RC=%d;AF=%.3f;NTFREQ=%d,%d,%d,%d;GT=%s;TYPE=snv\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[VariantVec[i].gPos], VariantVec[i].ALTstr.c_str(), VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].AD, (int)MappingRecordArr[gPos].readCount, 1.0*VariantVec[i].AD / VariantVec[i].DP, (int)MappingRecordArr[gPos].A, (int)MappingRecordArr[gPos].C, (int)MappingRecordArr[gPos].G, (int)MappingRecordArr[gPos].T, GenotypeLabel[VariantVec[i].GenoType]);
 		}
 		else if (VariantVec[i].VarType == var_INS)
 		{
 			VarNumVec[var_INS]++; AlleleFreq = 1.0*VariantVec[i].AD / VariantVec[i].DP;
-			fprintf(outFile, "%s	%d	.	%c	%c%s	%d	%s	DP=%d;AD=%d;RC=%d;AF=%.3f;GT=%s;TYPE=ins\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], RefSequence[gPos], VariantVec[i].ALTstr.c_str(), VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].AD, MappingRecordArr[gPos].readCount, AlleleFreq, GenotypeLabel[VariantVec[i].GenoType]);
+			fprintf(outFile, "%s	%d	.	%c	%c%s	%d	%s	DP=%d;AD=%d;RC=%d;AF=%.3f;GT=%s;TYPE=ins\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], RefSequence[gPos], VariantVec[i].ALTstr.c_str(), VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].AD, (int)MappingRecordArr[gPos].readCount, AlleleFreq, GenotypeLabel[VariantVec[i].GenoType]);
 		}
 		else if (VariantVec[i].VarType == var_DEL)
 		{
 			VarNumVec[var_DEL]++; AlleleFreq = 1.0*VariantVec[i].AD / VariantVec[i].DP;
-			fprintf(outFile, "%s	%d	.	%c%s	%c	%d	%s	DP=%d;AD=%d;RC=%d;AF=%.3f;GT=%s;TYPE=del\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], VariantVec[i].ALTstr.c_str(), RefSequence[gPos], VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].AD, MappingRecordArr[gPos].readCount, AlleleFreq, GenotypeLabel[VariantVec[i].GenoType]);
+			fprintf(outFile, "%s	%d	.	%c%s	%c	%d	%s	DP=%d;AD=%d;RC=%d;AF=%.3f;GT=%s;TYPE=del\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], VariantVec[i].ALTstr.c_str(), RefSequence[gPos], VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].AD, (int)MappingRecordArr[gPos].readCount, AlleleFreq, GenotypeLabel[VariantVec[i].GenoType]);
 		}
 		else if (VariantVec[i].VarType == var_TNL)
 		{
@@ -527,6 +528,12 @@ void GenVariantCallingFile()
 		{
 			VarNumVec[var_INV]++;
 			fprintf(outFile, "%s	%d	.	%c	<INV>	30	PASS	TYPE=BP\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos]);
+		}
+		else if (VariantVec[i].VarType == var_CNV)
+		{
+			gPosEnd = ChromosomeVec[coor.ChromosomeIdx].FowardLocation + ChromosomeVec[coor.ChromosomeIdx].len - 1;
+			if (i + 1 < iTotalVarNum && VariantVec[i + 1].VarType == var_CNV) gPosEnd = VariantVec[++i].gPos;
+			if ((gPosEnd - gPos + 1) >= MinCNVsize) fprintf(outFile, "%s	%d	.	%c	<*>	0	DUP	END=%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)DetermineCoordinate(gPosEnd).gPos);
 		}
 		else if (VariantVec[i].VarType == var_UMR)
 		{
@@ -542,7 +549,7 @@ void GenVariantCallingFile()
 		}
 		else if (VariantVec[i].VarType == var_MON)
 		{
-			fprintf(outFile, "%s	%d	.	%c	.	0	.	DP=%d;AD=%d;RC=%d;NTFREQ=%d,%d,%d,%d;GT=%s\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], VariantVec[i].DP, VariantVec[i].AD, MappingRecordArr[gPos].readCount, MappingRecordArr[gPos].A, MappingRecordArr[gPos].C, MappingRecordArr[gPos].G, MappingRecordArr[gPos].T, GenotypeLabel[VariantVec[i].GenoType]);
+			fprintf(outFile, "%s	%d	.	%c	.	0	.	DP=%d;AD=%d;RC=%d;NTFREQ=%d,%d,%d,%d;GT=%s\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], VariantVec[i].DP, VariantVec[i].AD, (int)MappingRecordArr[gPos].readCount, (int)MappingRecordArr[gPos].A, (int)MappingRecordArr[gPos].C, (int)MappingRecordArr[gPos].G, (int)MappingRecordArr[gPos].T, GenotypeLabel[VariantVec[i].GenoType]);
 		}
 	}
 	std::fclose(outFile);
@@ -609,12 +616,12 @@ void *IdentifyVariants(void *arg)
 	vector<pair<char, int> > vec;
 	vector<Variant_t> MyVariantVec;
 	map<int64_t, map<string, uint16_t> >::iterator IndMapIter;
-	int n, gap, cov, cov_thr, freq_thr, ins_thr, del_thr, ins_freq, del_freq, tid = *((int*)arg);
+	int n, gap, dup, cov, cov_thr, freq_thr, ins_thr, del_thr, ins_freq, del_freq, tid = *((int*)arg);
 
 	gPos = (tid == 0 ? 0 : (GenomeSize / iThreadNum)*tid);
 	end = (tid == iThreadNum - 1 ? GenomeSize : (GenomeSize / iThreadNum)*(tid + 1));
 
-	gap = 0;
+	gap = dup = 0;
 	for (; gPos < end; gPos++)
 	{
 		cov = GetProfileColumnSize(MappingRecordArr[gPos]);
@@ -675,18 +682,35 @@ void *IdentifyVariants(void *arg)
 				}
 			}
 		}
-		if (bNormal && cov == 0 && MappingRecordArr[gPos].multi_hit == 0)
+		if (bNormal && cov == 0)
 		{
-			if (MyVariantVec.size() == 0 || MyVariantVec.rbegin()->VarType != var_DEL)
+			if (MappingRecordArr[gPos].multi_hit > MinAlleleDepth)
 			{
-				if (gap == 0)
+				if (dup == 0)
 				{
-					//printf("gPos_begin=%lld\n", (long long)gPos);
-					Variant.qscore = 0; Variant.gPos = gPos; Variant.VarType = var_UMR; Variant.DP = Variant.AD = 0; Variant.ALTstr.clear();
+					Variant.qscore = 30; Variant.gPos = gPos; Variant.VarType = var_CNV; Variant.ALTstr.clear();
 					MyVariantVec.push_back(Variant);
 				}
-				gap++;
+				bNormal = false; dup++;
 			}
+			else if (MappingRecordArr[gPos].multi_hit == 0)
+			{
+				if (MyVariantVec.size() == 0 || MyVariantVec.rbegin()->VarType != var_DEL)
+				{
+					if (gap == 0)
+					{
+						//printf("gPos_begin=%lld\n", (long long)gPos);
+						Variant.qscore = 0; Variant.gPos = gPos; Variant.VarType = var_UMR; Variant.DP = Variant.AD = 0; Variant.ALTstr.clear();
+						MyVariantVec.push_back(Variant);
+					}
+					bNormal = false; gap++;
+				}
+			}
+		}
+		if (cov > 0 && dup > 0)
+		{
+			dup = 0; Variant.gPos = gPos - 1; Variant.VarType = var_CNV; Variant.ALTstr.clear();
+			MyVariantVec.push_back(Variant);
 		}
 		if (cov > 0 && gap > 0)
 		{

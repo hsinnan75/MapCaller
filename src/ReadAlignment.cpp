@@ -175,7 +175,6 @@ void ProcessNormalPair(char* seq, FragPair_t& fp)
 		//{
 		//	printf("%s\n%s\n", fp.aln1.c_str(), fp.aln2.c_str());
 		//}
-
 		if (fp.gPos >= GenomeSize) // reverse sequence
 		{
 			if (fp.rLen > 0) SelfComplementarySeq(fp.rLen, (char*)fp.aln1.c_str());

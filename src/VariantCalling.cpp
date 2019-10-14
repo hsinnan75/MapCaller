@@ -474,7 +474,7 @@ string DetermineFileter(int VarIdx)
 	else if ((VariantVec[VarIdx].VarType == var_INS || VariantVec[VarIdx].VarType == var_DEL) && VariantVec[VarIdx].AD < 5 && CheckNearbyVariant(VarIdx, 10)) filter_str += "q10;";
 	if (bFilter)
 	{
-		if (MappingRecordArr[VariantVec[VarIdx].gPos].multi_hit > (int)(GetProfileColumnSize(MappingRecordArr[VariantVec[VarIdx].gPos])*0.05)) filter_str += "str_contraction;";
+		if ((int)MappingRecordArr[VariantVec[VarIdx].gPos].multi_hit > (int)(GetProfileColumnSize(MappingRecordArr[VariantVec[VarIdx].gPos])*0.05)) filter_str += "str_contraction;";
 		if (CheckBadHaplotype(VarIdx, 100)) filter_str += "bad_haplotype;";
 	}
 	if (filter_str == "") filter_str = "PASS";
@@ -575,10 +575,10 @@ int GetRefCount(unsigned char ref_base, int64_t gPos)
 {
 	switch (ref_base)
 	{
-	case 0: return MappingRecordArr[gPos].A;
-	case 1: return MappingRecordArr[gPos].C;
-	case 2: return MappingRecordArr[gPos].G;
-	case 3: return MappingRecordArr[gPos].T;
+	case 0: return (int)MappingRecordArr[gPos].A;
+	case 1: return (int)MappingRecordArr[gPos].C;
+	case 2: return (int)MappingRecordArr[gPos].G;
+	case 3: return (int)MappingRecordArr[gPos].T;
 	default: return 0;
 	}
 }
@@ -684,7 +684,7 @@ void *IdentifyVariants(void *arg)
 		}
 		if (bNormal && cov == 0)
 		{
-			if (MappingRecordArr[gPos].multi_hit > MinAlleleDepth)
+			if ((int)MappingRecordArr[gPos].multi_hit > MinAlleleDepth)
 			{
 				if (dup == 0)
 				{
@@ -693,7 +693,7 @@ void *IdentifyVariants(void *arg)
 				}
 				bNormal = false; dup++;
 			}
-			else if (MappingRecordArr[gPos].multi_hit == 0)
+			else if ((int)MappingRecordArr[gPos].multi_hit == 0)
 			{
 				if (MyVariantVec.size() == 0 || MyVariantVec.rbegin()->VarType != var_DEL)
 				{

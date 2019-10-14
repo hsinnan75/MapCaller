@@ -656,10 +656,10 @@ void *IdentifyVariants(void *arg)
 			vec.clear(); freq_thr = (int)ceil(cov*(bSomatic ? 0.01 : FrequencyThr));
 			if (freq_thr < MinAlleleDepth) freq_thr = MinAlleleDepth;
 
-			if (ref_base != 0 && MappingRecordArr[gPos].A >= freq_thr) vec.push_back(make_pair('A', MappingRecordArr[gPos].A));
-			if (ref_base != 1 && MappingRecordArr[gPos].C >= freq_thr) vec.push_back(make_pair('C', MappingRecordArr[gPos].C));
-			if (ref_base != 2 && MappingRecordArr[gPos].G >= freq_thr) vec.push_back(make_pair('G', MappingRecordArr[gPos].G));
-			if (ref_base != 3 && MappingRecordArr[gPos].T >= freq_thr) vec.push_back(make_pair('T', MappingRecordArr[gPos].T));
+			if (ref_base != 0 && (int)MappingRecordArr[gPos].A >= freq_thr) vec.push_back(make_pair('A', (int)MappingRecordArr[gPos].A));
+			if (ref_base != 1 && (int)MappingRecordArr[gPos].C >= freq_thr) vec.push_back(make_pair('C', (int)MappingRecordArr[gPos].C));
+			if (ref_base != 2 && (int)MappingRecordArr[gPos].G >= freq_thr) vec.push_back(make_pair('G', (int)MappingRecordArr[gPos].G));
+			if (ref_base != 3 && (int)MappingRecordArr[gPos].T >= freq_thr) vec.push_back(make_pair('T', (int)MappingRecordArr[gPos].T));
 			
 			if (vec.size() == 1)
 			{

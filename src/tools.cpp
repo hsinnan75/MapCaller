@@ -178,7 +178,7 @@ Coordinate_t DetermineCoordinate(int64_t gPos)
 
 int GetProfileColumnSize(MappingRecord_t& Profile)
 {
-	return Profile.A + Profile.C + Profile.G + Profile.T;
+	return (int)Profile.A + (int)Profile.C + (int)Profile.G + (int)Profile.T;
 }
 
 void ShowProfileColumn(int64_t gPos)

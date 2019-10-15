@@ -33,7 +33,7 @@ static pthread_mutex_t Lock;
 vector<Variant_t> VariantVec;
 vector<BreakPoint_t> BreakPointCanVec;
 extern map<int64_t, uint16_t> BreakPointMap;
- // TranslocationSiteVec;
+
 extern float FrequencyThr;
 extern uint32_t avgReadLength;
 

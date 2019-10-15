@@ -2,6 +2,8 @@
 #define MinSeqIdy 0.5
 #define MinAlnBlcokSize 5
 
+extern float MaxMisMatchRate;
+
 float CalFragAlnSeqIdy(string& aln1, string& aln2)
 {
 	int i, len = (int)aln1.length(), n = 0, mis = 0;
@@ -305,9 +307,10 @@ void RemoveTailingGaps(bool bFirstFragPair, FragPair_t& FragPair)
 bool ProduceReadAlignment(ReadItem_t& read)
 {
 	bool bHead, bTail;
-	int i, FragPairNum, TailIdx;
 	vector<AlnCan_t>::iterator iter;
+	int i, FragPairNum, TailIdx, max_mismatches_thr;
 
+	max_mismatches_thr = (int)(read.rlen*MaxMisMatchRate);
 	for (iter = read.AlnCanVec.begin(); iter != read.AlnCanVec.end(); iter++)
 	{
 		if (iter->score == 0) continue;
@@ -381,15 +384,7 @@ bool ProduceReadAlignment(ReadItem_t& read)
 		//Coordinate_t coor = GetAlnCoordinate(iter->FragPairVec.begin()->gPos < GenomeSize ? true : false, iter->FragPairVec);
 		//if (coor.ChromosomeIdx == 0 && coor.gPos >= ObserveBegPos && coor.gPos + read.rlen < ObserveEndPos)
 		//{
-		//	//Display alignments
-		//	pthread_mutex_lock(&Lock);
 		//	printf("read = %s, score = %d / %d\n", read.header, EvaluateAlignmentScore(iter->FragPairVec), read.rlen);
-		//	ShowSimplePairInfo(iter->FragPairVec);
-		//	pthread_mutex_unlock(&Lock);
-		//}
-		//if (bDebugMode)
-		//{
-		//	printf("Done mapping: head(%s), tail(%s)\n", bHead ? "Yes" : "No", bTail ? "Yes" : "No");
 		//	ShowSimplePairInfo(iter->FragPairVec);
 		//}
 		if (iter->score == 0) continue;
@@ -399,8 +394,7 @@ bool ProduceReadAlignment(ReadItem_t& read)
 			//printf("%d %d\n", iter->FragPairVec.begin()->rPos, iter->FragPairVec.rbegin()->rPos + iter->FragPairVec.rbegin()->rLen);
 			iter->score = EvaluateAlignmentScore(iter->FragPairVec);
 			if (iter->score == 0) continue;
-			//if (iter->score < (int)(read.rlen*0.95) && FindMisMatchNumber(iter->FragPairVec) > (int)(read.rlen*0.05)) iter->score = 0;
-			if (FindMisMatchNumber(iter->FragPairVec) > MaxMisMatches) iter->score = 0;
+			if (iter->score < (int)(read.rlen*(1 - MaxMisMatchRate)) && FindMisMatchNumber(iter->FragPairVec) > max_mismatches_thr) iter->score = 0;
 			else
 			{
 				iter->orientation = (iter->FragPairVec[0].gPos < GenomeSize ? true : false);

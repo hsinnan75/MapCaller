@@ -168,7 +168,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - 0.9.9.21: Reported CNV (N>=2) regions with the flag "DUP" (experimental).
 
 # Acknowledgements
-We would like to thank [A/Prof. Torsten Seemann](https://github.com/tseemann) for valuable comments.
+We would like to thank [A/Prof. Torsten Seemann](https://github.com/tseemann) and [Dr. Devon Rya] (https://github.com/dpryan79) for their help with the software.
 
 # Note
 The source code of the homemade genome sequence variation simulator is available at src/sv_simulator/.

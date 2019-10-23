@@ -169,7 +169,8 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - 0.9.9.22: Change the argument "-maxmm" to the maximal mismatch rate allowed in a read alignment.
 
 # Acknowledgements
-We would like to thank [A/Prof. Torsten Seemann](https://github.com/tseemann) and [Dr. Devon Rya] (https://github.com/dpryan79) for their help with the software.
+We would like to thank [A/Prof. Torsten Seemann](https://github.com/tseemann)
+and [Dr. Devon Ryan](https://github.com/dpryan79) for their help with the software.
 
 # Note
 The source code of the homemade genome sequence variation simulator is available at src/sv_simulator/.

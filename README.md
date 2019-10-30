@@ -167,6 +167,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - 0.9.9.19: Fixed a bug on the determination of deletion locus.
 - 0.9.9.21: Reported CNV (N>=2) regions with the flag "DUP" (experimental).
 - 0.9.9.22: Change the argument "-maxmm" to the maximal mismatch rate allowed in a read alignment.
+- 0.9.9.23: Change the VCF output to fix the problem when applying vcftools with --plink
 
 # Acknowledgements
 We would like to thank [A/Prof. Torsten Seemann](https://github.com/tseemann)

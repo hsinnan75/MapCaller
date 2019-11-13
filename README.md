@@ -169,6 +169,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - 0.9.9.22: Change the argument "-maxmm" to the maximal mismatch rate allowed in a read alignment.
 - 0.9.9.23: Change the VCF output to fix the problem when applying vcftools with --plink
 - 0.9.9.24: Summarize the process to a log file
+- 0.9.9.25: Fixed typos in vcf headers.
 
 # Acknowledgements
 We would like to thank [A/Prof. Torsten Seemann](https://github.com/tseemann)

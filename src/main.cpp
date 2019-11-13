@@ -2,7 +2,7 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.24";
+const char* VersionStr = "0.9.9.25";
 
 string CmdLine;
 uint8_t iMaxDuplicate;

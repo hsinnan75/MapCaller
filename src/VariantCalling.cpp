@@ -213,7 +213,7 @@ void ShowMetaInfo()
 	fprintf(outFile, "##command_line=\"%s\"\n", CmdLine.c_str());
 	fprintf(outFile, "##INFO=<ID=RC,Number=1,Type=Integer,Description=\"Number of reads with start coordinate at this position.\">\n");
 	fprintf(outFile, "##INFO=<ID=NTFREQ,Number=4,Type=Integer,Description=\"base depth\">\n");
-	fprintf(outFile, "##INFO=<ID=END,Number=1,Type=Integer,Description=\"Last position(inclusive) of the reported block\"\n");
+	fprintf(outFile, "##INFO=<ID=END,Number=1,Type=Integer,Description=\"Last position(inclusive) of the reported block\">\n");
 	fprintf(outFile, "##INFO=<ID=TYPE,Number=A,Type=String,Description=\"The type of allele, either snv, ins, del, or BP(breakpoint).\">\n");
 	if (bGVCF) fprintf(outFile, "##INFO=<ID=MIN_DP,Number=1,Type=Integer,Description=\"Minimum depth in gVCF output block.\">\n");
 	fprintf(outFile, "##FORMAT=<ID=AD,Number=R,Type=Integer,Description=\"Alternate allele depth\">\n");
@@ -221,13 +221,13 @@ void ShowMetaInfo()
 	fprintf(outFile, "##FORMAT=<ID=AF,Number=1,Type=Float,Description=\"Alternate allele depth\">\n");
 	fprintf(outFile, "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n");
 	fprintf(outFile, "##FILTER=<ID=PASS,Description=\"All filters passed\">\n");
-	fprintf(outFile, "##FILTER=<ID=DUP,Description=\"Duplicated regions(>=%dbp).\"\n", MinCNVsize);
-	fprintf(outFile, "##FILTER=<ID=Gaps,Description=\"Region without any read alignment(>=%dbp).\"\n", MinUnmappedSize);
+	fprintf(outFile, "##FILTER=<ID=DUP,Description=\"Duplicated regions(>=%dbp).\">\n", MinCNVsize);
+	fprintf(outFile, "##FILTER=<ID=Gaps,Description=\"Region without any read alignment(>=%dbp).\">\n", MinUnmappedSize);
 	fprintf(outFile, "##FILTER=<ID=q10,Description=\"Confidence score below 10\">\n");
 	if (bFilter) fprintf(outFile, "##FILTER=<ID=bad_haplotype,Description=\"Variants with variable frequencies on same haplotype\">\n");
 	if (bFilter) fprintf(outFile, "##FILTER=<ID=str_contraction,Description=\"Variant appears in repetitive region\">\n");
 	for (int i = 0; i < iChromsomeNum; i++) fprintf(outFile, "##contig=<ID=%s,length=%d>\n", ChromosomeVec[i].name, ChromosomeVec[i].len);
-	fprintf(outFile, "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	unkonwn\n");
+	fprintf(outFile, "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	unknown\n");
 }
 
 void IdentifyBreakPointCandidates()

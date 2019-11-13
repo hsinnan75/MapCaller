@@ -208,7 +208,7 @@ extern MappingRecord_t* MappingRecordArr;
 extern vector<Chromosome_t> ChromosomeVec;
 extern vector<CoordinatePair_t> DistantPairVec;
 extern vector<string> ReadFileNameVec1, ReadFileNameVec2;
-extern char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
+extern char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
 extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bGVCF, bMonomorphic, bSomatic, NW_ALG;
 extern int iThreadNum, iPloidy, iChromsomeNum, MaxClipSize, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleDepth, MinIndFreq, MinCNVsize, MinUnmappedSize, MinVarConfScore;

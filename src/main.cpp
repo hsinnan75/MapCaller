@@ -2,7 +2,7 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.23";
+const char* VersionStr = "0.9.9.24";
 
 string CmdLine;
 uint8_t iMaxDuplicate;
@@ -11,7 +11,7 @@ float FrequencyThr, MaxMisMatchRate;
 MappingRecord_t* MappingRecordArr = NULL;
 vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
-char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName;
+char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
 int iThreadNum, iPloidy, FragmentSize, MaxClipSize, MinAlleleDepth, MinIndFreq, MinVarConfScore, MinCNVsize, MinUnmappedSize;
 bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bGVCF, bMonomorphic, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
 
@@ -33,6 +33,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -alg STR      gapped alignment algorithm (option: nw|ksw2)\n");
 	fprintf(stderr, "         -vcf          VCF output filename [%s]\n", VcfFileName);
 	fprintf(stderr, "         -gvcf         GVCF mode [false]\n");
+	fprintf(stderr, "         -log STR      log filename [%s]\n", LogFileName);
 	fprintf(stderr, "         -monomorphic  report all loci which do not have any potential alternates.\n");
 	fprintf(stderr, "         -min_cnv INT  the minimal cnv size to be reported [%d].\n", MinCNVsize);
 	fprintf(stderr, "         -min_gap INT  the minimal gap(unmapped) size to be reported [%d].\n", MinUnmappedSize);
@@ -148,6 +149,7 @@ int main(int argc, char* argv[])
 	MinVarConfScore = 10;
 	MinUnmappedSize = 50;
 	MaxMisMatchRate = 0.05;
+	LogFileName = (char*)"job.log";
 	VcfFileName = (char*)"output.vcf";
 	RefSequence = IndexFileName = SamFileName = NULL;
 	ObservGenomicPos = ObserveBegPos = ObserveEndPos = -1;
@@ -272,6 +274,8 @@ int main(int argc, char* argv[])
 			exit(0);
 		}
 		if (CheckInputFiles(ReadFileNameVec1) == false || CheckInputFiles(ReadFileNameVec2) == false) exit(0);
+
+		if (strcmp(LogFileName, "job.log")!= 0 && CheckOutputFileName(LogFileName) == false) exit(0);
 		if (SamFileName != NULL && CheckOutputFileName(SamFileName) == false) exit(0);
 		if (VcfFileName != NULL && CheckOutputFileName(VcfFileName) == false) exit(0);
 		//if (MinAlleleFreq > MinBaseDepth) MinAlleleFreq = MinBaseDepth;
@@ -301,12 +305,16 @@ int main(int argc, char* argv[])
 				MappingRecordArr = new MappingRecord_t[GenomeSize]();
 			}
 			StartProcessTime = time(NULL);
+			
+			FILE *log = fopen(LogFileName, "a"); fprintf(log, "\n\n%s\n[CMD]", string().assign(80, '*').c_str()); for (i = 0; i < argc; i++) fprintf(log, " %s", argv[i]); fprintf(log, "\n\n"); fclose(log);
 			Mapping();
 			if (bVCFoutput) VariantCalling();
 			bwa_idx_destroy(RefIdx);
 			if (RefSequence != NULL) delete[] RefSequence;
 			if (MappingRecordArr != NULL) delete[] MappingRecordArr;
 
+			log = fopen(LogFileName, "a"); 
+			fprintf(log, "All done! It took %lld seconds to complete the data analysis.\n", (long long)(time(NULL) - StartProcessTime)); fclose(log);
 			fprintf(stderr, "All done! It took %lld seconds to complete the data analysis.\n", (long long)(time(NULL)- StartProcessTime));
 		}
 	}

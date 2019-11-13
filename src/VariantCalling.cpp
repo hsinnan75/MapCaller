@@ -28,6 +28,7 @@ typedef struct
 
 FILE *outFile;
 int* BlockDepthArr;
+vector<int> VarNumVec(256);
 int BlockNum, iTotalVarNum;
 static pthread_mutex_t Lock;
 vector<Variant_t> VariantVec;
@@ -490,12 +491,10 @@ void GenVariantCallingFile()
 	Coordinate_t coor;
 	string filter_str;
 	int64_t gPos, gPosEnd;
-	vector<int> VarNumVec(256);
 	map<string, uint16_t>::iterator IndSeqMapIter;
 
 	outFile = fopen(VcfFileName, "w"); ShowMetaInfo();
 
-	
 	//sort(VariantVec.begin(), VariantVec.end(), CompByVarPos);
 	for (i = 0; i < iTotalVarNum; i++)
 	{
@@ -556,7 +555,6 @@ void GenVariantCallingFile()
 		}
 	}
 	std::fclose(outFile);
-	fprintf(stderr, "\t%d(snp); %d(ins); %d(del); %d(trans); %d(inversion)\n", VarNumVec[var_SUB], VarNumVec[var_INS], VarNumVec[var_DEL], VarNumVec[var_TNL] >> 1, VarNumVec[var_INV] >> 1);
 }
 
 bool CheckNeighboringCoverage(int64_t gPos, int cov)
@@ -766,18 +764,23 @@ void RemoveConsecutiveGenomicVariant()
 
 void VariantCalling()
 {
+	FILE *log;
 	int i, *ThrIDarr;
 	time_t t = time(NULL);
 	pthread_t *ThreadArr = new pthread_t[iThreadNum];
 
 	ThrIDarr = new int[iThreadNum];  for (i = 0; i < iThreadNum; i++) ThrIDarr[i] = i;
 
+	log = fopen(LogFileName, "a");
 	//if (ObserveBegPos != -1) printf("Profile[%lld-%lld]\n", (long long)ObserveBegPos, (long long)ObserveEndPos), ShowVariationProfile(ObserveBegPos, ObserveEndPos);
 	BlockNum = (int)(GenomeSize / BlockSize); if (((int64_t)BlockNum * BlockSize) < GenomeSize) BlockNum += 1; 
 	BlockDepthArr = new int[BlockNum]();
 	for (i = 0; i < iThreadNum; i++) pthread_create(&ThreadArr[i], NULL, CalBlockReadDepth, &ThrIDarr[i]);
 	for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);
+
+	fprintf(log, "Identify all variants (min_alt_allele_depth=%d)...\n", MinAlleleDepth); fflush(stderr);
 	fprintf(stderr, "Identify all variants (min_alt_allele_depth=%d)...\n", MinAlleleDepth); fflush(stderr);
+
 	//iThreadNum = 1;
 	for (i = 0; i < iThreadNum; i++) pthread_create(&ThreadArr[i], NULL, IdentifyVariants, &ThrIDarr[i]);
 	for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);
@@ -789,8 +792,16 @@ void VariantCalling()
 	if (BreakPointCanVec.size() > 0 && TranslocationSiteVec.size() > 0) IdentifyTranslocations();
 
 	iTotalVarNum = (int)VariantVec.size();
-	fprintf(stderr, "\tWrite all the predicted sample variations to file [%s]...\n", VcfFileName); GenVariantCallingFile();
+	fprintf(log, "\tWrite all the predicted sample variations to file [%s]...\n", VcfFileName); 
+	fprintf(stderr, "\tWrite all the predicted sample variations to file [%s]...\n", VcfFileName);
+	GenVariantCallingFile();
+	fprintf(log, "\t%d(snp); %d(ins); %d(del); %d(trans); %d(inversion)\n", VarNumVec[var_SUB], VarNumVec[var_INS], VarNumVec[var_DEL], VarNumVec[var_TNL] >> 1, VarNumVec[var_INV] >> 1);
+	fprintf(stderr, "\t%d(snp); %d(ins); %d(del); %d(trans); %d(inversion)\n", VarNumVec[var_SUB], VarNumVec[var_INS], VarNumVec[var_DEL], VarNumVec[var_TNL] >> 1, VarNumVec[var_INV] >> 1);
 
+	fprintf(log, "variant calling has been done in %lld seconds.\n", (long long)(time(NULL) - t));
 	fprintf(stderr, "variant calling has been done in %lld seconds.\n", (long long)(time(NULL) - t));
+
+	fclose(log);
+
 	delete[] ThrIDarr; delete[] ThreadArr; delete[] BlockDepthArr;
 }

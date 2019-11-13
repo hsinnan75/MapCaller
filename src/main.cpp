@@ -220,6 +220,7 @@ int main(int argc, char* argv[])
 				bSAMFormat = false;
 				SamFileName = argv[++i];
 			}
+			else if (parameter == "-log" && i + 1 < argc) LogFileName = argv[++i];
 			else if ((parameter == "-alg") && i + 1 < argc)
 			{
 				str = argv[++i];
@@ -306,7 +307,7 @@ int main(int argc, char* argv[])
 			}
 			StartProcessTime = time(NULL);
 			
-			FILE *log = fopen(LogFileName, "a"); fprintf(log, "\n\n%s\n[CMD]", string().assign(80, '*').c_str()); for (i = 0; i < argc; i++) fprintf(log, " %s", argv[i]); fprintf(log, "\n\n"); fclose(log);
+			FILE *log = fopen(LogFileName, "a"); fprintf(log, "%s\n[CMD]", string().assign(80, '*').c_str()); for (i = 0; i < argc; i++) fprintf(log, " %s", argv[i]); fprintf(log, "\n\n"); fclose(log);
 			Mapping();
 			if (bVCFoutput) VariantCalling();
 			bwa_idx_destroy(RefIdx);
@@ -314,7 +315,7 @@ int main(int argc, char* argv[])
 			if (MappingRecordArr != NULL) delete[] MappingRecordArr;
 
 			log = fopen(LogFileName, "a"); 
-			fprintf(log, "All done! It took %lld seconds to complete the data analysis.\n", (long long)(time(NULL) - StartProcessTime)); fclose(log);
+			fprintf(log, "All done! It took %lld seconds to complete the data analysis.\n\n\n", (long long)(time(NULL) - StartProcessTime)); fclose(log);
 			fprintf(stderr, "All done! It took %lld seconds to complete the data analysis.\n", (long long)(time(NULL)- StartProcessTime));
 		}
 	}

@@ -146,7 +146,6 @@ typedef struct
 	char* seq;
 	char* qual;
 	char* header;
-	uint8_t* EncodeSeq;
 	AlnSummary_t AlnSummary;
 	vector<AlnCan_t> AlnCanVec;
 } ReadItem_t;
@@ -208,6 +207,7 @@ extern MappingRecord_t* MappingRecordArr;
 extern vector<Chromosome_t> ChromosomeVec;
 extern vector<CoordinatePair_t> DistantPairVec;
 extern vector<string> ReadFileNameVec1, ReadFileNameVec2;
+extern pthread_mutex_t LibraryLock, ProfileLock, OutputLock, VarLock;
 extern char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
 extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bGVCF, bMonomorphic, bSomatic, NW_ALG;

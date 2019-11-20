@@ -30,7 +30,6 @@ FILE *outFile;
 int* BlockDepthArr;
 vector<int> VarNumVec(256);
 int BlockNum, iTotalVarNum;
-static pthread_mutex_t Lock;
 vector<Variant_t> VariantVec;
 vector<BreakPoint_t> BreakPointCanVec;
 extern map<int64_t, uint16_t> BreakPointMap;
@@ -741,9 +740,9 @@ void *IdentifyVariants(void *arg)
 	if ((n = (int)MyVariantVec.size()) > 0)
 	{
 		sort(MyVariantVec.begin(), MyVariantVec.end(), CompByVarPos);
-		pthread_mutex_lock(&Lock);
+		pthread_mutex_lock(&VarLock);
 		copy(MyVariantVec.begin(), MyVariantVec.end(), back_inserter(VariantVec)); inplace_merge(VariantVec.begin(), VariantVec.end() - n, VariantVec.end(), CompByVarPos);
-		pthread_mutex_unlock(&Lock);
+		pthread_mutex_unlock(&VarLock);
 	}
 	return (void*)(1);
 }

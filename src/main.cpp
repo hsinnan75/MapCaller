@@ -2,7 +2,7 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.25";
+const char* VersionStr = "0.9.9.26";
 
 string CmdLine;
 uint8_t iMaxDuplicate;
@@ -11,6 +11,7 @@ float FrequencyThr, MaxMisMatchRate;
 MappingRecord_t* MappingRecordArr = NULL;
 vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
+pthread_mutex_t LibraryLock, ProfileLock, OutputLock, VarLock;
 char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
 int iThreadNum, iPloidy, FragmentSize, MaxClipSize, MinAlleleDepth, MinIndFreq, MinVarConfScore, MinCNVsize, MinUnmappedSize;
 bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bGVCF, bMonomorphic, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
@@ -305,6 +306,11 @@ int main(int argc, char* argv[])
 				fprintf(stderr, "Initialize the alignment profile...\n");
 				MappingRecordArr = new MappingRecord_t[GenomeSize]();
 			}
+			pthread_mutex_init(&VarLock, NULL);
+			pthread_mutex_init(&OutputLock, NULL);
+			pthread_mutex_init(&LibraryLock, NULL);
+			pthread_mutex_init(&ProfileLock, NULL);
+
 			StartProcessTime = time(NULL);
 			
 			FILE *log = fopen(LogFileName, "a"); fprintf(log, "%s\n[CMD]", string().assign(80, '*').c_str()); for (i = 0; i < argc; i++) fprintf(log, " %s", argv[i]); fprintf(log, "\n\n"); fclose(log);

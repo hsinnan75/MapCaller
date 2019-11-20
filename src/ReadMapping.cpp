@@ -16,7 +16,6 @@ bam_hdr_t *header = NULL;
 bool bSepLibrary = false;
 FILE *ReadFileHandler1, *ReadFileHandler2;
 gzFile gzReadFileHandler1, gzReadFileHandler2;
-static pthread_mutex_t LibraryLock, ProfileLock, OutputLock;
 vector<DiscordPair_t> InversionSiteVec, TranslocationSiteVec;
 uint32_t avgCov, avgReadLength, avgDist = 1000;
 int64_t iTotalReadNum = 0, iTotalMappingNum = 0, iTotalPairedNum = 0, iAlignedBase = 0, iTotalCoverage = 0, TotalPairedDistance = 0, ReadLengthSum = 0;
@@ -409,8 +408,14 @@ int CheckAlnNumber(vector<AlnCan_t>& AlnCanVec)
 	//return n == 1 ? true : false;
 }
 
+void EnCodeReadSeq(int rlen, char* seq, uint8_t* EncodeSeq)
+{
+	for (int i = 0; i < rlen; i++) EncodeSeq[i] = nst_nt4_table[(int)seq[i]];
+}
+
 void *ReadMapping(void *arg)
 {
+	uint8_t* EncodeSeq;
 	AlnSummary_t AlnSummary;
 	DiscordPair_t DiscordPair;
 	CoordinatePair_t CoorPair;
@@ -418,7 +423,7 @@ void *ReadMapping(void *arg)
 	vector<string> SamStreamVec;
 	vector<FragPair_t> SimplePairVec;
 	int64_t myTotalDistance, myReadLengthSum;
-	int i, j, n, ReadNum, MappedNum, PairedNum;
+	int i, j, k, n, ReadNum, MappedNum, PairedNum;
 	vector<DiscordPair_t> INVSiteVec , TNLSiteVec;
 
 	ReadArr = new ReadItem_t[ReadChunkSize];
@@ -439,9 +444,12 @@ void *ReadMapping(void *arg)
 			MappedNum = PairedNum = 0; myTotalDistance = myReadLengthSum = 0;
 			for (i = 0, j = 1; i != ReadNum; i += 2, j += 2)
 			{
-				SimplePairVec = IdentifySimplePairs(ReadArr[i].rlen, ReadArr[i].EncodeSeq);
+				EncodeSeq = new uint8_t[ReadArr[i].rlen]; EnCodeReadSeq(ReadArr[i].rlen, ReadArr[i].seq, EncodeSeq);
+				SimplePairVec = IdentifySimplePairs(ReadArr[i].rlen, EncodeSeq); delete[] EncodeSeq;
 				ReadArr[i].AlnCanVec = SimplePairClustering(ReadArr[i].rlen, SimplePairVec);
-				SimplePairVec = IdentifySimplePairs(ReadArr[j].rlen, ReadArr[j].EncodeSeq);
+
+				EncodeSeq = new uint8_t[ReadArr[j].rlen]; EnCodeReadSeq(ReadArr[j].rlen, ReadArr[j].seq, EncodeSeq);
+				SimplePairVec = IdentifySimplePairs(ReadArr[j].rlen, EncodeSeq); delete[] EncodeSeq;
 				ReadArr[j].AlnCanVec = SimplePairClustering(ReadArr[j].rlen, SimplePairVec);
 
 				ReadArr[i].AlnSummary = AlnSummary; ReadArr[j].AlnSummary = AlnSummary;
@@ -584,7 +592,8 @@ void *ReadMapping(void *arg)
 			MappedNum = 0;
 			for (i = 0; i != ReadNum; i++)
 			{
-				SimplePairVec = IdentifySimplePairs(ReadArr[i].rlen, ReadArr[i].EncodeSeq);
+				EncodeSeq = new uint8_t[ReadArr[i].rlen]; EnCodeReadSeq(ReadArr[i].rlen, ReadArr[i].seq, EncodeSeq);
+				SimplePairVec = IdentifySimplePairs(ReadArr[i].rlen, EncodeSeq); delete[] EncodeSeq;
 				ReadArr[i].AlnCanVec = SimplePairClustering(ReadArr[i].rlen, SimplePairVec);
 				ReadArr[i].AlnSummary = AlnSummary;
 				//ShowFragPairCluster(ReadArr[i].AlnCanVec);
@@ -632,7 +641,6 @@ void *ReadMapping(void *arg)
 			delete[] ReadArr[i].header;
 			delete[] ReadArr[i].seq;
 			if (FastQFormat) delete[] ReadArr[i].qual;
-			delete[] ReadArr[i].EncodeSeq;
 		}
 		//if (iTotalReadNum >= 100000000) break;
 	}

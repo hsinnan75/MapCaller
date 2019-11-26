@@ -168,7 +168,11 @@ int main(int argc, char* argv[])
 	}
 	else if (strcmp(argv[1], "index") == 0)
 	{
-		bwa_idx_build(argv[2], argv[3]);
+		if(argc > 3) bwa_idx_build(argv[2], argv[3]);
+		else
+		{
+			fprintf(stderr, "usage: %s index ref.fa prefix\n", argv[0]);
+		}
 		exit(0);
 	}
 	else

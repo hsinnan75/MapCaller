@@ -8,8 +8,6 @@ LIBS=		-lm -lz
 .c.o:
 		$(CC) -c $(FLAGS) $(INCLUDES) $< -o $@
 
-all:$(PROG)
-
 libbwa.a:$(LOBJS)
 		$(AR) -csru $@ $(LOBJS)
 

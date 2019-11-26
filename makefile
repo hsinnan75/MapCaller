@@ -1,11 +1,12 @@
 .KEEP_STAT:
 
-all:		MapCaller bwt_index
+all:		MapCaller
 
-MapCaller: htslib
+MapCaller: index htslib
 		$(MAKE) -C src
 		mkdir -p bin/ && cp -f src/$@ bin/
-
+index:
+		$(MAKE) -C src/BWT_Index libbwa.a
 htslib:
 		$(MAKE) -C src/htslib libhts.a
 

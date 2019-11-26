@@ -2,7 +2,7 @@
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.26";
+const char* VersionStr = "0.9.9.27";
 
 string CmdLine;
 uint8_t iMaxDuplicate;
@@ -119,6 +119,11 @@ void ReadLibInput(const char* LibFileName)
 	file.close();
 }
 
+extern "C"
+{
+	int bwa_idx_build(const char *fa, const char *prefix);
+}
+
 int main(int argc, char* argv[])
 {
 	int i;
@@ -159,6 +164,11 @@ int main(int argc, char* argv[])
 	else if (strcmp(argv[1], "update") == 0)
 	{
 		system("git fetch;git merge origin/master master;make");
+		exit(0);
+	}
+	else if (strcmp(argv[1], "index") == 0)
+	{
+		bwa_idx_build(argv[2], argv[3]);
 		exit(0);
 	}
 	else

@@ -2,9 +2,9 @@
 #test indexing
 echo
 echo "Test1 -- Generate index files with a reference file"
-echo "Command=bin/bwt_index test/ref.fa test/RefIdx"
+echo "Command=bin/MapCaller index test/ref.fa test/RefIdx"
 echo
-bin/bwt_index test/ref.fa test/RefIdx
+bin/MapCaller index test/ref.fa test/RefIdx
 
 #test alignment
 echo

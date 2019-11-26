@@ -9,13 +9,8 @@ MapCaller: htslib
 htslib:
 		$(MAKE) -C src/htslib libhts.a
 
-bwt_index:
-		$(MAKE) -C src/BWT_Index
-		mkdir -p bin/ && cp -f src/BWT_Index/$@ bin/
-
 clean:
-		rm -f bin/MapCaller bin/bwt_index
+		rm -f bin/MapCaller
 		$(MAKE) clean -C src
 		$(MAKE) clean -C src/htslib
-		$(MAKE) clean -C src/BWT_Index
 

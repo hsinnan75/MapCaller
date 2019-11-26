@@ -36,7 +36,7 @@ to download the package of MapCaller.
 To compile MapCaller, it requires `libboost-all-dev`, `libbz2-dev`, and `liblzma-dev` pre-installed in your system.
 
 # Compiling
-To compile MapCaller and the index tool, please just type `make` to compile MapCaller and bwt_index. If the compilation or the program fails, please contact me (arith@iis.sinica.edu.tw) or report it at the
+To compile MapCaller and the index tool, please just type `make` to compile MapCaller. If the compilation or the program fails, please contact me (arith@iis.sinica.edu.tw) or report it at the
 [Issue Tracker](https://github.com/hsinnan75/MapCaller/issues).
 
 # Test
@@ -64,13 +64,13 @@ or
 To index a reference genome, it requires the target genome file (in fasta format) and the prefix of the index files (including the directory path).
 
   ```
-  $ bin/bwt_index ref_file[ex.ecoli.fa] index_prefix[ex. Ecoli]
+  $ bin/MapCaller index ref_file[ex.ecoli.fa] index_prefix[ex. Ecoli]
   ```
 The above command is to index the genome file Ecoli.fa and store the index files begining with ecoli.
 
 Please note that if you find bwt_index does not work in your computer system, you may use bwa (http://bio-bwa.sourceforge.net/) to build the index files.
   ```
-  $ ./bwa index -p index_prefix xxxx.fa
+  $ bwa index -p index_prefix xxxx.fa
   ```
 To perform variant calling, MapCaller requires the the index files of the reference genome and at least one read file (two read files for the separated paired-end reads). Users should use -i to specify the prefix of the index files (including the directory path).
 
@@ -171,6 +171,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - 0.9.9.24: Summarize the process to a log file
 - 0.9.9.25: Fixed typos in vcf headers.
 - 0.9.9.26: Fixed a bug when running multi-threads on MacOS.
+- 0.9.9.27: Integrated bwt_index into MapCaller
 
 # Acknowledgements
 We would like to thank [A/Prof. Torsten Seemann](https://github.com/tseemann)

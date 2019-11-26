@@ -423,7 +423,7 @@ void *ReadMapping(void *arg)
 	vector<string> SamStreamVec;
 	vector<FragPair_t> SimplePairVec;
 	int64_t myTotalDistance, myReadLengthSum;
-	int i, j, k, n, ReadNum, MappedNum, PairedNum;
+	int i, j, n, ReadNum, MappedNum, PairedNum;
 	vector<DiscordPair_t> INVSiteVec , TNLSiteVec;
 
 	ReadArr = new ReadItem_t[ReadChunkSize];
@@ -806,8 +806,8 @@ void Mapping()
 		avgDist = (int)(1.*TotalPairedDistance / iTotalPairedNum + .5);
 		avgReadLength = (int)(1.*ReadLengthSum / iTotalPairedNum + .5);
 		FragmentSize = avgDist + avgReadLength;
-		fprintf(log, "\tEstimated fragment size = %d, insert size = %d\n", FragmentSize, avgDist - avgReadLength);
-		fprintf(stderr, "\tEstimated fragment size = %d, insert size = %d\n", FragmentSize, avgDist - avgReadLength);
+		fprintf(log, "\tAverage read length = %d, Estimated fragment size = %d, insert size = %d\n", avgReadLength, FragmentSize, avgDist - avgReadLength);
+		fprintf(stderr, "\tAverage read length = %d, Estimated fragment size = %d, insert size = %d\n", avgReadLength, FragmentSize, avgDist - avgReadLength);
 	}
 	else avgDist = avgReadLength = 0;
 

@@ -15,7 +15,7 @@ OBJECT		= $(SOURCE:%.cpp=%.o)
 			$(CXX) $(FLAGS) -c $<
 
 main:		$(OBJECT)
-			$(CXX) $(FLAGS) $(OBJECT) -o MapCaller $(BWTLIB)/libbwa.a $(HTSLIB)/libhts.a $(LIB) 
+			$(CXX) $(FLAGS) $(OBJECT) -o MapCaller $(BWTLIB)/libbwa.a $(HTSLIB)/libhts.a $(LIB)
 
 clean:
 		rm -f *.o *~

@@ -66,12 +66,15 @@ To index a reference genome, it requires the target genome file (in fasta format
   ```
   $ bin/MapCaller index ref_file[ex.ecoli.fa] index_prefix[ex. Ecoli]
   ```
-The above command is to index the genome file Ecoli.fa and store the index files begining with ecoli.
+The above command is to index the genome file and store the index files begining with $index_prefix.
 
-Please note that if you find bwt_index does not work in your computer system, you may use bwa (http://bio-bwa.sourceforge.net/) to build the index files.
+or
+
   ```
-  $ bwa index -p index_prefix xxxx.fa
+  $ bin/MapCaller -r ref_file[ex.ecoli.fa] 
   ```
+The above command is to read a reference file and build a temporary index file
+
 To perform variant calling, MapCaller requires the the index files of the reference genome and at least one read file (two read files for the separated paired-end reads). Users should use -i to specify the prefix of the index files (including the directory path).
 
  case 1: standard vcf output / sam output (optional) / bam output (optional)
@@ -82,6 +85,11 @@ To perform variant calling, MapCaller requires the the index files of the refere
  case 2: multiple input 
   ```
  $ bin/MapCaller -i ecoli -f ReadFileA_1.fq ReadFileB_1.fq ReadFileC_1.fq -f2 ReadFileA_2.fq ReadFileB_2.fq ReadFileC_2.fq -vcf out.vcf
+  ```
+
+ case 3: given a reference genome
+  ```
+ $ bin/MapCaller -r ecoli.fa -f ReadFile1.fa -f2 ReadFile2.fa -vcf out.vcf [-sam out.sam][-bam out.bam]
   ```
 
 # File formats
@@ -106,7 +114,9 @@ To perform variant calling, MapCaller requires the the index files of the refere
  ```
 -t INT number of threads [16]
 
--i STR index prefix [BWT based (BWA), required]
+-i STR index prefix [optional, BWT based (BWA)]
+
+-r STR reference filename [optional, fasta]
 
 -f STR read filename [required, fasta or fastq or fq.gz]
 
@@ -172,6 +182,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - 0.9.9.25: Fixed typos in vcf headers.
 - 0.9.9.26: Fixed a bug when running multi-threads on MacOS.
 - 0.9.9.27: Integrated bwt_index into MapCaller
+- 0.9.9.28: Build reference index on the fly
 
 # Acknowledgements
 We would like to thank [A/Prof. Torsten Seemann](https://github.com/tseemann)

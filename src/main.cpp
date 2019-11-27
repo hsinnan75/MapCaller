@@ -1,8 +1,15 @@
 #include "structure.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+	int bwa_idx_build(const char *fa, const char *prefix);
+}
+#endif
+
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.27";
+const char* VersionStr = "0.9.9.28";
 
 string CmdLine;
 uint8_t iMaxDuplicate;
@@ -21,6 +28,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "MapCaller v%s\n\n", VersionStr);
 	fprintf(stderr, "Usage: %s -i Index_Prefix -f <ReadFile_A1 ReadFile_B1 ...> [-f2 <ReadFile_A2 ReadFile_B2 ...>]\n\n", program);
 	fprintf(stderr, "Options: -i STR        BWT_Index_Prefix\n");
+	fprintf(stderr, "         -r STR        Reference filename (format:fa)\n");
 	fprintf(stderr, "         -f            files with #1 mates reads (format:fa, fq, fq.gz)\n");
 	fprintf(stderr, "         -f2           files with #2 mates reads (format:fa, fq, fq.gz)\n");
 	fprintf(stderr, "         -t INT        number of threads [%d]\n", iThreadNum);
@@ -48,25 +56,34 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "\n");
 }
 
+void MakeRefIdx(char* RefFileName)
+{
+	IndexFileName = (char*)"tmp_idx";
+	bwa_idx_build(RefFileName, IndexFileName);
+}
+
 bool CheckOutputFileName(char *FileName)
 {
 	struct stat s;
 	bool bRet = true;
+	int i, len = strlen(FileName);
 
+	for (i = 0; i < len; i++)
+	{
+		if (isalnum(FileName[i]) || FileName[i] == '/' || FileName[i] == '.');
+		else
+		{
+			bRet = false;
+			fprintf(stdout, "Warning: [%s] is not a valid filename!\n", FileName);
+			break;
+		}
+	}
 	if (stat(FileName, &s) == 0)
 	{
 		if (s.st_mode & S_IFDIR)
 		{
 			bRet = false;
 			fprintf(stderr, "Warning: %s is a directory!\n", FileName);
-		}
-		else if (s.st_mode & S_IFREG)
-		{
-		}
-		else
-		{
-			bRet = false;
-			fprintf(stderr, "Warning: %s is not a regular file!\n", FileName);
 		}
 	}
 	return bRet;
@@ -119,14 +136,10 @@ void ReadLibInput(const char* LibFileName)
 	file.close();
 }
 
-extern "C"
-{
-	int bwa_idx_build(const char *fa, const char *prefix);
-}
-
 int main(int argc, char* argv[])
 {
 	int i;
+	char* RefFileName;
 	string parameter, str;
 
 	bGVCF = false;
@@ -157,8 +170,8 @@ int main(int argc, char* argv[])
 	MaxMisMatchRate = 0.05;
 	LogFileName = (char*)"job.log";
 	VcfFileName = (char*)"output.vcf";
-	RefSequence = IndexFileName = SamFileName = NULL;
 	ObservGenomicPos = ObserveBegPos = ObserveEndPos = -1;
+	RefSequence = RefFileName = IndexFileName = SamFileName = NULL;
 
 	if (argc == 1 || strcmp(argv[1], "-h") == 0) ShowProgramUsage(argv[0]);
 	else if (strcmp(argv[1], "update") == 0)
@@ -168,7 +181,7 @@ int main(int argc, char* argv[])
 	}
 	else if (strcmp(argv[1], "index") == 0)
 	{
-		if(argc > 3) bwa_idx_build(argv[2], argv[3]);
+		if(argc == 3) bwa_idx_build(argv[2], argv[3]);
 		else
 		{
 			fprintf(stderr, "usage: %s index ref.fa prefix\n", argv[0]);
@@ -184,6 +197,7 @@ int main(int argc, char* argv[])
 			parameter = argv[i];
 
 			if (parameter == "-i" && i + 1 < argc) IndexFileName = argv[++i];
+			else if (parameter == "-r" && i + 1 < argc) RefFileName = argv[++i];
 			else if (parameter == "-f")
 			{
 				while (++i < argc && argv[i][0] != '-') ReadFileNameVec1.push_back(argv[i]);
@@ -297,6 +311,7 @@ int main(int argc, char* argv[])
 		//if (MinAlleleFreq > MinBaseDepth) MinAlleleFreq = MinBaseDepth;
 		//fprintf(stderr, "AD=%d\n", MinAlleleFreq);
 
+		if (RefFileName != NULL) MakeRefIdx(RefFileName);
 		if (IndexFileName != NULL && CheckBWAIndexFiles(IndexFileName)) RefIdx = bwa_idx_load(IndexFileName);
 		else
 		{
@@ -333,6 +348,7 @@ int main(int argc, char* argv[])
 			bwa_idx_destroy(RefIdx);
 			if (RefSequence != NULL) delete[] RefSequence;
 			if (MappingRecordArr != NULL) delete[] MappingRecordArr;
+			if (strcmp(IndexFileName, "tmp_idx") == 0) system("rm -f tmp_idx.amb tmp_idx.ann tmp_idx.bwt tmp_idx.pac tmp_idx.sa");
 
 			log = fopen(LogFileName, "a"); 
 			fprintf(log, "All done! It took %lld seconds to complete the data analysis.\n\n\n", (long long)(time(NULL) - StartProcessTime)); fclose(log);

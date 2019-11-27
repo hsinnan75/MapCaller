@@ -14,4 +14,5 @@ clean:
 		rm -f bin/MapCaller
 		$(MAKE) clean -C src
 		$(MAKE) clean -C src/htslib
+		$(MAKE) clean -C src/BWT_Index
 

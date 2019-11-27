@@ -207,7 +207,7 @@ bool CheckBreakPoints(int64_t gPos)
 void ShowMetaInfo()
 {
 	fprintf(outFile, "##fileformat=VCFv4.2\n");
-	fprintf(outFile, "##reference=%s\n", IndexFileName);
+	fprintf(outFile, "##reference=%s\n", (RefFileName != NULL ? RefFileName: IndexFileName));
 	fprintf(outFile, "##source=MapCaller %s\n", VersionStr);
 	fprintf(outFile, "##command_line=\"%s\"\n", CmdLine.c_str());
 	fprintf(outFile, "##INFO=<ID=RC,Number=1,Type=Integer,Description=\"Number of reads with start coordinate at this position.\">\n");

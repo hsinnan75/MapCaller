@@ -3,7 +3,7 @@
 all: main
 
 CXX		= g++
-FLAGS		= -I${PREFIX}/include -Wall -D NDEBUG -O3 -m64 -msse4.1
+FLAGS		= -I${PREFIX}/include -L${PREFIX}/lib -Wall -D NDEBUG -O3 -m64 -msse4.1
 LIB		= -lz -lm -lbz2 -llzma -lpthread -lstdc++
 HTSLIB		= htslib
 BWTLIB		= BWT_Index

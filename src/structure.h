@@ -208,7 +208,7 @@ extern vector<Chromosome_t> ChromosomeVec;
 extern vector<CoordinatePair_t> DistantPairVec;
 extern vector<string> ReadFileNameVec1, ReadFileNameVec2;
 extern pthread_mutex_t LibraryLock, ProfileLock, OutputLock, VarLock;
-extern char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
+extern char *RefSequence, *RefFileName, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
 extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bGVCF, bMonomorphic, bSomatic, NW_ALG;
 extern int iThreadNum, iPloidy, iChromsomeNum, MaxClipSize, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleDepth, MinIndFreq, MinCNVsize, MinUnmappedSize, MinVarConfScore;

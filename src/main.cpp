@@ -19,7 +19,7 @@ MappingRecord_t* MappingRecordArr = NULL;
 vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 pthread_mutex_t LibraryLock, ProfileLock, OutputLock, VarLock;
-char *RefSequence, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
+char *RefSequence, *RefFileName, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
 int iThreadNum, iPloidy, FragmentSize, MaxClipSize, MinAlleleDepth, MinIndFreq, MinVarConfScore, MinCNVsize, MinUnmappedSize;
 bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bGVCF, bMonomorphic, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
 
@@ -139,7 +139,6 @@ void ReadLibInput(const char* LibFileName)
 int main(int argc, char* argv[])
 {
 	int i;
-	char* RefFileName;
 	string parameter, str;
 
 	bGVCF = false;

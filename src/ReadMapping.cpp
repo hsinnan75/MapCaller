@@ -448,6 +448,7 @@ void *ReadMapping(void *arg)
 				SimplePairVec = IdentifySimplePairs(ReadArr[i].rlen, EncodeSeq); delete[] EncodeSeq;
 				ReadArr[i].AlnCanVec = SimplePairClustering(ReadArr[i].rlen, SimplePairVec);
 
+				ReverseOrientation(&ReadArr[j]);
 				EncodeSeq = new uint8_t[ReadArr[j].rlen]; EnCodeReadSeq(ReadArr[j].rlen, ReadArr[j].seq, EncodeSeq);
 				SimplePairVec = IdentifySimplePairs(ReadArr[j].rlen, EncodeSeq); delete[] EncodeSeq;
 				ReadArr[j].AlnCanVec = SimplePairClustering(ReadArr[j].rlen, SimplePairVec);
@@ -719,8 +720,8 @@ void Mapping()
 
 	if (bSAMoutput && SamFileName != NULL)
 	{
-		if (bSAMFormat) sam_out = fopen(SamFileName, "w");
-		else bam_out = sam_open_format(SamFileName, "wb", NULL);
+		if (bSAMFormat) sam_out = strcmp(SamFileName, "-") == 0 ? fopen("/dev/stdout", "w") : fopen(SamFileName, "w");
+		else bam_out = strcmp(SamFileName, "-") == 0 ? sam_open_format("/dev/stdout", "wb", NULL): sam_open_format(SamFileName, "wb", NULL);
 	}
 	if (bSAMoutput) OutputSamHeaders();
 

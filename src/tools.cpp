@@ -1,60 +1,57 @@
 #include "structure.h" 
 
-static const char ReverseMap[255] =
+char GetComplementaryBase(char c)
 {
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /*   0 -   9 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /*  10 -  19 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /*  20 -  29 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /*  30 -  39 */
-	'\0', '\0', '\0', '\0', '\0', '-', '\0', '\0', '\0', '\0', /*  40 -  49 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /*  50 -  59 */
-	'\0', '\0', '\0', '\0', '\0',  'T', '\0',  'G', '\0', '\0', /*  60 -  69 */
-	'\0',  'C', '\0', '\0', '\0', '\0', '\0', '\0',  'N', '\0', /*  70 -  79 */
-	'\0', '\0', '\0', '\0',  'A',  'A', '\0', '\0', '\0', '\0', /*  80 -  89 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0',  'T', '\0',  'G', /*  90 -  99 */
-	'\0', '\0', '\0',  'C', '\0', '\0', '\0', '\0', '\0', '\0', /* 100 - 109 */
-	'N',  '\0', '\0', '\0', '\0', '\0',  'A',  'A', '\0', '\0', /* 110 - 119 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /* 120 - 129 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /* 130 - 139 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /* 140 - 149 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /* 150 - 159 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /* 160 - 169 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /* 170 - 179 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /* 180 - 189 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /* 190 - 199 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /* 200 - 209 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /* 210 - 219 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /* 220 - 229 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /* 230 - 239 */
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', /* 240 - 249 */
-	'\0', '\0', '\0', '\0', '\0'                                /* 250 - 254 */
-};
+	switch (c)
+	{
+	case 'A': return 'T';
+	case 'a': return 'T';
+	case 'C': return 'G';
+	case 'c': return 'G';
+	case 'G': return 'C';
+	case 'g': return 'C';
+	case 'T': return 'A';
+	case 't': return 'A';
+	default:  return 'N';
+	}
+}
 
 void GetComplementarySeq(int len, char* seq, char* rseq)
 {
 	int i, j;
-
 	for (j = len - 1, i = 0; i<j; i++, j--)
 	{
-		rseq[i] = ReverseMap[(int)seq[j]];
-		rseq[j] = ReverseMap[(int)seq[i]];
+		rseq[i] = GetComplementaryBase(seq[j]);
+		rseq[j] = GetComplementaryBase(seq[i]);
 	}
-	if (i == j) rseq[i] = ReverseMap[(int)seq[i]];
-
+	if (i == j) rseq[i] = GetComplementaryBase(seq[i]);
 	rseq[len] = '\0';
 }
 
 void SelfComplementarySeq(int len, char* seq)
 {
+	char c;
 	int i, j;
-	char aa1, aa2;
 
-	for (j = len - 1, i = 0; i<j; i++, j--)
+	for (j = len - 1, i = 0; i < j; i++, j--)
 	{
-		aa1 = seq[i]; aa2 = seq[j];
-		seq[i] = ReverseMap[(int)aa2]; seq[j] = ReverseMap[(int)aa1];
+		c = seq[i];
+		seq[i] = GetComplementaryBase(seq[j]);
+		seq[j] = GetComplementaryBase(c);;
 	}
-	if (i == j) seq[i] = ReverseMap[(int)seq[i]];
+	if (i == j) seq[i] = GetComplementaryBase(seq[i]);
+}
+
+void ReverseOrientation(ReadItem_t* read)
+{
+	char* rseq;
+
+	rseq = new char[read->rlen + 1];
+	GetComplementarySeq(read->rlen, read->seq, rseq);
+	strcpy(read->seq, rseq);
+	copy(rseq, rseq + read->rlen, read->seq);
+	if (read->qual != NULL) reverse(read->qual, read->qual + read->rlen);
+	delete[] rseq;
 }
 
 int CalFragPairNonIdenticalBases(int len, char* frag1, char* frag2)

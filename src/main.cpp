@@ -9,7 +9,7 @@ extern "C"
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.28";
+const char* VersionStr = "0.9.9.29";
 
 string CmdLine;
 uint8_t iMaxDuplicate;
@@ -68,22 +68,28 @@ bool CheckOutputFileName(char *FileName)
 	bool bRet = true;
 	int i, len = strlen(FileName);
 
-	for (i = 0; i < len; i++)
+	if (strcmp(FileName, "-") == 0)
 	{
-		if (isalnum(FileName[i]) || FileName[i] == '/' || FileName[i] == '.');
-		else
-		{
-			bRet = false;
-			fprintf(stdout, "Warning: [%s] is not a valid filename!\n", FileName);
-			break;
-		}
 	}
-	if (stat(FileName, &s) == 0)
+	else
 	{
-		if (s.st_mode & S_IFDIR)
+		for (i = 0; i < len; i++)
 		{
-			bRet = false;
-			fprintf(stderr, "Warning: %s is a directory!\n", FileName);
+			if (isalnum(FileName[i]) || FileName[i] == '/' || FileName[i] == '.');
+			else
+			{
+				bRet = false;
+				fprintf(stdout, "Warning: [%s] is not a valid filename!\n", FileName);
+				break;
+			}
+		}
+		if (stat(FileName, &s) == 0)
+		{
+			if (s.st_mode & S_IFDIR)
+			{
+				bRet = false;
+				fprintf(stderr, "Warning: %s is a directory!\n", FileName);
+			}
 		}
 	}
 	return bRet;
@@ -307,8 +313,6 @@ int main(int argc, char* argv[])
 		if (strcmp(LogFileName, "job.log")!= 0 && CheckOutputFileName(LogFileName) == false) exit(0);
 		if (SamFileName != NULL && CheckOutputFileName(SamFileName) == false) exit(0);
 		if (VcfFileName != NULL && CheckOutputFileName(VcfFileName) == false) exit(0);
-		//if (MinAlleleFreq > MinBaseDepth) MinAlleleFreq = MinBaseDepth;
-		//fprintf(stderr, "AD=%d\n", MinAlleleFreq);
 
 		if (RefFileName != NULL) MakeRefIdx(RefFileName);
 		if (IndexFileName != NULL && CheckBWAIndexFiles(IndexFileName)) RefIdx = bwa_idx_load(IndexFileName);
@@ -334,10 +338,7 @@ int main(int argc, char* argv[])
 				fprintf(stderr, "Initialize the alignment profile...\n");
 				MappingRecordArr = new MappingRecord_t[GenomeSize]();
 			}
-			pthread_mutex_init(&VarLock, NULL);
-			pthread_mutex_init(&OutputLock, NULL);
-			pthread_mutex_init(&LibraryLock, NULL);
-			pthread_mutex_init(&ProfileLock, NULL);
+			pthread_mutex_init(&VarLock, NULL); pthread_mutex_init(&OutputLock, NULL); pthread_mutex_init(&LibraryLock, NULL); pthread_mutex_init(&ProfileLock, NULL);
 
 			StartProcessTime = time(NULL);
 			

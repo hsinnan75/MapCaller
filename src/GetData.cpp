@@ -5,17 +5,6 @@ map<int64_t, int> ChrLocMap;
 int64_t GenomeSize, TwoGenomeSize;
 vector<Chromosome_t> ChromosomeVec;
 
-//int IdentifyHeaderBoundary(char* str, int len)
-//{
-//	int i;
-//
-//	for (i = 1; i < len; i++)
-//	{
-//		if (str[i] == ' ' || str[i] == '/' || str[i] == '\t') return i;
-//	}
-//	return i;
-//}
-
 int IdentifyHeaderBegPos(char* str, int len)
 {
 	for (int i = 1; i < len; i++)
@@ -102,7 +91,6 @@ ReadItem_t GetNextEntry(FILE *file)
 
 int GetNextChunk(bool bSepLibrary, FILE *file, FILE *file2, ReadItem_t* ReadArr)
 {
-	char* rseq;
 	int iCount = 0;
 
 	while (true)
@@ -112,18 +100,6 @@ int GetNextChunk(bool bSepLibrary, FILE *file, FILE *file2, ReadItem_t* ReadArr)
 
 		if (bSepLibrary) ReadArr[iCount] = GetNextEntry(file2);
 		else if ((ReadArr[iCount] = GetNextEntry(file)).rlen == 0) break;
-
-		if (bPairEnd)
-		{
-			rseq = new char[ReadArr[iCount].rlen + 1];
-			GetComplementarySeq(ReadArr[iCount].rlen, ReadArr[iCount].seq, rseq);
-			copy(rseq, rseq + ReadArr[iCount].rlen, ReadArr[iCount].seq); delete[] rseq;
-			if (FastQFormat)
-			{
-				string rqual = ReadArr[iCount].qual; reverse(rqual.begin(), rqual.end());
-				copy(rqual.c_str(), rqual.c_str() + ReadArr[iCount].rlen, ReadArr[iCount].qual);
-			}
-		}
 		iCount++;
 		if (iCount == ReadChunkSize) break;
 	}
@@ -164,7 +140,6 @@ ReadItem_t gzGetNextEntry(gzFile file)
 
 int gzGetNextChunk(bool bSepLibrary, gzFile file, gzFile file2, ReadItem_t* ReadArr)
 {
-	char* rseq;
 	int iCount = 0;
 
 	while (true)
@@ -173,17 +148,6 @@ int gzGetNextChunk(bool bSepLibrary, gzFile file, gzFile file2, ReadItem_t* Read
 		iCount++;
 		if (bSepLibrary) ReadArr[iCount] = gzGetNextEntry(file2);
 		else if ((ReadArr[iCount] = gzGetNextEntry(file)).rlen == 0) break;
-		if (bPairEnd)
-		{
-			rseq = new char[ReadArr[iCount].rlen + 1];
-			GetComplementarySeq(ReadArr[iCount].rlen, ReadArr[iCount].seq, rseq);
-			copy(rseq, rseq + ReadArr[iCount].rlen, ReadArr[iCount].seq); delete[] rseq;
-			if (FastQFormat)
-			{
-				string rqual = ReadArr[iCount].qual; reverse(rqual.begin(), rqual.end());
-				copy(rqual.c_str(), rqual.c_str() + ReadArr[iCount].rlen, ReadArr[iCount].qual);
-			}
-		}
 		iCount++;
 		if (iCount == ReadChunkSize) break;
 	}

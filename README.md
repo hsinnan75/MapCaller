@@ -183,6 +183,7 @@ To perform variant calling, MapCaller requires the the index files of the refere
 - 0.9.9.26: Fixed a bug when running multi-threads on MacOS.
 - 0.9.9.27: Integrated bwt_index into MapCaller
 - 0.9.9.28: Build reference index on the fly
+- 0.9.9.29: Fixed a bug when the input data contains unexpected characters.
 
 # Acknowledgements
 We would like to thank [A/Prof. Torsten Seemann](https://github.com/tseemann)

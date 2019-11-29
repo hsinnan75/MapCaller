@@ -22,7 +22,7 @@
 
 #define MaxPosDiff 30
 #define MinSeedLength 16
-#define ReadChunkSize 4000
+#define ReadChunkSize 200
 #define MaxAlleleCount 4095
 
 using namespace std;
@@ -251,6 +251,7 @@ extern void GeneratePairedSamStream(ReadItem_t& read1, ReadItem_t& read2, vector
 // tools.cpp
 extern void ShowProfileColumn(int64_t gPos);
 extern void ShowSeedLocationInfo(int64_t MyPos);
+extern void ReverseOrientation(ReadItem_t* read);
 extern int64_t GetAlignmentBoundary(int64_t gPos);
 //extern bool CheckFragValidity(FragPair_t FragPair);
 extern void SelfComplementarySeq(int len, char* rseq);

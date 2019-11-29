@@ -56,10 +56,13 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "\n");
 }
 
-void MakeRefIdx(char* RefFileName)
+string MakeRefIdx(char* RefFileName)
 {
-	IndexFileName = (char*)"tmp_idx";
-	bwa_idx_build(RefFileName, IndexFileName);
+	string str;
+	srand((unsigned int)time(NULL)); str.resize(10);
+	for (int i = 0; i < 10; i++) str[i] = (unsigned short)(rand() >> 3) % 26 + 97;
+
+	return str;
 }
 
 bool CheckOutputFileName(char *FileName)
@@ -145,7 +148,7 @@ void ReadLibInput(const char* LibFileName)
 int main(int argc, char* argv[])
 {
 	int i;
-	string parameter, str;
+	string parameter, str, random_prefix;
 
 	bGVCF = false;
 	iPloidy = 2;
@@ -314,7 +317,12 @@ int main(int argc, char* argv[])
 		if (SamFileName != NULL && CheckOutputFileName(SamFileName) == false) exit(0);
 		if (VcfFileName != NULL && CheckOutputFileName(VcfFileName) == false) exit(0);
 
-		if (RefFileName != NULL) MakeRefIdx(RefFileName);
+		if (RefFileName != NULL)
+		{
+			random_prefix = MakeRefIdx(RefFileName);
+			IndexFileName = (char*)random_prefix.c_str();
+			bwa_idx_build(RefFileName, IndexFileName);
+		}
 		if (IndexFileName != NULL && CheckBWAIndexFiles(IndexFileName)) RefIdx = bwa_idx_load(IndexFileName);
 		else
 		{
@@ -348,8 +356,11 @@ int main(int argc, char* argv[])
 			bwa_idx_destroy(RefIdx);
 			if (RefSequence != NULL) delete[] RefSequence;
 			if (MappingRecordArr != NULL) delete[] MappingRecordArr;
-			if (strcmp(IndexFileName, "tmp_idx") == 0) system("rm -f tmp_idx.amb tmp_idx.ann tmp_idx.bwt tmp_idx.pac tmp_idx.sa");
-
+			if (RefFileName != NULL)
+			{
+				random_prefix = "rm -f " + random_prefix + "*";
+				system(random_prefix.c_str());
+			}
 			log = fopen(LogFileName, "a"); 
 			fprintf(log, "All done! It took %lld seconds to complete the data analysis.\n\n\n", (long long)(time(NULL) - StartProcessTime)); fclose(log);
 			fprintf(stderr, "All done! It took %lld seconds to complete the data analysis.\n", (long long)(time(NULL)- StartProcessTime));

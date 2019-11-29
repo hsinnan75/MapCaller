@@ -413,6 +413,13 @@ void EnCodeReadSeq(int rlen, char* seq, uint8_t* EncodeSeq)
 	for (int i = 0; i < rlen; i++) EncodeSeq[i] = nst_nt4_table[(int)seq[i]];
 }
 
+void FreeReadItem(ReadItem_t* read)
+{
+	if (read->header != NULL) delete[] read->header;
+	if (read->seq != NULL)delete[] read->seq;
+	if (read->qual != NULL)delete[] read->qual;
+}
+
 void *ReadMapping(void *arg)
 {
 	uint8_t* EncodeSeq;
@@ -460,18 +467,13 @@ void *ReadMapping(void *arg)
 				//printf("read:%s\n", ReadArr[j].header); ShowFragPairCluster(ReadArr[j].AlnCanVec);
 
 				n = CheckPairedAlignmentDistance((int)(avgDist*1.5), ReadArr[i].AlnCanVec, ReadArr[j].AlnCanVec);
-				//if (n > 1) printf("%s: %d\n", ReadArr[i].header, n);
 				if (n == 0) n = AlignmentRescue((int)(avgDist*1.5), ReadArr[i], ReadArr[j]); // perform alignment rescue
 				//if (bDebugMode)
 				//{
 				//	printf("read1:%s\n", ReadArr[i].header); ShowFragPairCluster(ReadArr[i].AlnCanVec);
 				//	printf("read2:%s\n", ReadArr[j].header); ShowFragPairCluster(ReadArr[j].AlnCanVec);
 				//}
-				if(n == 0)
-				{
-					RemoveRedundantAlnCan(ReadArr[i].AlnCanVec); 
-					RemoveRedundantAlnCan(ReadArr[j].AlnCanVec); 
-				}
+				if(n == 0) RemoveRedundantAlnCan(ReadArr[i].AlnCanVec), RemoveRedundantAlnCan(ReadArr[j].AlnCanVec);
 				else MaskUnPairedAlnCan(ReadArr[i].AlnCanVec, ReadArr[j].AlnCanVec);
 
 				if (ProduceReadAlignment(ReadArr[i])) MappedNum++;
@@ -481,13 +483,10 @@ void *ReadMapping(void *arg)
 				//	printf("read1:%s\n", ReadArr[i].header); ShowFragPairCluster(ReadArr[i].AlnCanVec);
 				//	printf("read2:%s\n", ReadArr[j].header); ShowFragPairCluster(ReadArr[j].AlnCanVec);
 				//}
-
 				if ((CoorPair = GenCoordinatePair(ReadArr[i].AlnCanVec, ReadArr[j].AlnCanVec)).dist != 0)
 				{
 					if (CoorPair.gPos1 == -1 || CoorPair.gPos2 == -1)
 					{
-						//printf("Read1: %s\n", ReadArr[i].header); ShowFragPairCluster(ReadArr[i].AlnCanVec);
-						//printf("Read2: %s\n", ReadArr[j].header); ShowFragPairCluster(ReadArr[j].AlnCanVec);
 					}
 					else
 					{
@@ -499,12 +498,6 @@ void *ReadMapping(void *arg)
 								if (DiscordPair.dist > MinInversionSize && DiscordPair.dist < MaxInversionSize)
 								{
 									DiscordPair.gPos = CoorPair.gPos1; INVSiteVec.push_back(DiscordPair);
-									//printf("Coor1=%lld, Coor2=%lld, dist=%lld\n", CoorPair.gPos1, TwoGenomeSize - CoorPair.gPos2, abs(TwoGenomeSize - CoorPair.gPos2 - CoorPair.gPos1));
-									//if (CoorPair.gPos1 > ObserveBegPos && CoorPair.gPos1 < ObserveEndPos)
-									//{
-									//	printf("Read1: %s\n", ReadArr[i].header); ShowFragPairCluster(ReadArr[i].AlnCanVec);
-									//	printf("Read2: %s\n", ReadArr[j].header); ShowFragPairCluster(ReadArr[j].AlnCanVec);
-									//}
 								}
 							}
 						}
@@ -513,11 +506,7 @@ void *ReadMapping(void *arg)
 							if (bVCFoutput)
 							{
 								DiscordPair.dist = abs(TwoGenomeSize - CoorPair.gPos1 - CoorPair.gPos2);
-								if (DiscordPair.dist > MinInversionSize && DiscordPair.dist < MaxInversionSize)
-								{
-									DiscordPair.gPos = CoorPair.gPos2; INVSiteVec.push_back(DiscordPair);
-									//printf("Coor2=%lld, Coor1=%lld, dist=%lld\n", CoorPair.gPos2, TwoGenomeSize - CoorPair.gPos1, abs(TwoGenomeSize - CoorPair.gPos1 - CoorPair.gPos2));
-								}
+								if (DiscordPair.dist > MinInversionSize && DiscordPair.dist < MaxInversionSize) DiscordPair.gPos = CoorPair.gPos2; INVSiteVec.push_back(DiscordPair);
 							}
 						}
 						else if (CoorPair.dist > MinTranslocationSize)
@@ -536,9 +525,6 @@ void *ReadMapping(void *arg)
 									DiscordPair.gPos = TwoGenomeSize - CoorPair.gPos1; TNLSiteVec.push_back(DiscordPair);
 									DiscordPair.gPos = TwoGenomeSize - CoorPair.gPos2; TNLSiteVec.push_back(DiscordPair);
 								}
-								//printf("Distance Estimation = %d\n\n", CoorPair.dist);
-								//printf("Read1: %s\n", ReadArr[i].header); ShowFragPairCluster(ReadArr[i].AlnCanVec);
-								//printf("Read2: %s\n", ReadArr[j].header); ShowFragPairCluster(ReadArr[j].AlnCanVec);
 							}
 						}
 						else
@@ -595,9 +581,7 @@ void *ReadMapping(void *arg)
 			{
 				EncodeSeq = new uint8_t[ReadArr[i].rlen]; EnCodeReadSeq(ReadArr[i].rlen, ReadArr[i].seq, EncodeSeq);
 				SimplePairVec = IdentifySimplePairs(ReadArr[i].rlen, EncodeSeq); delete[] EncodeSeq;
-				ReadArr[i].AlnCanVec = SimplePairClustering(ReadArr[i].rlen, SimplePairVec);
-				ReadArr[i].AlnSummary = AlnSummary;
-				//ShowFragPairCluster(ReadArr[i].AlnCanVec);
+				ReadArr[i].AlnSummary = AlnSummary; ReadArr[i].AlnCanVec = SimplePairClustering(ReadArr[i].rlen, SimplePairVec);
 				RemoveRedundantAlnCan(ReadArr[i].AlnCanVec); 
 				if (ProduceReadAlignment(ReadArr[i])) MappedNum++;
 			}
@@ -637,12 +621,7 @@ void *ReadMapping(void *arg)
 				pthread_mutex_unlock(&ProfileLock);
 			}
 		}
-		for (i = 0; i != ReadNum; i++)
-		{
-			delete[] ReadArr[i].header;
-			delete[] ReadArr[i].seq;
-			if (FastQFormat) delete[] ReadArr[i].qual;
-		}
+		for (i = 0; i != ReadNum; i++)  FreeReadItem(ReadArr + i);
 		//if (iTotalReadNum >= 100000000) break;
 	}
 	delete[] ReadArr;

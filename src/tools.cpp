@@ -96,7 +96,7 @@ void ShowSimplePairInfo(vector<FragPair_t>& FragPairVec)
 			}
 		}
 	}
-	printf("\n"); fflush(stdout);
+	printf("\n");
 }
 
 void ShowSeedLocationInfo(int64_t MyPos)
@@ -115,16 +115,6 @@ int64_t GetAlignmentBoundary(int64_t gPos)
 
 	return iter->first;
 }
-
-//bool CheckFragValidity(FragPair_t FragPair)
-//{
-//	map<int64_t, int>::iterator iter1, iter2;
-//
-//	iter1 = ChrLocMap.lower_bound(FragPair.gPos);
-//	iter2 = ChrLocMap.lower_bound(FragPair.gPos + FragPair.gLen - 1);
-//
-//	return (iter1->first == iter2->first);
-//}
 
 bool CheckAlignmentValidity(vector<FragPair_t>& FragPairVec)
 {

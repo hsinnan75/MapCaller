@@ -9,7 +9,7 @@ extern "C"
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.29";
+const char* VersionStr = "0.9.9.30";
 
 string CmdLine;
 uint8_t iMaxDuplicate;
@@ -71,10 +71,7 @@ bool CheckOutputFileName(char *FileName)
 	bool bRet = true;
 	int i, len = strlen(FileName);
 
-	if (strcmp(FileName, "-") == 0)
-	{
-	}
-	else
+	if (strcmp(FileName, "-") != 0)
 	{
 		for (i = 0; i < len; i++)
 		{
@@ -82,7 +79,7 @@ bool CheckOutputFileName(char *FileName)
 			else
 			{
 				bRet = false;
-				fprintf(stdout, "Warning: [%s] is not a valid filename!\n", FileName);
+				fprintf(stderr, "Warning: [%s] is not a valid filename!\n", FileName);
 				break;
 			}
 		}
@@ -189,7 +186,7 @@ int main(int argc, char* argv[])
 	}
 	else if (strcmp(argv[1], "index") == 0)
 	{
-		if(argc == 3) bwa_idx_build(argv[2], argv[3]);
+		if(argc == 4) bwa_idx_build(argv[2], argv[3]);
 		else
 		{
 			fprintf(stderr, "usage: %s index ref.fa prefix\n", argv[0]);
@@ -296,8 +293,7 @@ int main(int argc, char* argv[])
 		}
 		if (bGVCF && bMonomorphic) bGVCF = false;
 		if (iMaxDuplicate <= 0 || iMaxDuplicate > 15) iMaxDuplicate = 15;
-		//fprintf(stderr, "Read1:\n"); for (vector<string>::iterator iter = ReadFileNameVec1.begin(); iter != ReadFileNameVec1.end(); iter++) fprintf(stderr, "\t%s\n", (char*)iter->c_str());
-		//fprintf(stderr, "Read2:\n"); for (vector<string>::iterator iter = ReadFileNameVec2.begin(); iter != ReadFileNameVec2.end(); iter++) fprintf(stderr, "\t%s\n", (char*)iter->c_str());
+
 		if (ReadFileNameVec1.size() == 0)
 		{
 			fprintf(stderr, "Warning! Please specify a valid read input!\n");
@@ -349,10 +345,11 @@ int main(int argc, char* argv[])
 			pthread_mutex_init(&VarLock, NULL); pthread_mutex_init(&OutputLock, NULL); pthread_mutex_init(&LibraryLock, NULL); pthread_mutex_init(&ProfileLock, NULL);
 
 			StartProcessTime = time(NULL);
-			
 			FILE *log = fopen(LogFileName, "a"); fprintf(log, "%s\n[CMD]", string().assign(80, '*').c_str()); for (i = 0; i < argc; i++) fprintf(log, " %s", argv[i]); fprintf(log, "\n\n"); fclose(log);
+
 			Mapping();
 			if (bVCFoutput) VariantCalling();
+
 			bwa_idx_destroy(RefIdx);
 			if (RefSequence != NULL) delete[] RefSequence;
 			if (MappingRecordArr != NULL) delete[] MappingRecordArr;

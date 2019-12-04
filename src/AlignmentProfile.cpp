@@ -71,10 +71,6 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 			}
 			if ((read->rlen - iter->FragPairVec.rbegin()->rPos) > MaxClipSize) continue;
 		}
-		//if (iter->FragPairVec.begin()->rPos > MaxClipSize || (read->rlen - iter->FragPairVec.rbegin()->rPos - iter->FragPairVec.rbegin()->rLen) > MaxClipSize) continue;
-		//if (bSomatic && CheckMismatch(iter->FragPairVec) > 2) continue;
-		//if (bSomatic && iter->PairedAlnCanIdx == -1) continue;
-
 		if (iter->orientation) gPos = iter->FragPairVec.begin()->gPos;
 		else gPos = TwoGenomeSize - (iter->FragPairVec.begin()->gPos + iter->FragPairVec.begin()->gLen);
 		if (MappingRecordArr[gPos].readCount < iMaxDuplicate) MappingRecordArr[gPos].readCount++;
@@ -220,13 +216,6 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 			}
 		}
 	}
-	//if (bShow)
-	//{
-	//	pthread_mutex_lock(&Lock);
-	//	printf("%s\n%s\n", read->header, read->seq);
-	//	ShowFragPairCluster(AlnCanVec);
-	//	pthread_mutex_unlock(&Lock);
-	//}
 }
 
 void UpdateMultiHitCount(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)

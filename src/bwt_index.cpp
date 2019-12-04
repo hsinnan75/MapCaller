@@ -15,9 +15,9 @@ static bwtint_t fread_fix(FILE *fp, bwtint_t size, void *a)
 
 void bwt_restore_sa(const char *fn, bwt_t *bwt)
 {
-	char skipped[256];
 	FILE *fp;
 	bwtint_t primary;
+	char skipped[256];
 
 	fp = fopen(fn, "rb");
 	fread(&primary, sizeof(bwtint_t), 1, fp);
@@ -37,16 +37,15 @@ void bwt_restore_sa(const char *fn, bwt_t *bwt)
 
 bntseq_t *bns_restore_core(const char *ann_filename, const char* amb_filename, const char* pac_filename)
 {
-	char str[1024];
-	FILE *fp;
-	const char *fname;
-	bntseq_t *bns;
-	long long xx;
 	int i;
+	FILE *fp;
+	long long xx;
+	bntseq_t *bns;
+	char str[1024];
 	//int scanres;
 	bns = (bntseq_t*)calloc(1, sizeof(bntseq_t));
 	{ // read .ann
-		fp = fopen(fname = ann_filename, "r");
+		fp = fopen(ann_filename, "r");
 		fscanf(fp, "%lld%d%u", &xx, &bns->n_seqs, &bns->seed);
 		bns->l_pac = xx;
 		bns->anns = (bntann1_t*)calloc(bns->n_seqs, sizeof(bntann1_t));
@@ -73,7 +72,7 @@ bntseq_t *bns_restore_core(const char *ann_filename, const char* amb_filename, c
 	{ // read .amb
 		//int64_t l_pac;
 		int32_t n_seqs;
-		fp = fopen(fname = amb_filename, "r");
+		fp = fopen(amb_filename, "r");
 		fscanf(fp, "%lld%d%d", &xx, &n_seqs, &bns->n_holes);
 		//l_pac = xx;
 		//xassert(l_pac == bns->l_pac && n_seqs == bns->n_seqs, "inconsistent .ann and .amb files.");
@@ -255,12 +254,4 @@ void RestoreReferenceInfo()
 	}
 	RefSequence = new char[TwoGenomeSize + 1]; RefSequence[TwoGenomeSize] = '\0';
 	RestoreReferenceSequences();
-
-	//for (i = 0; i < iChromsomeNum; i++) printf("%s, %lld\n", ChromosomeVec[i].name, ChromosomeVec[i].FowardLocation);
-	////printf("GenomeSize=%lld\n", GenomeSize);
-	//for (map<int64_t, int>::iterator iter = ChrLocMap.begin(); iter != ChrLocMap.end(); iter++)
-	//{
-	//	i = iter->second;
-	//	printf("Chr: %s [%ld -- %ld]\n", ChromosomeVec[i].name, iter->first - ChromosomeVec[i].len + 1, iter->first);
-	//}
 }

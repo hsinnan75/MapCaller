@@ -55,33 +55,6 @@ bool CompByVarPos(const Variant_t& p1, const Variant_t& p2)
 	else return p1.gPos < p2.gPos;
 }
 
-//pair<char, int> GetMaxItemInProfileColumn(MappingRecord_t& Profile)
-//{
-//	pair<char, int> p = make_pair('N', 0);
-//
-//	if (Profile.A > p.second) p = make_pair('A', Profile.A);
-//	if (Profile.C > p.second) p = make_pair('C', Profile.C);
-//	if (Profile.G > p.second) p = make_pair('G', Profile.G);
-//	if (Profile.T > p.second) p = make_pair('T', Profile.T);
-//
-//	return p;
-//}
-
-//int GetIndMapFrq(map<int64_t, map<string, uint16_t> >::iterator IndMapIter, string& ind_str)
-//{
-//	int freq = 0, max_freq = 0;
-//	for (map<string, uint16_t>::iterator iter = IndMapIter->second.begin(); iter != IndMapIter->second.end(); iter++)
-//	{
-//		freq += iter->second;
-//		if (max_freq < iter->second)
-//		{
-//			ind_str = iter->first;
-//			max_freq = iter->second;
-//		}
-//	}
-//	return freq;
-//}
-
 int GetPointIndFreq(map<string, uint16_t>& IndMap)
 {
 	int n = 0;

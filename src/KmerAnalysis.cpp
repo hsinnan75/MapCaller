@@ -161,21 +161,3 @@ vector<FragPair_t> GenerateSimplePairsFromCommonKmers(int thr, int64_t gPos, vec
 	}
 	return SimplePairVec;
 }
-//
-//vector<SeedPair_t> GenerateSimplePairsFromFragmentPair(int MaxDist, int len1, char* frag1, int len2, char* frag2)
-//{
-//	vector<int> rPosVec;
-//	vector<KmerPair_t> KmerPairVec;
-//	vector<SeedPair_t> SimplePairVec;
-//	vector<KmerItem_t> KmerVec1, KmerVec2;
-//
-//	KmerVec1 = CreateKmerVecFromReadSeq(len1, frag1); KmerVec2 = CreateKmerVecFromReadSeq(len2, frag2);
-//	KmerPairVec = IdentifyCommonKmers(MaxDist, KmerVec1, KmerVec2);
-//	SimplePairVec = GenerateSimplePairsFromCommonKmers(8, KmerPairVec);
-//
-//	sort(SimplePairVec.begin(), SimplePairVec.end(), CompByGenomePos);
-//	//if (bDebugMode) printf("Raw seeds from common kmers:\n"), ShowSeedInfo(SimplePairVec);
-//
-//	return SimplePairVec;
-//}
-

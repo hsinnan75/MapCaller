@@ -45,8 +45,6 @@ ReadItem_t GetNextEntry(FILE *file)
 	read.header = read.seq = read.qual = NULL; read.rlen = 0;
 	if ((len = getline(&buffer, &size, file)) != -1)
 	{
-		//len = IdentifyHeaderBoundary(buffer, len) - 1; read.header = new char[len + 1];
-		//strncpy(read.header, buffer + 1, len); read.header[len] = '\0';
 		p1 = IdentifyHeaderBegPos(buffer, len); p2 = IdentifyHeaderEndPos(buffer, len); len = p2 - p1;
 		read.header = new char[len + 1]; strncpy(read.header, (buffer + p1), len); read.header[len] = '\0';
 		if (FastQFormat)
@@ -97,7 +95,6 @@ int GetNextChunk(bool bSepLibrary, FILE *file, FILE *file2, ReadItem_t* ReadArr)
 	{
 		if ((ReadArr[iCount] = GetNextEntry(file)).rlen == 0) break;
 		iCount++;
-
 		if (bSepLibrary) ReadArr[iCount] = GetNextEntry(file2);
 		else if ((ReadArr[iCount] = GetNextEntry(file)).rlen == 0) break;
 		iCount++;
@@ -116,8 +113,6 @@ ReadItem_t gzGetNextEntry(gzFile file)
 	read.header = read.seq = read.qual = NULL; read.rlen = 0;
 	if (gzgets(file, buffer, 1024) != NULL)
 	{
-		//len = IdentifyHeaderBoundary(buffer, strlen(buffer)- 1) - 1;
-		//read.header = new char[len + 1]; strncpy(read.header, buffer+1, len); read.header[len] = '\0';
 		len = strlen(buffer);
 		if (len > 0 && (buffer[0] == '@' || buffer[0] == '>'))
 		{

@@ -237,14 +237,7 @@ void RemoveRedundantAlnCan(vector<AlnCan_t>& AlnCanVec)
 			if (iter->score > maxScore) n = 1, maxScore = iter->score;
 			else if (iter->score == maxScore) n++;
 		}
-		//if (bUnique && n > 1)
-		//{
-		//	for (iter = AlnCanVec.begin(); iter != AlnCanVec.end(); iter++) iter->score = 0;
-		//}
-		//else
-		//{
-			for (iter = AlnCanVec.begin(); iter != AlnCanVec.end(); iter++) if (iter->score < maxScore) iter->score = 0;
-		//}
+		for (iter = AlnCanVec.begin(); iter != AlnCanVec.end(); iter++) if (iter->score < maxScore) iter->score = 0;
 	}
 }
 

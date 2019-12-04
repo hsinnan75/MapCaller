@@ -1,0 +1,31 @@
+# Changes
+- 0.9.9.1: Adjusted read depth threshold.
+- 0.9.9.2: Removed variants which appear in repetitive regions.
+- 0.9.9.3: Adjusted read depth threshold for somatic mutation detection.
+- 0.9.9.4: Added variant filters.
+- 0.9.9.5: Fixed a bug on read count.
+- 0.9.9.6: Fixed a bug on read count.
+- 0.9.9.7: Fixed typos and warnings.
+- 0.9.9.8: Used ksw2 algorithm for gapped alignments and fixed a bug on VCF format output.
+- 0.9.9.9: Added a new argument(-ploidy) for setting different ploidy.
+- 0.9.9.a: Fixed a bug on read mapping && Added an option (-dup) to filter out PCR-duplicates.
+- 0.9.9.b: Added GVCF format (-gvcf).
+- 0.9.9.c: Added a new argument(-monomorphic) to report all loci which do not have any potential alternates.
+- 0.9.9.d: Fixed bugs on checking reference nucloetides and reporting deletion events.
+- 0.9.9.e: Fixed bugs on reporting monomorphic regions and reported unmapped regions (potential deletions).
+- 0.9.9.15: Fixed errors on VCF headers.
+- 0.9.9.16: Added a new argument (-maxmm) for setting maximal mismatches in read alignment.
+- 0.9.9.17: Updated VCF flags and format.
+- 0.9.9.18: Fixed bugs && Added a new argument (-maxclip) for setting maximal clip size in read alignment.
+- 0.9.9.19: Fixed a bug on the determination of deletion locus.
+- 0.9.9.21: Reported CNV (N>=2) regions with the flag "DUP" (experimental).
+- 0.9.9.22: Change the argument "-maxmm" to the maximal mismatch rate allowed in a read alignment.
+- 0.9.9.23: Change the VCF output to fix the problem when applying vcftools with --plink
+- 0.9.9.24: Summarize the process to a log file
+- 0.9.9.25: Fixed typos in vcf headers.
+- 0.9.9.26: Fixed a bug when running multi-threads on MacOS.
+- 0.9.9.27: Integrated bwt_index into MapCaller
+- 0.9.9.28: Build reference index on the fly
+- 0.9.9.29: Fixed a bug when the input data contains unexpected characters.
+- 0.9.9.30: Fixed a bug on buiding index
+- 0.9.9.31: Modified the definition of tag AD in VCF output

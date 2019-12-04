@@ -183,10 +183,11 @@ typedef struct
 
 typedef struct
 {
-	uint16_t AD; // allele depth
 	uint16_t DP; // read   depth
 	int64_t gPos;
 	string ALTstr;
+	uint16_t AD_ref; // allele depth
+	uint16_t AD_alt;
 	uint8_t GenoType;
 	uint8_t qscore;
 	uint8_t VarType;

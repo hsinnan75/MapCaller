@@ -522,7 +522,12 @@ void *ReadMapping(void *arg)
 						}
 						else
 						{
+							//Coordinate_t coor1 = DetermineCoordinate(CoorPair.gPos1), coor2 = DetermineCoordinate(CoorPair.gPos2);
+							//MC = GenMappingCoordinates(CoorPair);
+							//MC.rlen1 = ReadArr[i].rlen; MC.rlen2 = ReadArr[j].rlen;
+							//printf("%lld %lld vs %d %d\n", (long long)coor1.gPos - 1, (long long)coor2.gPos - 1, MC.gPos1, MC.gPos2);
 							myReadLengthSum += ReadArr[i].rlen;
+							myReadLengthSum += ReadArr[j].rlen;
 							PairedNum++; myTotalDistance += CoorPair.dist;
 						}
 					}
@@ -561,7 +566,7 @@ void *ReadMapping(void *arg)
 				{
 					//if (strcmp(ReadArr[i].header, "NC_000913_mut_1472703_1473141_0_1_0_0_0:0:0_2:0:0_45ec") == 0) ShowFragPairCluster(ReadArr[i].AlnCanVec);
 					if (ReadArr[i].AlnSummary.score == 0) continue;
-					if ((n = CheckAlnNumber(ReadArr[i].AlnCanVec)) == 1) UpdateProfile(ReadArr + i, ReadArr[i].AlnCanVec);
+					if ((n = CheckAlnNumber(ReadArr[i].AlnCanVec)) == 1) UpdateProfile((i % 2 == 0), ReadArr + i, ReadArr[i].AlnCanVec);
 					else UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
 				}
 				pthread_mutex_unlock(&ProfileLock);
@@ -608,14 +613,14 @@ void *ReadMapping(void *arg)
 				for (i = 0; i != ReadNum; i++)
 				{
 					if (ReadArr[i].AlnSummary.score == 0) continue;
-					if ((n = CheckAlnNumber(ReadArr[i].AlnCanVec)) == 1) UpdateProfile(ReadArr + i, ReadArr[i].AlnCanVec);
+					if ((n = CheckAlnNumber(ReadArr[i].AlnCanVec)) == 1) UpdateProfile(true, ReadArr + i, ReadArr[i].AlnCanVec);
 					else UpdateMultiHitCount(ReadArr + i, ReadArr[i].AlnCanVec);
 				}
 				pthread_mutex_unlock(&ProfileLock);
 			}
 		}
 		for (i = 0; i != ReadNum; i++)  FreeReadItem(ReadArr + i);
-		//if (iTotalReadNum >= 100000000) break;
+		//if (iTotalReadNum >= 10000) break;
 	}
 	delete[] ReadArr;
 
@@ -777,7 +782,7 @@ void Mapping()
 	if (iTotalReadNum > 0 && iTotalPairedNum > 0)
 	{
 		avgDist = (int)(1.*TotalPairedDistance / iTotalPairedNum + .5);
-		avgReadLength = (int)(1.*ReadLengthSum / iTotalPairedNum + .5);
+		avgReadLength = (int)(1.*ReadLengthSum / (iTotalPairedNum << 1) + .5);
 		FragmentSize = avgDist + avgReadLength;
 		fprintf(log, "\tAverage read length = %d, Estimated fragment size = %d, insert size = %d\n", avgReadLength, FragmentSize, avgDist - avgReadLength);
 		fprintf(stderr, "\tAverage read length = %d, Estimated fragment size = %d, insert size = %d\n", avgReadLength, FragmentSize, avgDist - avgReadLength);

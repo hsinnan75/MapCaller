@@ -38,7 +38,7 @@ int CheckMismatch(vector<FragPair_t>& FragPairVec)
 	return mis;
 }
 
-void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
+void UpdateProfile(bool bFirstRead, ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 {
 	int64_t gPos;
 	string IndSeq;
@@ -75,6 +75,29 @@ void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 		else gPos = TwoGenomeSize - (iter->FragPairVec.begin()->gPos + iter->FragPairVec.begin()->gLen);
 		if (MappingRecordArr[gPos].readCount < iMaxDuplicate) MappingRecordArr[gPos].readCount++;
 		else continue;
+
+		if (bFirstRead)
+		{
+			if (iter->orientation)
+			{
+				for (i = 0; i < read->rlen; i++) MappingRecordArr[gPos + i].F1++;
+			}
+			else
+			{
+				for (i = 0; i < read->rlen; i++) MappingRecordArr[gPos + i].R1++;
+			}
+		}
+		else
+		{
+			if (iter->orientation)
+			{
+				for (i = 0; i < read->rlen; i++) MappingRecordArr[gPos + i].R2++;
+			}
+			else
+			{
+				for (i = 0; i < read->rlen; i++) MappingRecordArr[gPos + i].F2++;
+			}
+		}
 
 		if (iter->orientation) //iter->FragPairVec[0].gPos < GenomeSize
 		{

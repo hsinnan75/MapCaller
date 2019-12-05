@@ -29,3 +29,4 @@
 - 0.9.9.29: Fixed a bug when the input data contains unexpected characters.
 - 0.9.9.30: Fixed a bug on buiding index
 - 0.9.9.31: Modified the definition of tag AD in VCF output
+- 0.9.9.32: Added the information of F1R2/F2R1 counts in VCF files.

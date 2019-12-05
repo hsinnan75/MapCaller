@@ -159,6 +159,7 @@ typedef struct
 	//uint8_t readCount;
 	//uint8_t multi_hit;
 	uint64_t A : 12, C : 12, G : 12, T : 12, multi_hit : 12, readCount : 4;
+	uint16_t F1, R2, F2, R1;
 } MappingRecord_t;
 
 typedef struct
@@ -241,8 +242,8 @@ extern bool ProduceReadAlignment(ReadItem_t& read);
 extern int AlignmentRescue(uint32_t EstDist, ReadItem_t& read1, ReadItem_t& read2);
 
 // AlignmentProfile.cpp
-extern void UpdateProfile(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec);
 extern void UpdateMultiHitCount(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec);
+extern void UpdateProfile(bool bFirstRead, ReadItem_t* read, vector<AlnCan_t>& AlnCanVec);
 
 // SamReport.cpp
 extern void GenerateSingleSamStream(ReadItem_t& read, vector<string>& SamStreamVec);

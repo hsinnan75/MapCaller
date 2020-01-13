@@ -75,7 +75,7 @@ bool CheckOutputFileName(char *FileName)
 	{
 		for (i = 0; i < len; i++)
 		{
-			if (isalnum(FileName[i]) || FileName[i] == '/' || FileName[i] == '.');
+			if (isalnum(FileName[i]) || FileName[i] == '/' || FileName[i] == '.' || FileName[i] == '_' || FileName[i] == '-');
 			else
 			{
 				bRet = false;

@@ -9,7 +9,7 @@ extern "C"
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.32";
+const char* VersionStr = "0.9.9.33";
 
 string CmdLine;
 uint8_t iMaxDuplicate;

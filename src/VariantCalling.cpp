@@ -17,7 +17,7 @@
 #define var_NIL 255
 
 //                         0   1    2    3      4      5      6
-const char* GenotypeLabel[] = {"", "0", "1", "0/0", "0/1", "1/1", "1/2"};
+const char* GenotypeLabel[] = {"", "0", "1", "0|0", "0|1", "1|1", "1|2"};
 
 typedef struct
 {
@@ -154,7 +154,7 @@ void ShowMetaInfo()
 	fprintf(outFile, "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n");
 	fprintf(outFile, "##FORMAT=<ID=F1R2,Number=R,Type=Integer,Description=\"Count of reads in F1R2 pair orientation supporting each allele\">\n");
 	fprintf(outFile, "##FORMAT=<ID=F2R1,Number=R,Type=Integer,Description=\"Count of reads in F2R1 pair orientation supporting each allele\">\n");
-	//fprintf(outFile, "##FORMAT=<ID=GQ,Number=1,Type=Integer,Description=\"Genotype Quality\">\n");
+	fprintf(outFile, "##FORMAT=<ID=GQ,Number=1,Type=Integer,Description=\"Genotype Quality\">\n");
 	fprintf(outFile, "##FILTER=<ID=PASS,Description=\"All filters passed\">\n");
 	fprintf(outFile, "##FILTER=<ID=DUP,Description=\"Duplicated regions(>=%dbp).\">\n", MinCNVsize);
 	fprintf(outFile, "##FILTER=<ID=Gaps,Description=\"Region without any read alignment(>=%dbp).\">\n", MinUnmappedSize);
@@ -454,7 +454,7 @@ void GenVariantCallingFile()
 		{
 			VarNumVec[var_DEL]++; AlleleFreq = 1.0*VariantVec[i].AD_alt / VariantVec[i].DP;
 			//fprintf(outFile, "%s	%d	.	%c%s	%c	%d	%s	DP=%d;AD=%d;RC=%d;AF=%.3f;GT=%s;TYPE=del\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], VariantVec[i].ALTstr.c_str(), RefSequence[gPos], VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].AD, (int)MappingRecordArr[gPos].readCount, AlleleFreq, GenotypeLabel[VariantVec[i].GenoType]);
-			fprintf(outFile, "%s	%d	.	%c	%c%s	%d	%s	RC=%d;TYPE=del	GT:DP:AD:AF:F1R2:F2R1	%s:%d:%d,%d:%.2f:%d,%d:%d,%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], RefSequence[gPos], VariantVec[i].ALTstr.c_str(), VariantVec[i].qscore, filter_str.c_str(), (int)MappingRecordArr[gPos].readCount, GenotypeLabel[VariantVec[i].GenoType], VariantVec[i].DP, VariantVec[i].AD_ref, VariantVec[i].AD_alt, AlleleFreq, MappingRecordArr[gPos].F1, MappingRecordArr[gPos].R2, MappingRecordArr[gPos].F2, MappingRecordArr[gPos].R1);
+			fprintf(outFile, "%s	%d	.	%c%s	%c	%d	%s	RC=%d;TYPE=del	GT:DP:AD:AF:F1R2:F2R1	%s:%d:%d,%d:%.2f:%d,%d:%d,%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], VariantVec[i].ALTstr.c_str(), RefSequence[gPos], VariantVec[i].qscore, filter_str.c_str(), (int)MappingRecordArr[gPos].readCount, GenotypeLabel[VariantVec[i].GenoType], VariantVec[i].DP, VariantVec[i].AD_ref, VariantVec[i].AD_alt, AlleleFreq, MappingRecordArr[gPos].F1, MappingRecordArr[gPos].R2, MappingRecordArr[gPos].F2, MappingRecordArr[gPos].R1);
 		}
 		else if (VariantVec[i].VarType == var_TNL)
 		{

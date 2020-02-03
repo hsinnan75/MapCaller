@@ -103,7 +103,7 @@ void ShowSeedLocationInfo(int64_t MyPos)
 {
 	int64_t gPos;
 
-	map<int64_t, int>::const_iterator iter = ChrLocMap.lower_bound(MyPos);
+	map<int64_t, int>::const_iterator iter = PosChrIdMap.lower_bound(MyPos);
 	if (MyPos < GenomeSize) gPos = MyPos - ChromosomeVec[iter->second].FowardLocation;
 	else gPos = iter->first - MyPos;
 	printf("\t\tChr [%s, %ld]\n", ChromosomeVec[iter->second].name, gPos);
@@ -111,7 +111,7 @@ void ShowSeedLocationInfo(int64_t MyPos)
 
 int64_t GetAlignmentBoundary(int64_t gPos)
 {
-	map<int64_t, int>::iterator iter = ChrLocMap.lower_bound(gPos);
+	map<int64_t, int>::iterator iter = PosChrIdMap.lower_bound(gPos);
 
 	return iter->first;
 }
@@ -122,9 +122,9 @@ bool CheckAlignmentValidity(vector<FragPair_t>& FragPairVec)
 	else
 	{
 		map<int64_t, int>::iterator iter1, iter2;
-		iter1 = ChrLocMap.lower_bound(FragPairVec.begin()->gPos);
-		iter2 = ChrLocMap.lower_bound(FragPairVec.rbegin()->gPos + FragPairVec.rbegin()->gLen - 1);
-		if (iter1 != ChrLocMap.end() && iter2 != ChrLocMap.end() && iter1->first == iter2->first) return true;
+		iter1 = PosChrIdMap.lower_bound(FragPairVec.begin()->gPos);
+		iter2 = PosChrIdMap.lower_bound(FragPairVec.rbegin()->gPos + FragPairVec.rbegin()->gLen - 1);
+		if (iter1 != PosChrIdMap.end() && iter2 != PosChrIdMap.end() && iter1->first == iter2->first) return true;
 		else return false;
 	}
 }
@@ -142,7 +142,7 @@ Coordinate_t DetermineCoordinate(int64_t gPos)
 		}
 		else
 		{
-			map<int64_t, int>::iterator iter = ChrLocMap.lower_bound(gPos);
+			map<int64_t, int>::iterator iter = PosChrIdMap.lower_bound(gPos);
 			coor.ChromosomeIdx = iter->second;
 			coor.gPos = gPos + 1 - ChromosomeVec[coor.ChromosomeIdx].FowardLocation;
 		}
@@ -156,7 +156,7 @@ Coordinate_t DetermineCoordinate(int64_t gPos)
 		}
 		else
 		{
-			map<int64_t, int>::iterator iter = ChrLocMap.lower_bound(gPos);
+			map<int64_t, int>::iterator iter = PosChrIdMap.lower_bound(gPos);
 			coor.gPos = iter->first - gPos + 1; coor.ChromosomeIdx = iter->second;
 		}
 	}
@@ -181,7 +181,7 @@ void ShowVariationProfile(int64_t begin_pos, int64_t end_pos)
 	if (end_pos >= GenomeSize) end_pos = GenomeSize - 1;
 	printf("%s-%lld\n", ChromosomeVec[coor.ChromosomeIdx].name, (long long)coor.gPos);
 	for (gPos = begin_pos; gPos <= end_pos; gPos++) ShowProfileColumn(gPos);
-	printf("\n\n");
+	printf("\n\n"); fflush(stdout);
 }
 
 void ShowIndSeq(int64_t begin_pos, int64_t end_pos)

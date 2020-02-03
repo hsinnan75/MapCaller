@@ -1,5 +1,4 @@
 #include "structure.h"
-#define MinSeqIdy 0.5
 #define MinAlnBlcokSize 5
 
 extern float MaxMisMatchRate;
@@ -420,10 +419,10 @@ bool ProduceReadAlignment(ReadItem_t& read)
 	//		if (coor.ChromosomeIdx == 0 && coor.gPos >= ObserveBegPos && coor.gPos + read.rlen < ObserveEndPos)
 	//		{
 	//			//Display alignments
-	//			//pthread_mutex_lock(&Lock);
+	//			pthread_mutex_lock(&OutputLock);
 	//			printf("read: %s, score=%d (%d/%d) len=%d, PairedIdx=%d\n\n", read.header, iter->score, read.AlnSummary.score, read.AlnSummary.sub_score, read.rlen, iter->PairedAlnCanIdx);
 	//			ShowSimplePairInfo(iter->FragPairVec);
-	//			//pthread_mutex_unlock(&Lock);
+	//			pthread_mutex_unlock(&OutputLock);
 	//		}
 	//	}
 	//}

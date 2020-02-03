@@ -147,7 +147,7 @@ void UpdateProfile(bool bFirstRead, ReadItem_t* read, vector<AlnCan_t>& AlnCanVe
 						{
 							ext_len = 1; while (iter->FragPairVec[i].aln1[j + ext_len] == '-') ext_len++;
 							IndSeq = iter->FragPairVec[i].aln2.substr(j, ext_len);
-							DeleteSeqMap[gPos-1][IndSeq]++;
+							DeleteSeqMap[gPos - 1][IndSeq]++;
 							//printf("%lld: %s\n", (long long)(gPos - 1), IndSeq.c_str());
 							//ShowSimplePairInfo(iter->FragPairVec);
 							j += ext_len; gPos += ext_len;

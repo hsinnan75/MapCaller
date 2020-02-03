@@ -20,7 +20,6 @@
 #define KmerSize 8
 #define KmerPower 0x3FFF
 
-#define MaxPosDiff 30
 #define MinSeedLength 16
 #define ReadChunkSize 200
 #define MaxAlleleCount 4095
@@ -158,6 +157,7 @@ typedef struct
 	//uint16_t T;
 	//uint8_t readCount;
 	//uint8_t multi_hit;
+	//bool bKnowSite;
 	uint64_t A : 12, C : 12, G : 12, T : 12, multi_hit : 12, readCount : 4;
 	uint16_t F1, R2, F2, R1;
 } MappingRecord_t;
@@ -203,22 +203,25 @@ extern uint8_t iMaxDuplicate;
 extern const char* VersionStr;
 extern vector<string> ReadVec;
 extern time_t StartProcessTime;
-extern map<int64_t, int> ChrLocMap;
+extern map<string, int> ChrIdMap;
+extern map<int64_t, int> PosChrIdMap;
+extern map<int64_t, bool> KnowSiteMap;
 extern unsigned char nst_nt4_table[256];
 extern MappingRecord_t* MappingRecordArr;
 extern vector<Chromosome_t> ChromosomeVec;
 extern vector<CoordinatePair_t> DistantPairVec;
 extern vector<string> ReadFileNameVec1, ReadFileNameVec2;
 extern pthread_mutex_t LibraryLock, ProfileLock, OutputLock, VarLock;
-extern char *RefSequence, *RefFileName, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
 extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos, ObserveBegPos, ObserveEndPos;
+extern char *RefSequence, *RefFileName, *IndexFileName, *KnownSiteFileName, *SamFileName, *VcfFileName, *LogFileName;
 extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bGVCF, bMonomorphic, bSomatic, NW_ALG;
-extern int iThreadNum, iPloidy, iChromsomeNum, MaxClipSize, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleDepth, MinIndFreq, MinCNVsize, MinUnmappedSize, MinVarConfScore;
+extern int iThreadNum, MaxPosDiff, iPloidy, iChromsomeNum, MaxClipSize, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinAlleleDepth, MinIndFreq, MinCNVsize, MinUnmappedSize, MinVarConfScore;
 
 extern vector<DiscordPair_t> InversionSiteVec, TranslocationSiteVec;
 extern map<int64_t, map<string, uint16_t> > InsertSeqMap, DeleteSeqMap;
 
 // GetData.cpp
+extern void LoadKnownSites(string filename);
 extern bool CheckReadFormat(const char* filename);
 extern bool CheckBWAIndexFiles(string IndexPrefix);
 extern bool CheckReadFile(char* filename, bool& bReadFormat);

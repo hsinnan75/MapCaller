@@ -246,11 +246,12 @@ void RestoreReferenceInfo()
 		ChromosomeVec[i].len = RefIdx->bns->anns[i].len;
 		ChromosomeVec[i].name = RefIdx->bns->anns[i].name;
 
+		ChrIdMap.insert(make_pair((string)ChromosomeVec[i].name, i));
 		ChromosomeVec[i].FowardLocation = iTotalLength; iTotalLength += ChromosomeVec[i].len;
 		ChromosomeVec[i].ReverseLocation = TwoGenomeSize - iTotalLength;
 
-		ChrLocMap.insert(make_pair(ChromosomeVec[i].FowardLocation + ChromosomeVec[i].len - 1, i));
-		ChrLocMap.insert(make_pair(ChromosomeVec[i].ReverseLocation + ChromosomeVec[i].len - 1, i));
+		PosChrIdMap.insert(make_pair(ChromosomeVec[i].FowardLocation + ChromosomeVec[i].len - 1, i));
+		PosChrIdMap.insert(make_pair(ChromosomeVec[i].ReverseLocation + ChromosomeVec[i].len - 1, i));
 	}
 	RefSequence = new char[TwoGenomeSize + 1]; RefSequence[TwoGenomeSize] = '\0';
 	RestoreReferenceSequences();

@@ -790,7 +790,6 @@ void Mapping()
 	else avgDist = avgReadLength = 0;
 
 	fclose(log);
-	//for (int64_t gPos = 0; gPos < 100000000; gPos+=10) ShowProfileColumn(gPos);
 	//if (ObserveBegPos != -1 && ObserveEndPos != -1)
 	//{
 	//	for (map<int64_t, map<string, uint16_t> >::iterator iter = InsertSeqMap.begin(); iter != InsertSeqMap.end(); iter++)
@@ -798,7 +797,7 @@ void Mapping()
 	//		if (iter->first > ObserveBegPos && iter->first < ObserveEndPos)
 	//		{
 	//			for (map<string, uint16_t>::iterator SeqMapIter = iter->second.begin(); SeqMapIter != iter->second.end(); SeqMapIter++)
-	//				fprintf(stdout, "INS:%lld	%d	[%s] %d\n", (long long)iter->first, SeqMapIter->second, (char*)SeqMapIter->first.c_str(), (int)SeqMapIter->first.length());
+	//				if (SeqMapIter->second >= MinIndFreq) fprintf(stdout, "INS:%lld	%d	[%s] %d\n", (long long)iter->first, SeqMapIter->second, (char*)SeqMapIter->first.c_str(), (int)SeqMapIter->first.length());
 	//		}
 	//	}
 	//	for (map<int64_t, map<string, uint16_t> >::iterator iter = DeleteSeqMap.begin(); iter != DeleteSeqMap.end(); iter++)
@@ -806,7 +805,7 @@ void Mapping()
 	//		if (iter->first > ObserveBegPos && iter->first < ObserveEndPos)
 	//		{
 	//			for (map<string, uint16_t>::iterator SeqMapIter = iter->second.begin(); SeqMapIter != iter->second.end(); SeqMapIter++)
-	//				fprintf(stdout, "DEL:%lld	%d	[%s] %d\n", (long long)iter->first, SeqMapIter->second, (char*)SeqMapIter->first.c_str(), (int)SeqMapIter->first.length());
+	//				if (SeqMapIter->second >= MinIndFreq) fprintf(stdout, "DEL:%lld	%d	[%s] %d\n", (long long)iter->first, SeqMapIter->second, (char*)SeqMapIter->first.c_str(), (int)SeqMapIter->first.length());
 	//		}
 	//	}
 	//}

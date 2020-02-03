@@ -1,10 +1,5 @@
 #include "structure.h"
 
-int iChromsomeNum;
-map<int64_t, int> ChrLocMap;
-int64_t GenomeSize, TwoGenomeSize;
-vector<Chromosome_t> ChromosomeVec;
-
 int IdentifyHeaderBegPos(char* str, int len)
 {
 	for (int i = 1; i < len; i++)
@@ -167,3 +162,32 @@ bool CheckBWAIndexFiles(string IndexPrefix)
 
 	return bChecked;
 }
+
+//bool DetermineVarType(string& ref_allele, string& alt_allele)
+//{
+//	if (ref_allele.length() == 1 && alt_allele.length() == 1) return true;
+//	else return false;
+//}
+
+//void LoadKnownSites(string filename)
+//{
+//	gzFile file;
+//	int64_t gPos;
+//	bool bVarType;
+//	int pos, chrId;
+//	stringstream ss;
+//	char buffer[1024];
+//	map<string, int>::iterator iter;
+//	string str, chr, ref_allele, alt_allele;
+//
+//	file = gzopen(filename.c_str(), "rb");
+//	while (gzgets(file, buffer, 1024) != NULL)
+//	{
+//		ss.clear(); ss.str(buffer); ss >> chr >> pos >> str >> ref_allele >> alt_allele;
+//		if ((iter = ChrIdMap.find(chr)) == ChrIdMap.end()) continue;
+//		chrId = iter->second; gPos = ChromosomeVec[chrId].FowardLocation + pos - 1;
+//		bVarType = (ref_allele.length() == 1 && alt_allele.length() == 1 ? true : false);
+//		KnowSiteMap.insert(make_pair(gPos, bVarType));
+//	}
+//	gzclose(file);
+//}

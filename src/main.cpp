@@ -9,18 +9,24 @@ extern "C"
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.33";
+const char* VersionStr = "0.9.9.34";
 
 string CmdLine;
+int iChromsomeNum;
 uint8_t iMaxDuplicate;
 time_t StartProcessTime;
+map<string, int> ChrIdMap;
+map<int64_t, int> PosChrIdMap;
+map<int64_t, bool> KnowSiteMap;
+int64_t GenomeSize, TwoGenomeSize;
+vector<Chromosome_t> ChromosomeVec;
 float FrequencyThr, MaxMisMatchRate;
 MappingRecord_t* MappingRecordArr = NULL;
 vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 pthread_mutex_t LibraryLock, ProfileLock, OutputLock, VarLock;
-char *RefSequence, *RefFileName, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
-int iThreadNum, iPloidy, FragmentSize, MaxClipSize, MinAlleleDepth, MinIndFreq, MinVarConfScore, MinCNVsize, MinUnmappedSize;
+char *RefSequence, *RefFileName, *KnownSiteFileName, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
+int iThreadNum, MaxPosDiff, iPloidy, FragmentSize, MaxClipSize, MinAlleleDepth, MinIndFreq, MinVarConfScore, MinCNVsize, MinUnmappedSize;
 bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bGVCF, bMonomorphic, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
 
 void ShowProgramUsage(const char* program)
@@ -33,6 +39,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -f2           files with #2 mates reads (format:fa, fq, fq.gz)\n");
 	fprintf(stderr, "         -t INT        number of threads [%d]\n", iThreadNum);
 	fprintf(stderr, "         -size         sequencing fragment size [%d]\n", FragmentSize);
+	fprintf(stderr, "         -indel INT	maximal indel size [%d]\n", MaxPosDiff);
 	fprintf(stderr, "         -ad INT       minimal ALT allele count [%d]\n", MinAlleleDepth);
 	fprintf(stderr, "         -dup INT      maximal PCR duplicates [%d]\n", iMaxDuplicate);
 	fprintf(stderr, "         -maxmm FLOAT  maximal mismatch rate in read alignment [%.2f]\n", MaxMisMatchRate);
@@ -166,6 +173,7 @@ int main(int argc, char* argv[])
 	MinIndFreq = 5;
 	MaxClipSize = 5;
 	MinCNVsize = 50;
+	MaxPosDiff = 30;
 	iMaxDuplicate = 5;
 	FragmentSize = 500;
 	MinAlleleDepth = 5;
@@ -176,7 +184,7 @@ int main(int argc, char* argv[])
 	LogFileName = (char*)"job.log";
 	VcfFileName = (char*)"output.vcf";
 	ObservGenomicPos = ObserveBegPos = ObserveEndPos = -1;
-	RefSequence = RefFileName = IndexFileName = SamFileName = NULL;
+	RefSequence = RefFileName = IndexFileName = SamFileName = KnownSiteFileName = NULL;
 
 	if (argc == 1 || strcmp(argv[1], "-h") == 0) ShowProgramUsage(argv[0]);
 	else if (strcmp(argv[1], "update") == 0)
@@ -232,9 +240,17 @@ int main(int argc, char* argv[])
 			}
 			else if (parameter == "-filter") bFilter = true;
 			else if (parameter == "-size" && i + 1 < argc) FragmentSize = atoi(argv[++i]);
+			else if (parameter == "-indel" && i + 1 < argc)
+			{
+				if ((MaxPosDiff = atoi(argv[++i])) > 100)
+				{
+					MaxPosDiff = 100;
+					fprintf(stderr, "Warning! The maximal indel size is 100!\n");
+				}
+			}
 			else if (parameter == "-ad" && i + 1 < argc) MinAlleleDepth = atoi(argv[++i]);
 			else if (parameter == "-ind" && i + 1 < argc) MinIndFreq = atoi(argv[++i]);
-			else if (parameter == "-ploidy"  && i + 1 < argc)
+			else if (parameter == "-ploidy" && i + 1 < argc)
 			{
 				if ((iPloidy = atoi(argv[++i])) > 2)
 				{
@@ -242,6 +258,10 @@ int main(int argc, char* argv[])
 					fprintf(stderr, "Warning! MapCaller only supports monoploid and diploid!\n");
 				}
 			}
+			//else if (parameter == "-known_sites" && i + 1 < argc)
+			//{
+			//	KnownSiteFileName = argv[++i];
+			//}
 			else if ((parameter == "-sam") && i + 1 < argc)
 			{
 				bSAMoutput = true;
@@ -331,6 +351,7 @@ int main(int argc, char* argv[])
 		{
 			Refbwt = RefIdx->bwt;
 			RestoreReferenceInfo();
+			//if (KnownSiteFileName != NULL) LoadKnownSites(KnownSiteFileName);
 
 			if (GenomeSize <= 0)
 			{

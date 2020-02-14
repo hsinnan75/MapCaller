@@ -155,6 +155,7 @@ void ShowMetaInfo()
 	fprintf(outFile, "##FORMAT=<ID=F2R1,Number=R,Type=Integer,Description=\"Count of reads in F2R1 pair orientation supporting each allele\">\n");
 	fprintf(outFile, "##FORMAT=<ID=GQ,Number=1,Type=Integer,Description=\"Genotype Quality\">\n");
 	fprintf(outFile, "##FILTER=<ID=PASS,Description=\"All filters passed\">\n");
+	//fprintf(outFile, "##FILTER=<ID=LowDepth,Description=\"Read depth < %d\">\n", MinReadDepth);
 	fprintf(outFile, "##FILTER=<ID=Ref,Description=\"Genotyping model thinks this site is reference.\">\n");
 	fprintf(outFile, "##FILTER=<ID=BreakPoint,Description=\"It is predicted as a breakpoint\">\n");
 	fprintf(outFile, "##FILTER=<ID=DUP,Description=\"Duplicated regions(>=%dbp).\">\n", MinCNVsize);
@@ -406,6 +407,7 @@ string DetermineFileter(int VarIdx)
 {
 	string filter_str="";
 
+	//if (VariantVec[VarIdx].DP < MinReadDepth) filter_str += "LowDepth;";
 	if (VariantVec[VarIdx].qscore < 10) filter_str += "q10;";
 	else if (VariantVec[VarIdx].VarType == var_SUB && VariantVec[VarIdx].AD_alt < 10 && CheckNearbyVariant(VarIdx, 10)) filter_str += "q10;";
 	else if ((VariantVec[VarIdx].VarType == var_INS || VariantVec[VarIdx].VarType == var_DEL) && VariantVec[VarIdx].AD_alt < 5 && CheckNearbyVariant(VarIdx, 10)) filter_str += "q10;";
@@ -563,6 +565,12 @@ void *IdentifyVariants(void *arg)
 	for (; gPos < end; gPos++)
 	{
 		cov = GetProfileColumnSize(MappingRecordArr[gPos]);
+		if (cov > 0 && gap > 0)
+		{
+			//printf("gPos_end=%lld\n", (long long)gPos-1);
+			gap = 0; Variant.qscore = 0; Variant.gPos = gPos - 1; Variant.VarType = var_UMR; Variant.DP = Variant.AD_alt = 0; Variant.ALTstr.clear();
+			MyVariantVec.push_back(Variant);
+		}
 		bNormal = true; ref_base = nst_nt4_table[(unsigned short)RefSequence[gPos]];
 		//if (bSomatic && (MappingRecordArr[gPos].multi_hit > (int)(cov*0.05))) continue;
 		if ((cov_thr = BlockDepthArr[(int)(gPos / BlockSize)] >> 1) < MinAlleleDepth) cov_thr = MinAlleleDepth;
@@ -652,12 +660,6 @@ void *IdentifyVariants(void *arg)
 		if (cov > 0 && dup > 0)
 		{
 			dup = 0; Variant.gPos = gPos - 1; Variant.VarType = var_CNV; Variant.ALTstr.clear();
-			MyVariantVec.push_back(Variant);
-		}
-		if (cov > 0 && gap > 0)
-		{
-			//printf("gPos_end=%lld\n", (long long)gPos-1);
-			gap = 0; Variant.qscore = 0; Variant.gPos = gPos - 1; Variant.VarType = var_UMR; Variant.DP = Variant.AD_alt = 0; Variant.ALTstr.clear();
 			MyVariantVec.push_back(Variant);
 		}
 		if (bGVCF && bNormal && cov > 0)

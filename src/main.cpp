@@ -9,7 +9,7 @@ extern "C"
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.34";
+const char* VersionStr = "0.9.9.35";
 
 string CmdLine;
 int iChromsomeNum;
@@ -26,7 +26,7 @@ vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 pthread_mutex_t LibraryLock, ProfileLock, OutputLock, VarLock;
 char *RefSequence, *RefFileName, *KnownSiteFileName, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
-int iThreadNum, MaxPosDiff, iPloidy, FragmentSize, MaxClipSize, MinAlleleDepth, MinIndFreq, MinVarConfScore, MinCNVsize, MinUnmappedSize;
+int iThreadNum, MaxPosDiff, iPloidy, FragmentSize, MaxClipSize, MinReadDepth, MinAlleleDepth, MinIndFreq, MinVarConfScore, MinCNVsize, MinUnmappedSize;
 bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bGVCF, bMonomorphic, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
 
 void ShowProgramUsage(const char* program)
@@ -40,6 +40,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -t INT        number of threads [%d]\n", iThreadNum);
 	fprintf(stderr, "         -size         sequencing fragment size [%d]\n", FragmentSize);
 	fprintf(stderr, "         -indel INT	maximal indel size [%d]\n", MaxPosDiff);
+	//fprintf(stderr, "         -dp INT       minimal read depth [%d]\n", MinReadDepth);
 	fprintf(stderr, "         -ad INT       minimal ALT allele count [%d]\n", MinAlleleDepth);
 	fprintf(stderr, "         -dup INT      maximal PCR duplicates [%d]\n", iMaxDuplicate);
 	fprintf(stderr, "         -maxmm FLOAT  maximal mismatch rate in read alignment [%.2f]\n", MaxMisMatchRate);
@@ -174,6 +175,7 @@ int main(int argc, char* argv[])
 	MaxClipSize = 5;
 	MinCNVsize = 50;
 	MaxPosDiff = 30;
+	MinReadDepth = 20;
 	iMaxDuplicate = 5;
 	FragmentSize = 500;
 	MinAlleleDepth = 5;
@@ -248,6 +250,8 @@ int main(int argc, char* argv[])
 					fprintf(stderr, "Warning! The maximal indel size is 100!\n");
 				}
 			}
+			else if (parameter == "-min_cnv" && i + 1 < argc) MinCNVsize = atoi(argv[++i]);
+			//else if (parameter == "-dp" && i + 1 < argc) MinReadDepth = atoi(argv[++i]);
 			else if (parameter == "-ad" && i + 1 < argc) MinAlleleDepth = atoi(argv[++i]);
 			else if (parameter == "-ind" && i + 1 < argc) MinIndFreq = atoi(argv[++i]);
 			else if (parameter == "-ploidy" && i + 1 < argc)

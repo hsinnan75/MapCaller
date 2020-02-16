@@ -623,6 +623,21 @@ void *IdentifyVariants(void *arg)
 				}
 			}
 		}
+		if (bNormal == false)
+		{
+			if (gap > 0)
+			{
+				Variant.VarType = var_UMR;
+				Variant.gPos = gPos - gap; Variant.DP = gap;
+				gap = 0; MyVariantVec.push_back(Variant);
+			}
+			if (dup > 0)
+			{
+				Variant.VarType = var_CNV;
+				Variant.gPos = gPos - dup; Variant.DP = dup;
+				dup = 0; MyVariantVec.push_back(Variant);
+			}
+		}
 		if (bNormal)
 		{
 			if (cov == 0)

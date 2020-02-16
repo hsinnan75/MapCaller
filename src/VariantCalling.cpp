@@ -565,8 +565,8 @@ void *IdentifyVariants(void *arg)
 		if ((cov_thr = BlockDepthArr[(int)(gPos / BlockSize)] >> 1) < MinAlleleDepth) cov_thr = MinAlleleDepth;
 		if (bSomatic && cov_thr > MinAlleleDepth) cov_thr = MinAlleleDepth;
 
-		if ((ins_thr = (int)(cov_thr*0.25)) < MinIndFreq) ins_thr = MinIndFreq;
-		if ((del_thr = (int)(cov_thr*0.35)) < MinIndFreq) del_thr = MinIndFreq;
+		if ((ins_thr = (int)(cov_thr*0.25)) < MinAlleleDepth) ins_thr = MinAlleleDepth;
+		if ((del_thr = (int)(cov_thr*0.35)) < MinAlleleDepth) del_thr = MinAlleleDepth;
 		ins_freq = GetAreaIndFrequency(gPos, InsertSeqMap, ins_str); del_freq = GetAreaIndFrequency(gPos, DeleteSeqMap, del_str);
 
 		if (ins_freq >= ins_thr)

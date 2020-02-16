@@ -9,7 +9,7 @@ extern "C"
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.36";
+const char* VersionStr = "0.9.9.3";
 
 string CmdLine;
 int iChromsomeNum;
@@ -26,7 +26,7 @@ vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 pthread_mutex_t LibraryLock, ProfileLock, OutputLock, VarLock;
 char *RefSequence, *RefFileName, *KnownSiteFileName, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
-int iThreadNum, MaxPosDiff, iPloidy, FragmentSize, MaxClipSize, MinReadDepth, MinAlleleDepth, MinIndFreq, MinVarConfScore, MinCNVsize, MinUnmappedSize;
+int iThreadNum, MaxPosDiff, iPloidy, FragmentSize, MaxClipSize, MinReadDepth, MinAlleleDepth, MinVarConfScore, MinCNVsize, MinUnmappedSize;
 bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bGVCF, bMonomorphic, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
 
 void ShowProgramUsage(const char* program)
@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
 	gzCompressed = false;
 	bMonomorphic = false;
 
-	MinIndFreq = 5;
+	//MinIndFreq = 5;
 	MaxClipSize = 5;
 	MinCNVsize = 50;
 	MaxPosDiff = 30;
@@ -253,7 +253,7 @@ int main(int argc, char* argv[])
 			else if (parameter == "-min_cnv" && i + 1 < argc) MinCNVsize = atoi(argv[++i]);
 			//else if (parameter == "-dp" && i + 1 < argc) MinReadDepth = atoi(argv[++i]);
 			else if (parameter == "-ad" && i + 1 < argc) MinAlleleDepth = atoi(argv[++i]);
-			else if (parameter == "-ind" && i + 1 < argc) MinIndFreq = atoi(argv[++i]);
+			//else if (parameter == "-ind" && i + 1 < argc) MinIndFreq = atoi(argv[++i]);
 			else if (parameter == "-ploidy" && i + 1 < argc)
 			{
 				if ((iPloidy = atoi(argv[++i])) > 2)

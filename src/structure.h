@@ -215,7 +215,7 @@ extern pthread_mutex_t LibraryLock, ProfileLock, OutputLock, VarLock;
 extern int64_t GenomeSize, TwoGenomeSize, ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 extern char *RefSequence, *RefFileName, *IndexFileName, *KnownSiteFileName, *SamFileName, *VcfFileName, *LogFileName;
 extern bool bDebugMode, bFilter, bPairEnd, bUnique, gzCompressed, FastQFormat, bSAMoutput, bSAMFormat, bVCFoutput, bGVCF, bMonomorphic, bSomatic, NW_ALG;
-extern int iThreadNum, MaxPosDiff, iPloidy, iChromsomeNum, MaxClipSize, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinReadDepth, MinAlleleDepth, MinIndFreq, MinCNVsize, MinUnmappedSize, MinVarConfScore;
+extern int iThreadNum, MaxPosDiff, iPloidy, iChromsomeNum, MaxClipSize, WholeChromosomeNum, ChromosomeNumMinusOne, FragmentSize, MinReadDepth, MinAlleleDepth, MinCNVsize, MinUnmappedSize, MinVarConfScore;
 
 extern vector<DiscordPair_t> InversionSiteVec, TranslocationSiteVec;
 extern map<int64_t, map<string, uint16_t> > InsertSeqMap, DeleteSeqMap;

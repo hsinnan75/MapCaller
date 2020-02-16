@@ -9,7 +9,7 @@ extern "C"
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.3";
+const char* VersionStr = "0.9.9.37";
 
 string CmdLine;
 int iChromsomeNum;
@@ -251,6 +251,7 @@ int main(int argc, char* argv[])
 				}
 			}
 			else if (parameter == "-min_cnv" && i + 1 < argc) MinCNVsize = atoi(argv[++i]);
+			else if (parameter == "-min_gap" && i + 1 < argc) MinUnmappedSize = atoi(argv[++i]);
 			//else if (parameter == "-dp" && i + 1 < argc) MinReadDepth = atoi(argv[++i]);
 			else if (parameter == "-ad" && i + 1 < argc) MinAlleleDepth = atoi(argv[++i]);
 			//else if (parameter == "-ind" && i + 1 < argc) MinIndFreq = atoi(argv[++i]);
@@ -287,7 +288,6 @@ int main(int argc, char* argv[])
 			}
 			else if (parameter == "-maxmm" && i + 1 < argc) MaxMisMatchRate = atof(argv[++i]);
 			else if (parameter == "-maxclip" && i + 1 < argc) MaxClipSize = atoi(argv[++i]);
-			else if (parameter == "-min_gap" && i + 1 < argc) MinUnmappedSize = atoi(argv[++i]);
 			else if (parameter == "-vcf" && i + 1 < argc) VcfFileName = argv[++i];
 			else if (parameter == "-gvcf") bGVCF = true;
 			else if (parameter == "-monomorphic") bMonomorphic = true;

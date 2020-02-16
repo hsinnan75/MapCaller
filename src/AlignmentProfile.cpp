@@ -249,11 +249,23 @@ void UpdateMultiHitCount(ReadItem_t* read, vector<AlnCan_t>& AlnCanVec)
 
 	for (iter = AlnCanVec.begin(); iter != AlnCanVec.end(); iter++)
 	{
-		if (iter->score != 0)
+		if (iter->score > 0)
 		{
-			if (iter->orientation) gPos = iter->FragPairVec.begin()->gPos, gPosEnd = iter->FragPairVec.rbegin()->gPos + iter->FragPairVec.rbegin()->gLen;
-			else gPos = TwoGenomeSize - (iter->FragPairVec.begin()->gPos + iter->FragPairVec.begin()->gLen), gPosEnd = TwoGenomeSize - iter->FragPairVec.rbegin()->gPos;
-			for (; gPos < gPosEnd; gPos++) if (MappingRecordArr[gPos].multi_hit < MaxAlleleCount) MappingRecordArr[gPos].multi_hit++;
+			if (iter->orientation)
+			{
+				gPos = iter->FragPairVec.begin()->gPos;
+				gPosEnd = iter->FragPairVec.rbegin()->gPos + iter->FragPairVec.rbegin()->gLen;
+			}
+			else
+			{
+				gPos = TwoGenomeSize - (iter->FragPairVec.begin()->gPos + iter->FragPairVec.begin()->gLen);
+				gPosEnd = TwoGenomeSize - iter->FragPairVec.rbegin()->gPos;
+				//printf("%lld - %lld (len=%d)\n", gPos, gPosEnd, gPosEnd - gPos);
+			}
+			for (; gPos < gPosEnd; gPos++)
+			{
+				if (MappingRecordArr[gPos].multi_hit < MaxAlleleCount) MappingRecordArr[gPos].multi_hit++;
+			}
 		}
 	}
 }

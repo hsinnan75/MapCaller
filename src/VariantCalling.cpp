@@ -623,63 +623,25 @@ void *IdentifyVariants(void *arg)
 				}
 			}
 		}
-		if (bNormal == false)
+		if (cov == 0 && MappingRecordArr[gPos].multi_hit == 0) bNormal=false, gap++;
+		else if(gap > 0)
 		{
-			if (gap > 0)
+			if (gap > MinUnmappedSize)
 			{
-				Variant.VarType = var_UMR;
-				Variant.gPos = gPos - gap; Variant.DP = gap;
-				gap = 0; MyVariantVec.push_back(Variant);
+				Variant.VarType = var_UMR; 	Variant.gPos = gPos - gap; Variant.DP = gap;
+				MyVariantVec.push_back(Variant);
 			}
-			if (dup > 0)
-			{
-				Variant.VarType = var_CNV;
-				Variant.gPos = gPos - dup; Variant.DP = dup;
-				dup = 0; MyVariantVec.push_back(Variant);
-			}
+			gap = 0;
 		}
-		if (bNormal)
+		if (cov == 0 && MappingRecordArr[gPos].multi_hit > 0) bNormal = false, dup++;
+		else if (dup > 0)
 		{
-			if (cov == 0)
+			if (dup > MinCNVsize)
 			{
-				if ((int)MappingRecordArr[gPos].multi_hit > MinAlleleDepth)
-				{
-					if (gap > 0)
-					{
-						Variant.VarType = var_UMR;
-						Variant.gPos = gPos - gap; Variant.DP = gap;
-						gap = 0; MyVariantVec.push_back(Variant);
-					}
-					bNormal = false; dup++;
-					//printf("gPos=%d, dup=%d\n", gPos, dup);
-				}
-				else if ((int)MappingRecordArr[gPos].multi_hit == 0)
-				{
-					if (dup > 0)
-					{
-						Variant.VarType = var_CNV; 
-						Variant.gPos = gPos - dup; Variant.DP = dup; 
-						dup = 0; MyVariantVec.push_back(Variant);
-					}
-					bNormal = false; gap++;
-					//printf("gPos=%d, umr=%d\n", gPos, gap);
-				}
+				Variant.VarType = var_CNV; Variant.gPos = gPos - dup; Variant.DP = dup;
+				MyVariantVec.push_back(Variant);
 			}
-			else
-			{
-				if (gap > 0)
-				{
-					Variant.VarType = var_UMR;
-					Variant.gPos = gPos - gap; Variant.DP = gap;
-					gap = 0; MyVariantVec.push_back(Variant);
-				}
-				if (dup > 0)
-				{
-					Variant.VarType = var_CNV;
-					Variant.gPos = gPos - dup; Variant.DP = dup;
-					dup = 0; MyVariantVec.push_back(Variant);
-				}
-			}
+			dup = 0; 
 		}
 		if (bGVCF && bNormal && cov > 0)
 		{
@@ -699,6 +661,7 @@ void *IdentifyVariants(void *arg)
 			Variant.AD_ref = GetRefCount(ref_base, gPos);
 			MyVariantVec.push_back(Variant);
 		}
+		//printf("%lld: cov=%d, cnv=%d, umr=%d\n", gPos, cov, dup, gap); ShowProfileColumn(gPos);
 	}
 	if ((n = (int)MyVariantVec.size()) > 0)
 	{

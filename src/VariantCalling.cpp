@@ -708,7 +708,7 @@ void VariantCalling()
 	fprintf(log, "Identify all variants (min_alt_allele_depth=%d)...\n", MinAlleleDepth); fflush(stderr);
 	fprintf(stderr, "Identify all variants (min_alt_allele_depth=%d)...\n", MinAlleleDepth); fflush(stderr);
 
-	//iThreadNum = 1;
+	iThreadNum = 1;
 	for (i = 0; i < iThreadNum; i++) pthread_create(&ThreadArr[i], NULL, IdentifyVariants, &ThrIDarr[i]);
 	for (i = 0; i < iThreadNum; i++) pthread_join(ThreadArr[i], NULL);
 	if (bGVCF) RemoveConsecutiveGenomicVariant();

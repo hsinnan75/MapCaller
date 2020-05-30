@@ -419,7 +419,7 @@ void GeneratePairedSamStream(ReadItem_t& read1, ReadItem_t& read2, vector<string
 				}
 				CIGAR = GenerateCIGARstring(read1.rlen, read1.AlnCanVec[i].orientation, read1.AlnCanVec[i].FragPairVec);
 				coor1 = GetAlnCoordinate(read1.AlnCanVec[i].orientation, read1.AlnCanVec[i].FragPairVec);
-				if ((j = read1.AlnCanVec[i].PairedAlnCanIdx) != -1 && read2.AlnCanVec[j].score == read2.AlnSummary.score)
+				if ((j = read1.AlnCanVec[i].PairedAlnCanIdx) != -1 && read2.AlnSummary.score > 0 && read2.AlnCanVec[j].score == read2.AlnSummary.score)
 				{
 					coor2 = GetAlnCoordinate(read2.AlnCanVec[j].orientation, read2.AlnCanVec[j].FragPairVec);
 					dist = (int)(coor2.gPos - coor1.gPos + (read1.AlnCanVec[i].orientation ? read2.rlen : 0 - read1.rlen));
@@ -467,7 +467,7 @@ void GeneratePairedSamStream(ReadItem_t& read1, ReadItem_t& read2, vector<string
 				}
 				CIGAR = GenerateCIGARstring(read2.rlen, read2.AlnCanVec[j].orientation, read2.AlnCanVec[j].FragPairVec);
 				coor2 = GetAlnCoordinate(read2.AlnCanVec[j].orientation, read2.AlnCanVec[j].FragPairVec);
-				if ((i = read2.AlnCanVec[j].PairedAlnCanIdx) != -1 && read1.AlnCanVec[i].score == read1.AlnSummary.score)
+				if ((i = read2.AlnCanVec[j].PairedAlnCanIdx) != -1 && read1.AlnSummary.score > 0 && read1.AlnCanVec[i].score == read1.AlnSummary.score)
 				{
 					coor1 = GetAlnCoordinate(read1.AlnCanVec[i].orientation, read1.AlnCanVec[i].FragPairVec);
 					dist = 0 - (int)(coor2.gPos - coor1.gPos + (read1.AlnCanVec[i].orientation ? read2.rlen : 0 - read1.rlen));

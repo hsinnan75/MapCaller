@@ -9,7 +9,7 @@ extern "C"
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.37";
+const char* VersionStr = "0.9.9.38";
 
 string CmdLine;
 int iChromsomeNum;

@@ -156,11 +156,11 @@ void ShowMetaInfo()
 	fprintf(outFile, "##FORMAT=<ID=GQ,Number=1,Type=Integer,Description=\"Genotype Quality\">\n");
 	fprintf(outFile, "##FILTER=<ID=PASS,Description=\"All filters passed\">\n");
 	//fprintf(outFile, "##FILTER=<ID=LowDepth,Description=\"Read depth < %d\">\n", MinReadDepth);
-	fprintf(outFile, "##FILTER=<ID=Ref,Description=\"Genotyping model thinks this site is reference.\">\n");
+	fprintf(outFile, "##FILTER=<ID=REF,Description=\"Genotyping model thinks this site is reference.\">\n");
 	fprintf(outFile, "##FILTER=<ID=BreakPoint,Description=\"It is predicted as a breakpoint\">\n");
 	fprintf(outFile, "##FILTER=<ID=DUP,Description=\"Duplicated regions(>=%dbp).\">\n", MinCNVsize);
 	fprintf(outFile, "##FILTER=<ID=Gaps,Description=\"Region without any read alignment(>=%dbp).\">\n", MinUnmappedSize);
-	if (bFilter) fprintf(outFile, "##FILTER=<ID=q10,Description=\"Confidence score below 10\">\n");
+	fprintf(outFile, "##FILTER=<ID=q10,Description=\"Confidence score below 10\">\n");
 	if (bFilter) fprintf(outFile, "##FILTER=<ID=bad_haplotype,Description=\"Variants with variable frequencies on same haplotype\">\n");
 	if (bFilter) fprintf(outFile, "##FILTER=<ID=str_contraction,Description=\"Variant appears in repetitive region\">\n");
 	for (int i = 0; i < iChromsomeNum; i++) fprintf(outFile, "##contig=<ID=%s,length=%d>\n", ChromosomeVec[i].name, ChromosomeVec[i].len);

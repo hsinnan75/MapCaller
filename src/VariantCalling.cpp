@@ -16,7 +16,7 @@
 #define var_MON	11 // monomorphic
 #define var_NIL 255
 
-const char* GenotypeLabel[] = {"*", "0", "1", "0|0", "0|1", "1|1", "1|2"};
+const char* GenotypeLabel[] = {"*", "0", "1", "0/0", "0/1", "1/1", "1/2"};
 
 typedef struct
 {
@@ -142,16 +142,18 @@ void ShowMetaInfo()
 	fprintf(outFile, "##reference=%s\n", (RefFileName != NULL ? RefFileName: IndexFileName));
 	fprintf(outFile, "##source=MapCaller %s\n", VersionStr);
 	fprintf(outFile, "##command_line=\"%s\"\n", CmdLine.c_str());
+	fprintf(outFile, "##ALT=<ID=NON_REF,Description=\"Represents any possible alternative allele at this location\">");
 	fprintf(outFile, "##INFO=<ID=RC,Number=1,Type=Integer,Description=\"Number of reads with start coordinate at this position.\">\n");
 	fprintf(outFile, "##INFO=<ID=NTFREQ,Number=4,Type=Integer,Description=\"base depth\">\n");
 	fprintf(outFile, "##INFO=<ID=END,Number=1,Type=Integer,Description=\"Last position(inclusive) of the reported block\">\n");
 	fprintf(outFile, "##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Read depth\">\n");
 	fprintf(outFile, "##INFO=<ID=TYPE,Number=A,Type=String,Description=\"The type of allele, either snv, ins, del, or BP(breakpoint).\">\n");
-	if (bGVCF) fprintf(outFile, "##INFO=<ID=MIN_DP,Number=1,Type=Integer,Description=\"Minimum depth in gVCF output block.\">\n");
 	fprintf(outFile, "##FORMAT=<ID=AD,Number=R,Type=Integer,Description=\"Allelic depths for the ref and alt alleles in the order listed\">\n");
-	fprintf(outFile, "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read depth\">\n");
+	fprintf(outFile, "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Approximate read depth\">\n");
 	fprintf(outFile, "##FORMAT=<ID=AF,Number=A,Type=Float,Description=\"Allele fractions of alternate alleles\">\n");
 	fprintf(outFile, "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n");
+	fprintf(outFile, "##FORMAT=<ID=PL,Number=G,Type=Integer,Description=\"Normalized, Phred - scaled likelihoods for genotypes as defined in the VCF specification\">");
+	if (bGVCF) fprintf(outFile, "##FORMAT=<ID=MIN_DP,Number=1,Type=Integer,Description=\"Minimum depth in gVCF output block.\">\n");
 	fprintf(outFile, "##FORMAT=<ID=F1R2,Number=R,Type=Integer,Description=\"Count of reads in F1R2 pair orientation supporting each allele\">\n");
 	fprintf(outFile, "##FORMAT=<ID=F2R1,Number=R,Type=Integer,Description=\"Count of reads in F2R1 pair orientation supporting each allele\">\n");
 	fprintf(outFile, "##FORMAT=<ID=GQ,Number=1,Type=Integer,Description=\"Genotype Quality\">\n");
@@ -451,12 +453,15 @@ void GenVariantCallingFile()
 		}
 		else if (VariantVec[i].VarType == var_INS)
 		{
+			if(VariantVec[i].ALTstr.length() > 5) continue;
+			
 			VarNumVec[var_INS]++; AlleleFreq = 1.0*VariantVec[i].AD_alt / VariantVec[i].DP;
 			//fprintf(outFile, "%s	%d	.	%c	%c%s	%d	%s	DP=%d;AD=%d;RC=%d;AF=%.3f;GT=%s;TYPE=ins\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], RefSequence[gPos], VariantVec[i].ALTstr.c_str(), VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].AD, (int)MappingRecordArr[gPos].readCount, AlleleFreq, GenotypeLabel[VariantVec[i].GenoType]);
 			fprintf(outFile, "%s	%d	.	%c	%c%s	%d	%s	RC=%d;TYPE=ins	GT:GQ:DP:AD:AF:F1R2:F2R1	%s:%d:%d:%d,%d:%.2f:%d,%d:%d,%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], RefSequence[gPos], VariantVec[i].ALTstr.c_str(), VariantVec[i].qscore, filter_str.c_str(), (int)MappingRecordArr[gPos].readCount, GenotypeLabel[VariantVec[i].GenoType], VariantVec[i].qscore, VariantVec[i].DP, VariantVec[i].AD_ref, VariantVec[i].AD_alt, AlleleFreq, MappingRecordArr[gPos].F1, MappingRecordArr[gPos].R2, MappingRecordArr[gPos].F2, MappingRecordArr[gPos].R1);
 		}
 		else if (VariantVec[i].VarType == var_DEL)
 		{
+			if (VariantVec[i].ALTstr.length() > 5) continue;
 			VarNumVec[var_DEL]++; AlleleFreq = 1.0*VariantVec[i].AD_alt / VariantVec[i].DP;
 			//fprintf(outFile, "%s	%d	.	%c%s	%c	%d	%s	DP=%d;AD=%d;RC=%d;AF=%.3f;GT=%s;TYPE=del\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], VariantVec[i].ALTstr.c_str(), RefSequence[gPos], VariantVec[i].qscore, filter_str.c_str(), VariantVec[i].DP, VariantVec[i].AD, (int)MappingRecordArr[gPos].readCount, AlleleFreq, GenotypeLabel[VariantVec[i].GenoType]);
 			fprintf(outFile, "%s	%d	.	%c%s	%c	%d	%s	RC=%d;TYPE=del	GT:GQ:DP:AD:AF:F1R2:F2R1	%s:%d:%d:%d,%d:%.2f:%d,%d:%d,%d\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], VariantVec[i].ALTstr.c_str(), RefSequence[gPos], VariantVec[i].qscore, filter_str.c_str(), (int)MappingRecordArr[gPos].readCount, GenotypeLabel[VariantVec[i].GenoType], VariantVec[i].qscore, VariantVec[i].DP, VariantVec[i].AD_ref, VariantVec[i].AD_alt, AlleleFreq, MappingRecordArr[gPos].F1, MappingRecordArr[gPos].R2, MappingRecordArr[gPos].F2, MappingRecordArr[gPos].R1);
@@ -627,7 +632,7 @@ void *IdentifyVariants(void *arg)
 		if (cov == 0 && MappingRecordArr[gPos].multi_hit == 0) bNormal=false, gap++;
 		else if(gap > 0)
 		{
-			if (gap > MinUnmappedSize)
+			if (gap >= MinUnmappedSize)
 			{
 				Variant.VarType = var_UMR; 	Variant.gPos = gPos - gap; Variant.DP = gap;
 				MyVariantVec.push_back(Variant);

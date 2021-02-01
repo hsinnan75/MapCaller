@@ -9,7 +9,7 @@ extern "C"
 
 bwt_t *Refbwt;
 bwaidx_t *RefIdx;
-const char* VersionStr = "0.9.9.40";
+const char* VersionStr = "0.9.9.41";
 
 string CmdLine;
 int iChromsomeNum;
@@ -25,7 +25,7 @@ MappingRecord_t* MappingRecordArr = NULL;
 vector<string> ReadFileNameVec1, ReadFileNameVec2;
 int64_t ObservGenomicPos, ObserveBegPos, ObserveEndPos;
 pthread_mutex_t LibraryLock, ProfileLock, OutputLock, VarLock;
-char *RefSequence, *RefFileName, *KnownSiteFileName, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName;
+char *RefSequence, *RefFileName, *KnownSiteFileName, *IndexFileName, *SamFileName, *VcfFileName, *LogFileName, *sample_id;
 int iThreadNum, MaxPosDiff, iPloidy, FragmentSize, MaxClipSize, MinReadDepth, MinAlleleDepth, MinVarConfScore, MinCNVsize, MinUnmappedSize;
 bool bDebugMode, bFilter, bPairEnd, bUnique, bSAMoutput, bSAMFormat, bGVCF, bMonomorphic, bVCFoutput, bSomatic, gzCompressed, FastQFormat, NW_ALG;
 
@@ -60,6 +60,7 @@ void ShowProgramUsage(const char* program)
 	fprintf(stderr, "         -no_vcf       No VCF output [false]\n");
 	fprintf(stderr, "         -p            paired-end reads are interlaced in the same file\n");
 	fprintf(stderr, "         -filter       apply variant filters (under test) [false]\n");
+	fprintf(stderr, "         -id STR       assign sample id\n");
 	fprintf(stderr, "         -v            version\n");
 	fprintf(stderr, "\n");
 }
@@ -183,6 +184,7 @@ int main(int argc, char* argv[])
 	MinVarConfScore = 10;
 	MinUnmappedSize = 50;
 	MaxMisMatchRate = 0.05;
+	sample_id = (char*)"unknown";
 	LogFileName = (char*)"job.log";
 	VcfFileName = (char*)"output.vcf";
 	ObservGenomicPos = ObserveBegPos = ObserveEndPos = -1;
@@ -241,6 +243,8 @@ int main(int argc, char* argv[])
 				else fprintf(stderr, "Warning! The PCR-duplicate range is [1-15]!\n");
 			}
 			else if (parameter == "-filter") bFilter = true;
+			else if (parameter == "-id" && i + 1 < argc) sample_id = argv[++i];
+			else if (parameter == "-label" && i + 1 < argc) sample_id = argv[++i];
 			else if (parameter == "-size" && i + 1 < argc) FragmentSize = atoi(argv[++i]);
 			else if (parameter == "-indel" && i + 1 < argc)
 			{

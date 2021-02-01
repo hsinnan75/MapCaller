@@ -152,7 +152,7 @@ void ShowMetaInfo()
 	fprintf(outFile, "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Approximate read depth\">\n");
 	fprintf(outFile, "##FORMAT=<ID=AF,Number=A,Type=Float,Description=\"Allele fractions of alternate alleles\">\n");
 	fprintf(outFile, "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n");
-	fprintf(outFile, "##FORMAT=<ID=PL,Number=G,Type=Integer,Description=\"Normalized, Phred - scaled likelihoods for genotypes as defined in the VCF specification\">");
+	fprintf(outFile, "##FORMAT=<ID=PL,Number=G,Type=Integer,Description=\"Normalized, Phred - scaled likelihoods for genotypes as defined in the VCF specification\">\n");
 	if (bGVCF) fprintf(outFile, "##FORMAT=<ID=MIN_DP,Number=1,Type=Integer,Description=\"Minimum depth in gVCF output block.\">\n");
 	fprintf(outFile, "##FORMAT=<ID=F1R2,Number=R,Type=Integer,Description=\"Count of reads in F1R2 pair orientation supporting each allele\">\n");
 	fprintf(outFile, "##FORMAT=<ID=F2R1,Number=R,Type=Integer,Description=\"Count of reads in F2R1 pair orientation supporting each allele\">\n");

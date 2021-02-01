@@ -142,7 +142,7 @@ void ShowMetaInfo()
 	fprintf(outFile, "##reference=%s\n", (RefFileName != NULL ? RefFileName: IndexFileName));
 	fprintf(outFile, "##source=MapCaller %s\n", VersionStr);
 	fprintf(outFile, "##command_line=\"%s\"\n", CmdLine.c_str());
-	fprintf(outFile, "##ALT=<ID=NON_REF,Description=\"Represents any possible alternative allele at this location\">");
+	fprintf(outFile, "##ALT=<ID=NON_REF,Description=\"Represents any possible alternative allele at this location\">\n");
 	fprintf(outFile, "##INFO=<ID=RC,Number=1,Type=Integer,Description=\"Number of reads with start coordinate at this position.\">\n");
 	fprintf(outFile, "##INFO=<ID=NTFREQ,Number=4,Type=Integer,Description=\"base depth\">\n");
 	fprintf(outFile, "##INFO=<ID=END,Number=1,Type=Integer,Description=\"Last position(inclusive) of the reported block\">\n");

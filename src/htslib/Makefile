@@ -38,7 +38,7 @@ EXTRA_CFLAGS_PIC = -fpic
 LDFLAGS  =
 LIBS     = $(htslib_default_libs)
 
-prefix      = /usr/local
+prefix      = 
 exec_prefix = $(prefix)
 bindir      = $(exec_prefix)/bin
 includedir  = $(prefix)/include

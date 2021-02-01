@@ -469,27 +469,27 @@ void GenVariantCallingFile()
 		else if (VariantVec[i].VarType == var_TNL)
 		{
 			VarNumVec[var_TNL]++;
-			fprintf(outFile, "%s	%d	.	%c	<TNL>	30	BreakPoint	TYPE=BP	GT:GQ:DP:AD	.:.:.:.\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos]);
+			fprintf(outFile, "%s	%d	.	%c	<TNL>	30	BreakPoint	TYPE=BP	GT:GQ:DP:AD	.:.:0:.\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos]);
 		}
 		else if (VariantVec[i].VarType == var_INV)
 		{
 			VarNumVec[var_INV]++;
-			fprintf(outFile, "%s	%d	.	%c	<INV>	30	BreakPoint	TYPE=BP	GT:GQ:DP:AD	.:.:.:.\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos]);
+			fprintf(outFile, "%s	%d	.	%c	<INV>	30	BreakPoint	TYPE=BP	GT:GQ:DP:AD	.:.:0:.\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos]);
 		}
 		else if (VariantVec[i].VarType == var_CNV)
 		{
 			//gPosEnd = ChromosomeVec[coor.ChromosomeIdx].FowardLocation + ChromosomeVec[coor.ChromosomeIdx].len - 1;
-			if (VariantVec[i].DP >= MinCNVsize) fprintf(outFile, "%s	%d	.	%c	<*>	0	DUP	END=%d	GT:GQ:DP:AD	.:.:.:.\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)(coor.gPos + VariantVec[i].DP - 1));
+			if (VariantVec[i].DP >= MinCNVsize) fprintf(outFile, "%s	%d	.	%c	<*>	0	DUP	END=%d	GT:GQ:DP:AD	.:.:0:.\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)(coor.gPos + VariantVec[i].DP - 1));
 		}
 		else if (VariantVec[i].VarType == var_UMR)
 		{
-			if(VariantVec[i].DP >= MinUnmappedSize) fprintf(outFile, "%s	%d	.	%c	<*>	0	Gaps	END=%d	GT:GQ:DP:AD	.:.:.:.\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)(coor.gPos + VariantVec[i].DP - 1));
+			if(VariantVec[i].DP >= MinUnmappedSize) fprintf(outFile, "%s	%d	.	%c	<*>	0	Gaps	END=%d	GT:GQ:DP:AD	.:.:0:.\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)(coor.gPos + VariantVec[i].DP - 1));
 		}
 		else if (VariantVec[i].VarType == var_NOR)
 		{
 			gPosEnd = ChromosomeVec[coor.ChromosomeIdx].FowardLocation + ChromosomeVec[coor.ChromosomeIdx].len - 1;
 			if (i + 1 < iTotalVarNum && VariantVec[i + 1].gPos < gPosEnd) gPosEnd = VariantVec[i + 1].gPos - 1;
-			fprintf(outFile, "%s	%d	.	%c	<*>	0	REF	END=%d;DP=%d;MIN_DP=%d	GT:GQ:DP:AD	.:.:.:.\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)DetermineCoordinate(gPosEnd).gPos, VariantVec[i].DP, VariantVec[i].AD_alt);
+			fprintf(outFile, "%s	%d	.	%c	<*>	0	REF	END=%d;DP=%d;MIN_DP=%d	GT:GQ:DP:AD	.:.:0:.\n", ChromosomeVec[coor.ChromosomeIdx].name, (int)coor.gPos, RefSequence[gPos], (int)DetermineCoordinate(gPosEnd).gPos, VariantVec[i].DP, VariantVec[i].AD_alt);
 		}
 		else if (VariantVec[i].VarType == var_MON)
 		{
